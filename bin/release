@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# bin/release <build-dir>
+
+cat <<EOF
+---
+config_vars:
+  PATH: .sbt:/usr/local/bin:/usr/bin:/bin
+  JETTY_HOME: .jetty
+EOF
