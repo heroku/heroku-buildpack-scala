@@ -31,13 +31,9 @@ fi
 
 # build app
 echo "-----> Building app with SBT"
-BUILD_CMD="clean update package"
-if [ -f .build ]; then
-BUILD_CMD=`cat .build`
-fi
-echo "-----> executing sbt $BUILD_CMD"
+echo "-----> executing sbt package"
 
-java -Xmx512M -Duser.home=$BUILD_DIR -jar .sbt/sbt-launch-0.7.5.jar $BUILD_CMD 2>&1 | sed -u 's/^/       /'
+java -Xmx512M -Duser.home=$BUILD_DIR -jar .sbt/sbt-launch-0.7.5.jar package 2>&1 | sed -u 's/^/       /'
 if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   echo " !     Failed to build app with SBT"
   exit 1
