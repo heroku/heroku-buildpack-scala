@@ -31,9 +31,9 @@ fi
 
 # build app
 echo "-----> Building app with SBT"
-echo "-----> executing sbt heroku"
+echo "-----> executing sbt clean clean-lib update push"
 
-java -Xmx512M -Duser.home=$BUILD_DIR -jar .sbt/sbt-launch-0.7.5.jar clean clean-lib update heroku 2>&1 | sed -u 's/^/       /'
+java -Xmx512M -Duser.home=$BUILD_DIR -jar .sbt/sbt-launch-0.7.5.jar clean clean-lib update push 2>&1 | sed -u 's/^/       /'
 if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   echo " !     Failed to build app with SBT"
   exit 1
