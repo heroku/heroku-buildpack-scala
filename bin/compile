@@ -31,9 +31,9 @@ fi
 
 # build app
 echo "-----> Building app with SBT"
-echo "-----> executing sbt clean clean-lib update push"
+echo "-----> executing sbt clean clean-lib update package (with java system property production=true)"
 
-java -Xmx512M -Duser.home=$BUILD_DIR -jar .sbt/sbt-launch-0.7.5.jar clean clean-lib update push 2>&1 | sed -u 's/^/       /'
+java -Xmx1024M -Dproduction=true -Duser.home=$BUILD_DIR -jar .sbt/sbt-launch-0.7.5.jar clean clean-lib update package 2>&1 | sed -u 's/^/       /'
 if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   echo " !     Failed to build app with SBT"
   exit 1
