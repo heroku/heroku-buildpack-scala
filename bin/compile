@@ -4,6 +4,8 @@
 # fail fast
 set -e
 
+BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
+
 # parse args
 BUILD_DIR=$1
 CACHE_DIR=$2
@@ -28,6 +30,15 @@ if [ ! -d .sbt ]; then
   chmod +x .sbt/sbt
   echo " done"
 fi
+
+if [ ! -d .opt ]; then
+  mkdir .opt
+  mkdir .opt/bin
+fi
+
+cp $BIN_DIR/../opt/environment .opt/bin
+cp $BIN_DIR/../opt/jdyno .opt/bin
+cp $BIN_DIR/../opt/sbt .opt/bin
 
 # build app
 echo "-----> Building app with SBT"

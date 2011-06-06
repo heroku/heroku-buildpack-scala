@@ -4,6 +4,9 @@
 cat <<EOF
 ---
 config_vars:
-  PATH: .sbt:/usr/local/bin:/usr/bin:/bin
+  PATH: .opt/bin:.sbt:/usr/local/bin:/usr/bin:/bin
   JETTY_HOME: .jetty
+addons:
+  shared-database:5mb
+
 EOF
