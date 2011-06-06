@@ -37,7 +37,7 @@ if [ ! -d .opt ]; then
 fi
 
 cp $BIN_DIR/../opt/environment .opt/bin
-cp $BIN_DIR/../opt/jdyno .opt/bin
+cp $BIN_DIR/../opt/java .opt/bin
 cp $BIN_DIR/../opt/sbt .opt/bin
 
 # build app
