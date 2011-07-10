@@ -3,6 +3,8 @@
 
 if [ -f $1/project/build.properties ]; then
   echo "Scala" && exit 0
+elif [ -f $1/build.sbt ]; then
+  echo "Scala (sbt > 0.10.0)" && exit 0
 else
   echo "no" && exit 1
 fi

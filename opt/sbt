@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-
-BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
-
-source $BIN_DIR/environment
-
-/usr/bin/java -Xmx512m -jar -Dproduction=true $BIN_DIR/../../.sbt/sbt-launch-0.7.5.jar "$@"

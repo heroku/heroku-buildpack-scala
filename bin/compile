@@ -7,14 +7,14 @@ set -e
 BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
 
 # parse args
-BUILD_DIR=$1
+BUILD_DIR=$(cd $1; pwd)
 CACHE_DIR=$2
 
 # chdir as sbt expects
 cd $BUILD_DIR
 
 # unpack cache
-for DIR in ".ivy2" ".sbt" ".jetty"; do
+for DIR in ".ivy2" ".sbt"; do
   rm -rf $DIR
   if [ -d $CACHE_DIR/$DIR ]; then
     cp -r $CACHE_DIR/$DIR $DIR
@@ -22,29 +22,30 @@ for DIR in ".ivy2" ".sbt" ".jetty"; do
 done
 
 # install sbt with base repository
-SBT_URL="http://s3.amazonaws.com/sclasen-langpack-scala/sbt-01.tar.gz"
+SBT_VERSION="0.7.7"
+SBT_JAR="sbt-launch-$SBT_VERSION.jar"
+SBT_URL="http://s3.amazonaws.com/sclasen-langpack-scala/$SBT_JAR"
+
+if [ ! -d .ivy2/cache ]; then  
+   mkdir -p .ivy2/cache
+fi
 
 if [ ! -d .sbt ]; then
-  echo -n "-----> Installing SBT..."
-  curl --silent --max-time 60 --location $SBT_URL | tar xz
-  chmod +x .sbt/sbt
+  mkdir .sbt
+  cd .sbt
+  echo -n "-----> Installing SBT from $SBT_URL..."
+  curl --silent --max-time 60 -O --location $SBT_URL
+  cd $BUILD_DIR
   echo " done"
 fi
 
-if [ ! -d .opt ]; then
-  mkdir .opt
-  mkdir .opt/bin
-fi
-
-cp $BIN_DIR/../opt/environment .opt/bin
-cp $BIN_DIR/../opt/java .opt/bin
-cp $BIN_DIR/../opt/sbt .opt/bin
+#copy the sbt script (do this every time so we can change it if necessary)
+cp $BIN_DIR/../opt/sbt-$SBT_VERSION .sbt/sbt
 
 # build app
 echo "-----> Building app with SBT"
-echo "-----> executing sbt clean clean-lib update package (with java system property production=true)"
-
-java -Xmx1024M -Dproduction=true -Duser.home=$BUILD_DIR -jar .sbt/sbt-launch-0.7.5.jar clean clean-lib update package 2>&1 | sed -u 's/^/       /'
+echo "-----> executing sbt clean clean-lib update package"
+java -Xmx1024M -Duser.home=$BUILD_DIR -jar .sbt/$SBT_JAR clean clean-lib update package 2>&1 | sed -u 's/^/       /'
 if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   echo " !     Failed to build app with SBT"
   exit 1
@@ -52,7 +53,10 @@ fi
 
 # repack cache
 mkdir -p $CACHE_DIR
-for DIR in ".ivy2" ".sbt" ".jetty"; do
+for DIR in ".ivy2" ".sbt" ; do
   rm -rf $CACHE_DIR/$DIR
   cp -r $DIR $CACHE_DIR/$DIR
 done
+
+
+
