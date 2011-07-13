@@ -10,11 +10,14 @@ BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
 BUILD_DIR=$(cd $1; pwd)
 CACHE_DIR=$2
 
+# name of the .sbt directory
+SBT_HOME=".sbt_home"
+
 # chdir as sbt expects
 cd $BUILD_DIR
 
 # unpack cache
-for DIR in ".ivy2" ".sbt"; do
+for DIR in ".ivy2" "$SBT_HOME"; do
   rm -rf $DIR
   if [ -d $CACHE_DIR/$DIR ]; then
     cp -r $CACHE_DIR/$DIR $DIR
@@ -44,9 +47,9 @@ if [ ! -d .ivy2/cache ]; then
    mkdir -p .ivy2/cache
 fi
 
-if [ ! -f .sbt/"$SBT_JAR" ]; then
-  mkdir -p .sbt
-  cd .sbt
+if [ ! -f "$SBT_HOME"/"$SBT_JAR" ]; then
+  mkdir -p "$SBT_HOME"
+  cd "$SBT_HOME"
 
   ## clean up any old versions
   /bin/rm sbt sbt-launch-*.jar || true
@@ -74,13 +77,13 @@ fi
 
 #copy the sbt script (do this every time so we can change it if necessary,
 #for example if switching sbt version, or just updates to the script)
-cp $BIN_DIR/../opt/sbt-$SBT_VERSION .sbt/sbt
-cp $BIN_DIR/../opt/sbt-$SBT_VERSION.boot.properties .sbt/sbt.boot.properties
+cp $BIN_DIR/../opt/sbt-$SBT_VERSION "$SBT_HOME"/sbt
+cp $BIN_DIR/../opt/sbt-$SBT_VERSION.boot.properties "$SBT_HOME"/sbt.boot.properties
 
 # build app
 echo "-----> Building app with SBT"
 echo "-----> executing sbt $SBT_TASKS"
-java -Xmx1024M -Duser.home=$BUILD_DIR -Dsbt.boot.properties=.sbt/sbt.boot.properties -jar .sbt/$SBT_JAR $SBT_TASKS 2>&1 | sed -u 's/^/       /'
+java -Xmx1024M -Duser.home=$BUILD_DIR -Dsbt.boot.properties=.sbt/sbt.boot.properties -jar "$SBT_HOME"/$SBT_JAR $SBT_TASKS 2>&1 | sed -u 's/^/       /'
 if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   echo " !     Failed to build app with SBT $SBT_VERSION"
   exit 1
@@ -88,10 +91,9 @@ fi
 
 # repack cache
 mkdir -p $CACHE_DIR
-for DIR in ".ivy2" ".sbt" ; do
+for DIR in ".ivy2" "$SBT_HOME" ; do
   rm -rf $CACHE_DIR/$DIR
   cp -r $DIR $CACHE_DIR/$DIR
 done
-
 
 
