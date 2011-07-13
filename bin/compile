@@ -44,7 +44,7 @@ if [ ! -d .ivy2/cache ]; then
    mkdir -p .ivy2/cache
 fi
 
-if [ ! -d .sbt ]; then
+if [ ! -f .sbt/"$SBT_JAR" ]; then
   mkdir .sbt
   cd .sbt
   echo -n "-----> Installing SBT from $SBT_URL..."
@@ -67,7 +67,8 @@ if [ ! -d .sbt ]; then
   echo " done"
 fi
 
-#copy the sbt script (do this every time so we can change it if necessary)
+#copy the sbt script (do this every time so we can change it if necessary,
+#for example if switching sbt version, or just updates to the script)
 cp $BIN_DIR/../opt/sbt-$SBT_VERSION .sbt/sbt
 cp $BIN_DIR/../opt/sbt-$SBT_VERSION.boot.properties .sbt/sbt.boot.properties
 
