@@ -45,8 +45,12 @@ if [ ! -d .ivy2/cache ]; then
 fi
 
 if [ ! -f .sbt/"$SBT_JAR" ]; then
-  mkdir .sbt
+  mkdir -p .sbt
   cd .sbt
+
+  ## clean up any old versions
+  /bin/rm sbt sbt-launch-*.jar || true
+
   echo -n "-----> Installing SBT from $SBT_URL..."
   curl --silent --max-time 60 -O --location $SBT_URL
 
