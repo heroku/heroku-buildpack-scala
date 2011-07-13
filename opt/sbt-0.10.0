@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+/usr/bin/java $SBT_OPTS -jar `dirname $0`/sbt-launch-0.10.0.jar "$@"

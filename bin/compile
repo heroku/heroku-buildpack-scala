@@ -21,10 +21,24 @@ for DIR in ".ivy2" ".sbt"; do
   fi
 done
 
-# install sbt with base repository
-SBT_VERSION="0.7.7"
-SBT_JAR="sbt-launch-$SBT_VERSION.jar"
-SBT_URL="http://s3.amazonaws.com/sclasen-langpack-scala/$SBT_JAR"
+## Determine SBT version. Only 0.7 and 0.10
+## are currently supported.
+if grep -q 'sbt.version *= *0\.10' project/build.properties ; then
+    echo "-----> Selecting SBT 0.10"
+    SBT_VERSION="0.10.0"
+    SBT_JAR="sbt-launch-$SBT_VERSION.jar"
+    ## FIXME put this on S3
+    SBT_URL="http://typesafe.artifactoryonline.com/typesafe/ivy-releases/org.scala-tools.sbt/sbt-launch/0.10.0/sbt-launch.jar"
+    SBT_SHA1="2ce42a3f7d22dcc8507c17569565e9bc855c8e7a"
+    SBT_TASKS="clean package"
+else
+    echo "-----> Selecting SBT 0.7.7"
+    SBT_VERSION="0.7.7"
+    SBT_JAR="sbt-launch-$SBT_VERSION.jar"
+    SBT_URL="http://s3.amazonaws.com/sclasen-langpack-scala/$SBT_JAR"
+    SBT_SHA1="6b5ba879e80a0464c9eaae786bef494e448e6df7"
+    SBT_TASKS="clean clean-lib update package"
+fi
 
 if [ ! -d .ivy2/cache ]; then  
    mkdir -p .ivy2/cache
@@ -35,6 +49,20 @@ if [ ! -d .sbt ]; then
   cd .sbt
   echo -n "-----> Installing SBT from $SBT_URL..."
   curl --silent --max-time 60 -O --location $SBT_URL
+
+  ## some of the downloads don't have the version in the name,
+  ## fix it.
+  if [ -f "sbt-launch.jar" ] ; then
+      mv "sbt-launch.jar" "$SBT_JAR"
+  fi
+
+  ## verify SHA1
+  FOUND_SHA1=`sha1sum $SBT_JAR`
+  if test "$SBT_SHA1" != "$FOUND_SHA1" ; then
+      echo " !     Expected SHA1 $SBT_SHA1 but found $FOUND_SHA1 for $SBT_JAR from $SBT_URL"
+      exit 1
+  fi
+
   cd $BUILD_DIR
   echo " done"
 fi
@@ -45,10 +73,10 @@ cp $BIN_DIR/../opt/sbt-$SBT_VERSION.boot.properties .sbt/sbt.boot.properties
 
 # build app
 echo "-----> Building app with SBT"
-echo "-----> executing sbt clean clean-lib update package"
-java -Xmx1024M -Duser.home=$BUILD_DIR -Dsbt.boot.properties=.sbt/sbt.boot.properties -jar .sbt/$SBT_JAR clean clean-lib update package 2>&1 | sed -u 's/^/       /'
+echo "-----> executing sbt $SBT_TASKS"
+java -Xmx1024M -Duser.home=$BUILD_DIR -Dsbt.boot.properties=.sbt/sbt.boot.properties -jar .sbt/$SBT_JAR $SBT_TASKS 2>&1 | sed -u 's/^/       /'
 if [ "${PIPESTATUS[*]}" != "0 0" ]; then
-  echo " !     Failed to build app with SBT"
+  echo " !     Failed to build app with SBT $SBT_VERSION"
   exit 1
 fi
 
