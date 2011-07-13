@@ -61,9 +61,10 @@ if [ ! -f .sbt/"$SBT_JAR" ]; then
   fi
 
   ## verify SHA1
-  FOUND_SHA1=`sha1sum $SBT_JAR`
+  FOUND_SHA1=`sha1sum $SBT_JAR | cut -d ' ' -f 1`
   if test "$SBT_SHA1" != "$FOUND_SHA1" ; then
-      echo " !     Expected SHA1 $SBT_SHA1 but found $FOUND_SHA1 for $SBT_JAR from $SBT_URL"
+      echo " failed"
+      echo " !     Expected SHA1 \"$SBT_SHA1\" but found \"$FOUND_SHA1\" for $SBT_JAR from $SBT_URL"
       exit 1
   fi
 
