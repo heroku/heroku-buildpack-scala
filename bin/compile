@@ -41,11 +41,12 @@ fi
 
 #copy the sbt script (do this every time so we can change it if necessary)
 cp $BIN_DIR/../opt/sbt-$SBT_VERSION .sbt/sbt
+cp $BIN_DIR/../opt/sbt-$SBT_VERSION.boot.properties .sbt/sbt.boot.properties
 
 # build app
 echo "-----> Building app with SBT"
 echo "-----> executing sbt clean clean-lib update package"
-java -Xmx1024M -Duser.home=$BUILD_DIR -jar .sbt/$SBT_JAR clean clean-lib update package 2>&1 | sed -u 's/^/       /'
+java -Xmx1024M -Duser.home=$BUILD_DIR -Dsbt.boot.properties=.sbt/sbt.boot.properties -jar .sbt/$SBT_JAR clean clean-lib update package 2>&1 | sed -u 's/^/       /'
 if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   echo " !     Failed to build app with SBT"
   exit 1
