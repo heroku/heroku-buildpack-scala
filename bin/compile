@@ -59,7 +59,7 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   cd "$SBT_BINDIR"
 
   ## clean up any old versions
-  /bin/rm sbt sbt-launch-*.jar || true
+  /bin/rm -f sbt sbt-launch-*.jar || true
 
   echo -n "-----> Installing SBT from $SBT_URL..."
   curl --silent --max-time 60 -O --location $SBT_URL
