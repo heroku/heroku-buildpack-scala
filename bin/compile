@@ -30,8 +30,17 @@ for DIR in ".ivy2" "$SBT_USER_HOME"; do
 done
 
 ## Determine SBT version. Only 0.7 and 0.10
-## are currently supported.
-if grep -q 'sbt.version *= *0\.10' project/build.properties ; then
+## are currently supported. Easiest to check for 0.7
+## since it requires build.properties to exist.
+if test -e project/build.properties && \
+   ! grep -q 'sbt.version *= *0\.10' project/build.properties ; then
+    echo "-----> Selecting SBT 0.7.7"
+    SBT_VERSION="0.7.7"
+    SBT_JAR="sbt-launch-$SBT_VERSION.jar"
+    SBT_URL="http://s3.amazonaws.com/sclasen-langpack-scala/$SBT_JAR"
+    SBT_SHA1="6b5ba879e80a0464c9eaae786bef494e448e6df7"
+    SBT_TASKS="clean clean-lib update package"
+else
     echo "-----> Selecting SBT 0.10"
     SBT_VERSION="0.10.0"
     SBT_JAR="sbt-launch-$SBT_VERSION.jar"
@@ -39,13 +48,6 @@ if grep -q 'sbt.version *= *0\.10' project/build.properties ; then
     SBT_URL="http://typesafe.artifactoryonline.com/typesafe/ivy-releases/org.scala-tools.sbt/sbt-launch/0.10.0/sbt-launch.jar"
     SBT_SHA1="2ce42a3f7d22dcc8507c17569565e9bc855c8e7a"
     SBT_TASKS="clean package"
-else
-    echo "-----> Selecting SBT 0.7.7"
-    SBT_VERSION="0.7.7"
-    SBT_JAR="sbt-launch-$SBT_VERSION.jar"
-    SBT_URL="http://s3.amazonaws.com/sclasen-langpack-scala/$SBT_JAR"
-    SBT_SHA1="6b5ba879e80a0464c9eaae786bef494e448e6df7"
-    SBT_TASKS="clean clean-lib update package"
 fi
 
 if [ ! -d .ivy2/cache ]; then
