@@ -14,7 +14,7 @@ CACHE_DIR=$2
 # it because otherwise the project root and $HOME
 # are the same, and by default .sbt has a (different)
 # meaning in those two places
-SBT_USER_HOME=".sbt_home"
+SBT_USER_HOME="$BUILD_DIR/.sbt_home"
 # where we put the SBT binaries
 SBT_BINDIR="$SBT_USER_HOME"/bin
 
