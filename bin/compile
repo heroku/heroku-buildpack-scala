@@ -14,7 +14,8 @@ CACHE_DIR=$2
 # it because otherwise the project root and $HOME
 # are the same, and by default .sbt has a (different)
 # meaning in those two places
-SBT_USER_HOME="$BUILD_DIR/.sbt_home"
+SBT_USER_HOME=".sbt_home"
+SBT_USER_HOME_ABSOLUTE="$BUILD_DIR/$SBT_USER_HOME"
 # where we put the SBT binaries
 SBT_BINDIR="$SBT_USER_HOME"/bin
 
@@ -98,7 +99,7 @@ test -e "$BIN_DIR/../opt/$HEROKU_PLUGINS_CONFIG" && mkdir -p "$SBT_USER_HOME/.sb
 echo "-----> Building app with SBT"
 echo "-----> executing sbt $SBT_TASKS"
 test -e "$SBT_BINDIR"/sbt.boot.properties && PROPS_OPTION="-Dsbt.boot.properties=$SBT_BINDIR/sbt.boot.properties"
-java -Xmx1024M -Duser.home="$SBT_USER_HOME" $PROPS_OPTION -jar "$SBT_BINDIR"/$SBT_JAR $SBT_TASKS 2>&1 | sed -u 's/^/       /'
+java -Xmx1024M -Duser.home="$SBT_USER_HOME_ABSOLUTE" $PROPS_OPTION -jar "$SBT_BINDIR"/$SBT_JAR $SBT_TASKS 2>&1 | sed -u 's/^/       /'
 if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   echo " !     Failed to build app with SBT $SBT_VERSION"
   exit 1
