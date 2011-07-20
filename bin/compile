@@ -84,8 +84,8 @@ fi
 
 #copy the sbt script (do this every time so we can change it if necessary,
 #for example if switching sbt version, or just updates to the script)
-cp $BIN_DIR/../opt/sbt-$SBT_VERSION "$SBT_BINDIR"/sbt
-cp $BIN_DIR/../opt/sbt-$SBT_VERSION.boot.properties "$SBT_BINDIR"/sbt.boot.properties
+cp "$BIN_DIR/../opt/sbt-$SBT_VERSION" "$SBT_BINDIR"/sbt
+test -e "$BIN_DIR/../opt/sbt-$SBT_VERSION.boot.properties" && cp $BIN_DIR/../opt/sbt-$SBT_VERSION.boot.properties "$SBT_BINDIR"/sbt.boot.properties
 
 # build app
 echo "-----> Building app with SBT"
