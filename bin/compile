@@ -10,14 +10,19 @@ BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
 BUILD_DIR=$(cd $1; pwd)
 CACHE_DIR=$2
 
-# name of the .sbt directory
-SBT_HOME=".sbt_home"
+# home directory from perspective of SBT; we rename
+# it because otherwise the project root and $HOME
+# are the same, and by default .sbt has a (different)
+# meaning in those two places
+SBT_USER_HOME=".sbt_home"
+# where we put the SBT binaries
+SBT_BINDIR="$SBT_USER_HOME"/bin
 
 # chdir as sbt expects
 cd $BUILD_DIR
 
 # unpack cache
-for DIR in ".ivy2" "$SBT_HOME"; do
+for DIR in ".ivy2" "$SBT_USER_HOME"; do
   rm -rf $DIR
   if [ -d $CACHE_DIR/$DIR ]; then
     cp -r $CACHE_DIR/$DIR $DIR
@@ -43,13 +48,13 @@ else
     SBT_TASKS="clean clean-lib update package"
 fi
 
-if [ ! -d .ivy2/cache ]; then  
+if [ ! -d .ivy2/cache ]; then
    mkdir -p .ivy2/cache
 fi
 
-if [ ! -f "$SBT_HOME"/"$SBT_JAR" ]; then
-  mkdir -p "$SBT_HOME"
-  cd "$SBT_HOME"
+if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
+  mkdir -p "$SBT_BINDIR"
+  cd "$SBT_BINDIR"
 
   ## clean up any old versions
   /bin/rm sbt sbt-launch-*.jar || true
@@ -77,13 +82,13 @@ fi
 
 #copy the sbt script (do this every time so we can change it if necessary,
 #for example if switching sbt version, or just updates to the script)
-cp $BIN_DIR/../opt/sbt-$SBT_VERSION "$SBT_HOME"/sbt
-cp $BIN_DIR/../opt/sbt-$SBT_VERSION.boot.properties "$SBT_HOME"/sbt.boot.properties
+cp $BIN_DIR/../opt/sbt-$SBT_VERSION "$SBT_BINDIR"/sbt
+cp $BIN_DIR/../opt/sbt-$SBT_VERSION.boot.properties "$SBT_BINDIR"/sbt.boot.properties
 
 # build app
 echo "-----> Building app with SBT"
 echo "-----> executing sbt $SBT_TASKS"
-java -Xmx1024M -Duser.home=$BUILD_DIR -Dsbt.boot.properties=.sbt/sbt.boot.properties -jar "$SBT_HOME"/$SBT_JAR $SBT_TASKS 2>&1 | sed -u 's/^/       /'
+java -Xmx1024M -Duser.home="$SBT_USER_HOME" -Dsbt.boot.properties="$SBT_BINDIR"/sbt.boot.properties -jar "$SBT_BINDIR"/$SBT_JAR $SBT_TASKS 2>&1 | sed -u 's/^/       /'
 if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   echo " !     Failed to build app with SBT $SBT_VERSION"
   exit 1
@@ -91,7 +96,7 @@ fi
 
 # repack cache
 mkdir -p $CACHE_DIR
-for DIR in ".ivy2" "$SBT_HOME" ; do
+for DIR in ".ivy2" "$SBT_BINDIR" ; do
   rm -rf $CACHE_DIR/$DIR
   cp -r $DIR $CACHE_DIR/$DIR
 done
