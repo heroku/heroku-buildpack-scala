@@ -42,11 +42,11 @@ if test -e project/build.properties && \
     SBT_TASKS="clean clean-lib update package"
 else
     echo "-----> Selecting SBT 0.10"
-    SBT_VERSION="0.10.0"
+    SBT_VERSION="0.10.1"
     SBT_JAR="sbt-launch-$SBT_VERSION.jar"
     ## FIXME put this on S3
-    SBT_URL="http://typesafe.artifactoryonline.com/typesafe/ivy-releases/org.scala-tools.sbt/sbt-launch/0.10.0/sbt-launch.jar"
-    SBT_SHA1="2ce42a3f7d22dcc8507c17569565e9bc855c8e7a"
+    SBT_URL="http://typesafe.artifactoryonline.com/typesafe/ivy-releases/org.scala-tools.sbt/sbt-launch/$SBT_VERSION/sbt-launch.jar"
+    SBT_SHA1="b41d79cb2d919a0e8732fb8ef4e71347cceea90a"
     SBT_TASKS="clean package"
 fi
 
@@ -102,5 +102,3 @@ for DIR in ".ivy2" "$SBT_BINDIR" ; do
   rm -rf $CACHE_DIR/$DIR
   cp -r $DIR $CACHE_DIR/$DIR
 done
-
-
