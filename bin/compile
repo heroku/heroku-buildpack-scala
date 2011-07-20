@@ -23,7 +23,8 @@ SBT_BINDIR="$SBT_USER_HOME"/bin
 cd $BUILD_DIR
 
 # unpack cache
-for DIR in "$SBT_USER_HOME"/.ivy2 "$SBT_BINDIR"; do
+CACHED_DIRS="$SBT_USER_HOME/.ivy2 $SBT_BINDIR"
+for DIR in $CACHED_DIRS; do
   rm -rf $DIR
   if [ -d $CACHE_DIR/$DIR ]; then
     cp -r $CACHE_DIR/$DIR $DIR
@@ -107,7 +108,7 @@ fi
 
 # repack cache
 mkdir -p $CACHE_DIR
-for DIR in ".ivy2" "$SBT_BINDIR" ; do
+for DIR in $CACHED_DIRS ; do
   rm -rf $CACHE_DIR/$DIR
   cp -r $DIR $CACHE_DIR/$DIR
 done
