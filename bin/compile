@@ -23,7 +23,7 @@ SBT_BINDIR="$SBT_USER_HOME"/bin
 cd $BUILD_DIR
 
 # unpack cache
-for DIR in ".ivy2" "$SBT_USER_HOME"; do
+for DIR in "$SBT_USER_HOME"/.ivy2 "$SBT_BINDIR"; do
   rm -rf $DIR
   if [ -d $CACHE_DIR/$DIR ]; then
     cp -r $CACHE_DIR/$DIR $DIR
