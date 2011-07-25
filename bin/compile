@@ -47,8 +47,7 @@ else
     echo "-----> Selecting SBT 0.10"
     SBT_VERSION="0.10.1"
     SBT_JAR="sbt-launch-$SBT_VERSION.jar"
-    ## FIXME put this on S3
-    SBT_URL="http://typesafe.artifactoryonline.com/typesafe/ivy-releases/org.scala-tools.sbt/sbt-launch/$SBT_VERSION/sbt-launch.jar"
+    SBT_URL="http://s3.amazonaws.com/sclasen-langpack-scala/$SBT_JAR"
     SBT_SHA1="b41d79cb2d919a0e8732fb8ef4e71347cceea90a"
     SBT_TASKS="clean package"
 fi
