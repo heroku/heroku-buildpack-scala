@@ -49,7 +49,10 @@ else
     SBT_JAR="sbt-launch-$SBT_VERSION.jar"
     SBT_URL="http://s3.amazonaws.com/sclasen-langpack-scala/$SBT_JAR"
     SBT_SHA1="b41d79cb2d919a0e8732fb8ef4e71347cceea90a"
-    SBT_TASKS="clean package"
+    ## in 0.10 start-script will depend on package, if packaging
+    ## is required - it may not be, we can run .class files or a package-war
+    ## instead.
+    SBT_TASKS="clean compile ensure-start-script-tasks start-script"
 fi
 
 if [ ! -d .ivy2/cache ]; then
@@ -95,6 +98,9 @@ test -e "$BIN_DIR/../opt/$HEROKU_PLUGIN" && mkdir -p "$SBT_USER_HOME/.sbt/plugin
 
 HEROKU_PLUGINS_CONFIG="heroku-plugins-$SBT_VERSION.sbt"
 test -e "$BIN_DIR/../opt/$HEROKU_PLUGINS_CONFIG" && mkdir -p "$SBT_USER_HOME/.sbt/plugins" && cp "$BIN_DIR/../opt/$HEROKU_PLUGINS_CONFIG" "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG"
+
+START_SCRIPT_PLUGIN="StartScriptPlugin-$SBT_VERSION.scala"
+test -e "$BIN_DIR/../opt/$START_SCRIPT_PLUGIN" && mkdir -p "$SBT_USER_HOME/.sbt/plugins" && cp "$BIN_DIR/../opt/$START_SCRIPT_PLUGIN" "$SBT_USER_HOME/.sbt/plugins/$START_SCRIPT_PLUGIN"
 
 # build app
 echo "-----> Building app with SBT"
