@@ -1,4 +1,4 @@
-package com.typesafe.startScript
+package com.typesafe.startscript
 
 import _root_.sbt._
 
@@ -128,6 +128,13 @@ object StartScriptPlugin extends Plugin {
     val startScriptNotDefined = TaskKey[File]("start-script-not-defined", "Generate a shell script that just complains that the project is not launchable")
     val startScript = TaskKey[File]("start-script", "Generate a shell script that runs the application")
 
+    // jetty-related settings keys
+    val startScriptJettyVersion = SettingKey[String]("start-script-jetty-version", "Version of Jetty to use for running the .war")
+    val startScriptJettyChecksum = SettingKey[String]("start-script-jetty-checksum", "Expected SHA-1 of the Jetty distribution we intend to download")
+    val startScriptJettyURL = SettingKey[String]("start-script-jetty-url", "URL of the Jetty distribution to download (if set, then it overrides the start-script-jetty-version)")
+    val startScriptJettyContextPath = SettingKey[String]("start-script-jetty-context-path", "Context path for the war file when deployed to Jetty")
+    val startScriptJettyHome = TaskKey[File]("start-script-jetty-home", "Download Jetty distribution and return JETTY_HOME")
+
     // this is in WebPlugin, but we don't want to rely on WebPlugin to build
     private val packageWar = TaskKey[File]("package-war")
 
@@ -180,7 +187,14 @@ object StartScriptPlugin extends Plugin {
     // by checking that the script itself exists.
     private def scriptRootCheck(baseDirectory: File, scriptFile: File): String = {
         val relativeScript = relativizeFile(baseDirectory, scriptFile)
-        """test -x '%s' || (echo "'%s' not found, this script must be run from the project base directory" 1>&2 && exit 1)""".format(relativeScript, relativeScript)
+        val template = """
+function die() {
+    echo "$*" 1>&2
+    exit 1
+}
+test -x '@RELATIVE_SCRIPT@' || die "'@RELATIVE_SCRIPT@' not found, this script must be run from the project base directory"
+"""
+        template.replace("@RELATIVE_SCRIPT@", relativeScript.toString)
     }
 
     private def writeScript(scriptFile: File, script: String) = {
@@ -193,8 +207,11 @@ object StartScriptPlugin extends Plugin {
             case Some(mainClass) =>
                 val template = """#!/bin/bash
 @SCRIPT_ROOT_CHECK@
+
 java $JAVA_OPTS -cp "@CLASSPATH@" @MAINCLASS@ "$@"
-exit 1
+
+exit 0
+
 """
                 val script = template.replace("@SCRIPT_ROOT_CHECK@", scriptRootCheck(baseDirectory, scriptFile)).replace("@CLASSPATH@", cpString.value).replace("@MAINCLASS@", mainClass)
                 writeScript(scriptFile, script)
@@ -206,10 +223,11 @@ exit 1
     }
 
     def startScriptForJarTask(streams: TaskStreams, baseDirectory: File, scriptFile: File, jarFile: File, cpString: RelativeClasspathString) = {
-        val template = """#!/bin/bas
+        val template = """#!/bin/bash
 @SCRIPT_ROOT_CHECK@
 java $JAVA_OPTS -cp "@CLASSPATH@" -jar @JARFILE@ "$@"
-exit 1
+exit 0
+
 """
         val script = template.replace("@SCRIPT_ROOT_CHECK@", scriptRootCheck(baseDirectory, scriptFile)).replace("@CLASSPATH@", cpString.value).replace("@JARFILE@", jarFile.toString)
         writeScript(scriptFile, script)
@@ -221,11 +239,36 @@ exit 1
     // we need to download and unpack the Jetty "distribution" which isn't
     // a normal jar dependency. Not sure if Ivy can do that, may have to just
     // have a configurable URL and checksum.
-    def startScriptForWarTask(streams: TaskStreams, baseDirectory: File, scriptFile: File, warFile: File) = {
-        writeScript(scriptFile, """#!/bin/bash
-echo "Launching web projects is not yet implemented" 1>&2
-exit 1
-""")
+    def startScriptForWarTask(streams: TaskStreams, baseDirectory: File, scriptFile: File, warFile: File, jettyHome: File, jettyContextPath: String) = {
+
+        // First we need a Jetty config to move us to the right context path
+        val contextFile = jettyHome / "contexts" / "start-script.xml"
+        val contextFileTemplate = """
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+  <Set name="contextPath">@CONTEXTPATH@</Set>
+  <Set name="war"><SystemProperty name="jetty.home" default="."/>/webapps/@WARFILE_BASENAME@</Set>
+</Configure>
+"""
+        val contextFileContents = contextFileTemplate.replace("@WARFILE_BASENAME@", warFile.getName).replace("@CONTEXTPATH@", jettyContextPath)
+        IO.write(contextFile, contextFileContents)
+
+        val template = """#!/bin/bash
+@SCRIPT_ROOT_CHECK@
+
+/bin/cp -f "@WARFILE@" "@JETTY_HOME@/webapps" || die "Failed to copy @WARFILE@ to @JETTY_HOME@/webapps"
+
+if test x"$PORT" = x ; then
+    PORT=8080
+fi
+
+java $JAVA_OPTS -Djetty.port="$PORT" -Djetty.home="@JETTY_HOME@" -jar "@JETTY_HOME@/start.jar" "$@"
+
+exit 0
+
+"""
+        val script = template.replace("@SCRIPT_ROOT_CHECK@", scriptRootCheck(baseDirectory, scriptFile)).replace("@WARFILE@", warFile.toString).replace("@JETTY_HOME@", jettyHome.toString)
+        writeScript(scriptFile, script)
+
         streams.log.info("Wrote start script for war " + warFile + " to " + scriptFile)
         scriptFile
     }
@@ -237,9 +280,72 @@ exit 1
         writeScript(scriptFile, """#!/bin/bash
 echo "No meaningful way to start this project was defined in the SBT build" 1>&2
 exit 1
+
 """)
         streams.log.info("Wrote start script that always fails to " + scriptFile)
         scriptFile
+    }
+
+    private def basenameFromURL(url: URL) = {
+        val path = url.getPath
+        val slash = path.lastIndexOf('/')
+        if (slash < 0)
+            path
+        else
+            path.substring(slash + 1)
+    }
+
+    def startScriptJettyHomeTask(streams: TaskStreams, target: File, jettyURLString: String, jettyChecksum: String) = {
+        try {
+            val jettyURL = new URL(jettyURLString)
+            val jettyDistBasename = basenameFromURL(jettyURL)
+            if (!jettyDistBasename.endsWith(".zip"))
+                error("%s doesn't end with .zip".format(jettyDistBasename))
+            val jettyHome = target / jettyDistBasename.substring(0, jettyDistBasename.length - ".zip".length)
+
+            val zipFile = target / jettyDistBasename
+            if (!zipFile.exists()) {
+                streams.log.info("Downloading %s to %s".format(jettyURL.toExternalForm, zipFile))
+                IO.download(jettyURL, zipFile)
+            } else {
+                streams.log.debug("%s already exists".format(zipFile))
+            }
+            val sha1 = Hash.toHex(Hash(zipFile))
+            if (sha1 != jettyChecksum) {
+                streams.log.error("%s has checksum %s expected %s".format(jettyURL.toExternalForm, sha1, jettyChecksum))
+                error("Bad checksum on Jetty distribution")
+            }
+            try {
+                IO.delete(jettyHome)
+            } catch {
+                case e => // probably didn't exist
+            }
+            val files = IO.unzip(zipFile, target)
+            val jettyHomePrefix = jettyHome.getCanonicalPath
+            // check that all the unzipped files went where expected
+            files foreach { f =>
+                if (!f.getCanonicalPath.startsWith(jettyHomePrefix))
+                    error("Unzipped jetty file %s that isn't in %s".format(f, jettyHome))
+            }
+            streams.log.debug("Unzipped %d files to %s".format(files.size, jettyHome))
+
+            // delete annoying test.war and associated gunge
+            for (deleteContentsOf <- (Seq("contexts", "webapps") map { jettyHome / _ })) {
+                val contents = PathFinder(deleteContentsOf) ** new SimpleFileFilter({ f =>
+                    f != deleteContentsOf
+                })
+                for (doNotWant <- contents.get) {
+                    streams.log.debug("Deleting test noise " + doNotWant)
+                    IO.delete(doNotWant)
+                }
+            }
+
+            jettyHome
+        } catch {
+            case e: Throwable =>
+                streams.log.error("Failure obtaining Jetty distribution: " + e.getMessage)
+            throw e
+        }
     }
 
     // apps can manually add these settings (in the way you'd use WebPlugin.webSettings),
@@ -256,7 +362,13 @@ exit 1
 
     // settings to be added to a web plugin project
     val startScriptWarSettings: Seq[Project.Setting[_]] = Seq(
-        startScriptForWar in Compile <<= (streams, startScriptBaseDirectory, startScriptFile in Compile, packageWar in Compile) map startScriptForWarTask
+        // hardcoding these defaults is not my favorite, but I'm not sure what else to do exactly.
+        startScriptJettyVersion in Compile :== "7.3.0.v20110203",
+        startScriptJettyChecksum in Compile :== "46ea33c033ca2597592cae294d23917079e1095d",
+        startScriptJettyURL in Compile <<= (startScriptJettyVersion in Compile) { (version) =>  "http://download.eclipse.org/jetty/" + version + "/dist/jetty-distribution-" + version + ".zip" },
+        startScriptJettyContextPath in Compile :== "/",
+        startScriptJettyHome in Compile <<= (streams, target, startScriptJettyURL in Compile, startScriptJettyChecksum in Compile) map startScriptJettyHomeTask,
+        startScriptForWar in Compile <<= (streams, startScriptBaseDirectory, startScriptFile in Compile, packageWar in Compile, startScriptJettyHome in Compile, startScriptJettyContextPath in Compile) map startScriptForWarTask
     ) ++ genericStartScriptSettings
 
     // settings to be added to a project with an exported jar
