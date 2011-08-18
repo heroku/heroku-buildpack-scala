@@ -59,7 +59,7 @@ else
     ## in 0.10 start-script will depend on package, if packaging
     ## is required - it may not be, we can run .class files or a package-war
     ## instead.
-    SBT_TASKS="clean compile"
+    SBT_TASKS="clean compile ensure-start-script-tasks start-script"
 fi
 
 if [ ! -d .ivy2/cache ]; then
