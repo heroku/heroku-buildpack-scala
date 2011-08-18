@@ -225,7 +225,7 @@ exit 0
     def startScriptForJarTask(streams: TaskStreams, baseDirectory: File, scriptFile: File, jarFile: File, cpString: RelativeClasspathString) = {
         val template = """#!/bin/bash
 @SCRIPT_ROOT_CHECK@
-java $JAVA_OPTS -cp "@CLASSPATH@" -jar @JARFILE@ "$@"
+java $JAVA_OPTS -cp "@CLASSPATH@" "$@"
 exit 0
 
 """
