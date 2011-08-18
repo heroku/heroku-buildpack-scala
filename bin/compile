@@ -94,10 +94,10 @@ cp "$BIN_DIR/../opt/sbt-$SBT_VERSION" "$SBT_BINDIR"/sbt
 test -e "$BIN_DIR/../opt/sbt-$SBT_VERSION.boot.properties" && cp $BIN_DIR/../opt/sbt-$SBT_VERSION.boot.properties "$SBT_BINDIR"/sbt.boot.properties
 
 HEROKU_PLUGIN="Heroku-$SBT_VERSION.scala"
-#test -e "$BIN_DIR/../opt/$HEROKU_PLUGIN" && mkdir -p "$SBT_USER_HOME/.sbt/plugins" && cp "$BIN_DIR/../opt/$HEROKU_PLUGIN" "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN"
+test -e "$BIN_DIR/../opt/$HEROKU_PLUGIN" && mkdir -p "$SBT_USER_HOME/.sbt/plugins/project" && cp "$BIN_DIR/../opt/$HEROKU_PLUGIN" "$SBT_USER_HOME/.sbt/plugins/project/$HEROKU_PLUGIN"
 
 HEROKU_PLUGINS_CONFIG="heroku-plugins-$SBT_VERSION.sbt"
-#test -e "$BIN_DIR/../opt/$HEROKU_PLUGINS_CONFIG" && mkdir -p "$SBT_USER_HOME/.sbt/plugins" && cp "$BIN_DIR/../opt/$HEROKU_PLUGINS_CONFIG" "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG"
+test -e "$BIN_DIR/../opt/$HEROKU_PLUGINS_CONFIG" && mkdir -p "$SBT_USER_HOME/.sbt/plugins" && cp "$BIN_DIR/../opt/$HEROKU_PLUGINS_CONFIG" "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG"
 
 START_SCRIPT_PLUGIN="StartScriptPlugin-$SBT_VERSION.scala"
 #test -e "$BIN_DIR/../opt/$START_SCRIPT_PLUGIN" && mkdir -p "$SBT_USER_HOME/.sbt/plugins" && cp "$BIN_DIR/../opt/$START_SCRIPT_PLUGIN" "$SBT_USER_HOME/.sbt/plugins/$START_SCRIPT_PLUGIN"
