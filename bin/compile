@@ -48,8 +48,7 @@ else
     SBT_VERSION="0.10.1"
     SBT_JAR="sbt-launch-$SBT_VERSION.jar"
     SBT_URL="http://s3.amazonaws.com/sclasen-langpack-scala/$SBT_JAR"
-    #SBT_SHA1="b41d79cb2d919a0e8732fb8ef4e71347cceea90a"
-    SBT_SHA1="257a7a4e4231976932a71c00c58209eb0e6fd72f"
+    SBT_SHA1="b41d79cb2d919a0e8732fb8ef4e71347cceea90a"
     ## in 0.10 start-script will depend on package, if packaging
     ## is required - it may not be, we can run .class files or a package-war
     ## instead.
