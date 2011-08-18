@@ -44,6 +44,13 @@ if test -e project/build.properties && \
     SBT_SHA1="6b5ba879e80a0464c9eaae786bef494e448e6df7"
     SBT_TASKS="clean clean-lib update package"
 else
+    
+    if grep -q 'sbt.version *= *0\.10\.0' project/build.properties ; then
+    	echo "!      Error, you have defined sbt.version=0.10.0 in project/build.properties"
+    	echo "!      You must use sbt.version=0.10.1 or greater"
+    	exit 1
+    fi
+    
     echo "-----> Selecting SBT 0.10"
     SBT_VERSION="0.10.1"
     SBT_JAR="sbt-launch-$SBT_VERSION.jar"
