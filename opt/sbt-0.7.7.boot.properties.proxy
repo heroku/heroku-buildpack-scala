@@ -1,0 +1,45 @@
+[scala]
+  version: 2.7.7
+# classifiers: sources, javadocs
+
+[app]
+  org: org.scala-tools.sbt
+  name: sbt
+  version: read(sbt.version)
+  class: sbt.xMain
+  components: xsbti
+  cross-versioned: true
+# classifiers: sources, javadocs
+
+[repositories]
+  local
+  maven-local
+  heroku-sbt-db: http://s3pository.heroku.com/ivy-databinder/, [organization]/[module]/[revision]/[type]s/[artifact](-[classifier]).[ext]
+  heroku-central: http://s3pository.heroku.com/maven-central/
+  heroku-scala-tools-releases: http://s3pository.heroku.com/maven-scala-tools-releases/
+  heroku-scala-tools-snapshots: http://s3pository.heroku.com/maven-scala-tools-snapshots/
+  #sbt-db: http://databinder.net/repo/, [organization]/[module]/[revision]/[type]s/[artifact](-[classifier]).[ext]
+  #maven-central
+  #scala-tools-releases
+  #scala-tools-snapshots
+
+[boot]
+ directory: project/boot
+ properties: project/build.properties
+ prompt-create: Project does not exist, create new project?
+ prompt-fill: true
+ quick-option: true
+
+[log]
+ level: info
+
+[app-properties]
+ project.name: quick=set(test), new=prompt(Name), fill=prompt(Name)
+ project.organization: new=prompt(Organization)
+ project.version: quick=set(1.0), new=prompt(Version)[1.0], fill=prompt(Version)[1.0]
+ def.scala.version: quick=set(2.7.7), new=set(2.7.7), fill=set(2.7.7)
+ build.scala.versions: quick=set(2.9.0), new=prompt(Scala version)[2.9.0], fill=prompt(Scala version)[2.9.0]
+ sbt.version: quick=set(0.7.7), new=prompt(sbt version)[0.7.7], fill=prompt(sbt version)[0.7.7]
+ project.scratch: quick=set(true)
+ project.initialize: quick=set(true), new=set(true)
+
