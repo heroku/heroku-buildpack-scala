@@ -106,11 +106,15 @@ echo -n "-----> Installing sbt.boot.properties..."
 curl --silent --max-time 10 --location $SBT_PROPS_URL --output "$SBT_BINDIR"/sbt.boot.properties
 echo " done"
 
-HEROKU_PLUGIN="Heroku-$SBT_VERSION.scala"
-test -e "$BIN_DIR/../opt/$HEROKU_PLUGIN" && mkdir -p "$SBT_USER_HOME/.sbt/plugins" && cp "$BIN_DIR/../opt/$HEROKU_PLUGIN" "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN"
+if [ $SBT_VERSION == "0.10.1" ]; then
+    echo -n "-----> Intsalling plugins..."
+    HEROKU_PLUGIN="Heroku-$SBT_VERSION.scala"
+    mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGIN" --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN"
 
-HEROKU_PLUGINS_CONFIG="heroku-plugins-$SBT_VERSION.sbt"
-test -e "$BIN_DIR/../opt/$HEROKU_PLUGINS_CONFIG" && mkdir -p "$SBT_USER_HOME/.sbt/plugins" && cp "$BIN_DIR/../opt/$HEROKU_PLUGINS_CONFIG" "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG"
+    HEROKU_PLUGINS_CONFIG="heroku-plugins-$SBT_VERSION.sbt"
+    mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGIN_CONFIG"  --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG"
+    echo " done"
+fi
 
 # build app
 echo "-----> Building app with SBT"

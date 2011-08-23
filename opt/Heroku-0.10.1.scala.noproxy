@@ -1,0 +1,5 @@
+import sbt._
+import Keys._
+
+object Heroku extends Plugin {
+}
