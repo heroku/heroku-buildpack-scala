@@ -41,8 +41,8 @@ if test -e project/build.properties && \
     SBT_VERSION="0.7.7"
     SBT_JAR="sbt-launch-$SBT_VERSION.jar"
     SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
-    SBT_URL="http://s3.amazonaws.com/sclasen-langpack-scala/$SBT_JAR"
-    SBT_PROPS_URL="http://s3.amazonaws.com/sclasen-langpack-scala/$SBT_PROPS"
+    SBT_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_JAR"
+    SBT_PROPS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_PROPS"
     SBT_SHA1="6b5ba879e80a0464c9eaae786bef494e448e6df7"
     SBT_TASKS="clean clean-lib update package"
 else
@@ -57,8 +57,8 @@ else
     SBT_VERSION="0.10.1"
     SBT_JAR="sbt-launch-$SBT_VERSION.jar"
     SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
-    SBT_URL="http://s3.amazonaws.com/sclasen-langpack-scala/$SBT_JAR"
-    SBT_PROPS_URL="http://s3.amazonaws.com/sclasen-langpack-scala/$SBT_PROPS"
+    SBT_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_JAR"
+    SBT_PROPS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_PROPS"
     SBT_SHA1="b41d79cb2d919a0e8732fb8ef4e71347cceea90a"
     ## in 0.10 start-script will depend on package, if packaging
     ## is required - it may not be, we can run .class files or a package-war
@@ -77,7 +77,7 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   ## clean up any old versions
   /bin/rm -f sbt sbt-launch-*.jar || true
 
-  echo -n "-----> Installing SBT from $SBT_URL..."
+  echo -n "-----> Installing SBT..."
   curl --silent --max-time 60 -O --location $SBT_URL
 
   ## some of the downloads don't have the version in the name,
@@ -91,7 +91,7 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   if test "$SBT_SHA1" != "$FOUND_SHA1" ; then
       echo " failed"
       echo " !     Expected SHA1 \"$SBT_SHA1\" but found \"$FOUND_SHA1\" for $SBT_JAR from $SBT_URL"
-      #exit 1
+      exit 1
   fi
 
   cd $BUILD_DIR
@@ -102,7 +102,7 @@ fi
 #for example if switching sbt version, or just updates to the script)
 cp "$BIN_DIR/../opt/sbt-$SBT_VERSION" "$SBT_BINDIR"/sbt
 
-echo -n "-----> Installing sbt.boot.properties from $SBT_PROPS_URL..."
+echo -n "-----> Installing sbt.boot.properties..."
 curl --silent --max-time 10 --location $SBT_PROPS_URL --output "$SBT_BINDIR"/sbt.boot.properties
 echo " done"
 
