@@ -112,7 +112,7 @@ if [ $SBT_VERSION == "0.10.1" ]; then
     mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGIN" --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN"
 
     HEROKU_PLUGINS_CONFIG="heroku-plugins-$SBT_VERSION.sbt"
-    mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGIN_CONFIG"  --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG"
+    mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGINS_CONFIG"  --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG"
     echo " done"
 fi
 
