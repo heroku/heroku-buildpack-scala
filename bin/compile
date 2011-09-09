@@ -35,36 +35,25 @@ done
 ## Determine SBT version. Only 0.7 and 0.10
 ## are currently supported. Easiest to check for 0.7
 ## since it requires build.properties to exist.
-if test -e project/build.properties && \
-   ! grep -q 'sbt.version *= *0\.10' project/build.properties ; then
-    echo "-----> Selecting SBT 0.7.7"
-    SBT_VERSION="0.7.7"
-    SBT_JAR="sbt-launch-$SBT_VERSION.jar"
-    SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
-    SBT_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_JAR"
-    SBT_PROPS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_PROPS"
-    SBT_SHA1="6b5ba879e80a0464c9eaae786bef494e448e6df7"
-    SBT_TASKS="clean clean-lib update package"
-else
+
     
-    if grep -q 'sbt.version *= *0\.10\.0' project/build.properties ; then
-    	echo "!      Error, you have defined sbt.version=0.10.0 in project/build.properties"
-    	echo "!      You must use sbt.version=0.10.1 or greater"
-    	exit 1
-    fi
-    
-    echo "-----> Selecting SBT 0.10"
-    SBT_VERSION="0.10.1"
-    SBT_JAR="sbt-launch-$SBT_VERSION.jar"
-    SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
-    SBT_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_JAR"
-    SBT_PROPS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_PROPS"
-    SBT_SHA1="b41d79cb2d919a0e8732fb8ef4e71347cceea90a"
-    ## in 0.10 start-script will depend on package, if packaging
-    ## is required - it may not be, we can run .class files or a package-war
-    ## instead.
-    SBT_TASKS="clean compile stage"
+if grep -q 'sbt.version *= *0\.10\.0' project/build.properties ; then
+	echo "!      Error, you have defined sbt.version=0.10.0 in project/build.properties"
+	echo "!      You must use sbt.version=0.10.1 or greater"
+	exit 1
 fi
+
+SBT_VERSION="0.10.1"
+SBT_JAR="sbt-launch-$SBT_VERSION.jar"
+SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
+SBT_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_JAR"
+SBT_PROPS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_PROPS"
+SBT_SHA1="b41d79cb2d919a0e8732fb8ef4e71347cceea90a"
+## in 0.10 start-script will depend on package, if packaging
+## is required - it may not be, we can run .class files or a package-war
+## instead.
+SBT_TASKS="clean compile stage"
+
 
 if [ ! -d .ivy2/cache ]; then
    mkdir -p .ivy2/cache
@@ -106,15 +95,14 @@ echo -n "-----> Installing sbt.boot.properties..."
 curl --silent --max-time 10 --location $SBT_PROPS_URL --output "$SBT_BINDIR"/sbt.boot.properties
 echo " done"
 
-if [ $SBT_VERSION == "0.10.1" ]; then
-    echo -n "-----> Intsalling plugins..."
-    HEROKU_PLUGIN="Heroku-$SBT_VERSION.scala"
-    mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGIN" --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN"
 
-    HEROKU_PLUGINS_CONFIG="heroku-plugins-$SBT_VERSION.sbt"
-    mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGINS_CONFIG"  --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG"
-    echo " done"
-fi
+echo -n "-----> Intsalling plugins..."
+HEROKU_PLUGIN="Heroku-$SBT_VERSION.scala"
+mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGIN" --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN"
+
+HEROKU_PLUGINS_CONFIG="heroku-plugins-$SBT_VERSION.sbt"
+mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGINS_CONFIG"  --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG"
+echo " done"
 
 # build app
 echo "-----> Building app with SBT"
