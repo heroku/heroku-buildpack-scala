@@ -32,10 +32,6 @@ for DIR in $CACHED_DIRS; do
   fi
 done
 
-## Determine SBT version. Only 0.7 and 0.10
-## are currently supported. Easiest to check for 0.7
-## since it requires build.properties to exist.
-
     
 if grep -q 'sbt.version *= *0\.10\.0' project/build.properties ; then
 	echo "!      Error, you have defined sbt.version=0.10.0 in project/build.properties"
@@ -66,7 +62,7 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   ## clean up any old versions
   /bin/rm -f sbt sbt-launch-*.jar || true
 
-  echo -n "-----> Installing SBT..."
+  echo -n "-----> Installing sbt..."
   curl --silent --max-time 60 -O --location $SBT_URL
 
   ## some of the downloads don't have the version in the name,
@@ -105,7 +101,7 @@ mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location
 echo " done"
 
 # build app
-echo "-----> Building app with SBT"
+echo "-----> Building app with sbt"
 echo "-----> executing sbt $SBT_TASKS"
 test -e "$SBT_BINDIR"/sbt.boot.properties && PROPS_OPTION="-Dsbt.boot.properties=$SBT_BINDIR/sbt.boot.properties"
 HOME="$SBT_USER_HOME_ABSOLUTE" java -Xmx512M -Duser.home="$SBT_USER_HOME_ABSOLUTE" -Divy.default.ivy.user.dir="$SBT_USER_HOME_ABSOLUTE/.ivy2" $PROPS_OPTION -jar "$SBT_BINDIR"/$SBT_JAR $SBT_TASKS 2>&1 | sed -u 's/^/       /'
