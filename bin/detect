@@ -4,7 +4,6 @@
 cd $1
 
 ## SBT 0.10 allows either *.sbt in the root dir, or project/*.scala or .sbt/*.scala
-## SBT 0.7 always has a build.properties
 if test -n "$(find . -maxdepth 1 -name '*.sbt' -print -quit)" || \
    (test -d project && test -n "$(find project -maxdepth 1 -name '*.scala' -print -quit)") || \
    (test -d .sbt && test -n "$(find .sbt -maxdepth 1 -name '*.scala' -print -quit)") || \
