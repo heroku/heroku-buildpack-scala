@@ -33,9 +33,9 @@ for DIR in $CACHED_DIRS; do
 done
 
     
-if grep -q 'sbt.version *= *0\.10\.0' project/build.properties ; then
-	echo "!      Error, you have defined sbt.version=0.10.0 in project/build.properties"
-	echo "!      You must use sbt.version=0.10.1 or greater"
+if grep -q -v 'sbt.version *= *0\.11\.' project/build.properties ; then
+	echo " !      Error, you have defined an unsupported sbt.version in project/build.properties"
+	echo " !      You must use sbt.version=0.11.0-RC1 or greater"
 	exit 1
 fi
 
