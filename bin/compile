@@ -32,6 +32,12 @@ for DIR in $CACHED_DIRS; do
   fi
 done
 
+if ! test -e project/build.properties; then
+	echo " !      Error, your scala project must include project/build.properties and define sbt.version"
+	echo " !      You must use a release verison of sbt, sbt.version=0.11.0 or greater"
+        exit 1
+fi
+
     
 if grep -q -v 'sbt.version *= *0\.11\.[0-9]' project/build.properties; then
 	echo " !      Error, you have defined an unsupported sbt.version in project/build.properties"
