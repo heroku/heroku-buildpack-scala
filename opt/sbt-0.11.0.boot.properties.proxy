@@ -1,0 +1,24 @@
+[scala]
+  version: 2.9.1
+[app]
+  org: org.scala-tools.sbt
+  name: sbt
+  version: read(sbt.version)
+  class: sbt.xMain
+  components: xsbti
+  cross-versioned: true
+# classifiers: sources, javadocs
+
+[repositories]
+  local
+  maven-local
+  heroku-typesafe-ivy: http://s3pository.heroku.com/ivy-typesafe-releases/, [organization]/[module]/[revision]/[type]s/[artifact](-[classifier]).[ext]
+  heroku-central: http://s3pository.heroku.com/maven-central/
+  heroku-scala-tools-releases: http://s3pository.heroku.com/maven-scala-tools-releases/
+  heroku-typesafe-snapshots: http://s3pository.heroku.com/ivy-typesafe-snapshots/, [organization]/[module]/[revision]/[type]s/[artifact](-[classifier]).[ext]
+  heroku-scala-tools-snapshots: http://s3pository.heroku.com/maven-scala-tools-snapshots/
+
+[log]
+ level: info
+
+
