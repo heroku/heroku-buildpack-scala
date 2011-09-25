@@ -33,13 +33,21 @@ for DIR in $CACHED_DIRS; do
 done
 
     
-if grep -q -v 'sbt.version *= *0\.11\.' project/build.properties ; then
+if grep -q -v 'sbt.version *= *0\.11\.[0-9]' project/build.properties; then
 	echo " !      Error, you have defined an unsupported sbt.version in project/build.properties"
-	echo " !      You must use sbt.version=0.11.0-RC1 or greater"
+	echo " !      You must use a release verison of sbt, sbt.version=0.11.0 or greater"
 	exit 1
 fi
 
-SBT_VERSION="0.11.0-RC1"
+if grep -q 'sbt.version *= *0\.11\.[0-9]-RC' project/build.properties; then
+	echo " !      Error, you have defined an unsupported sbt.version in project/build.properties"
+	echo " !      You must use a release verison of sbt, sbt.version=0.11.0 or greater"
+	exit 1
+fi
+
+
+
+SBT_VERSION="0.11.0"
 SBT_JAR="sbt-launch-$SBT_VERSION.jar"
 SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
 SBT_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_JAR"
