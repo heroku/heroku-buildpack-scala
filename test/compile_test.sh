@@ -25,20 +25,21 @@
 
 DEFAULT_SBT_VERSION="0.11.0"
 SBT_TEST_CACHE="/tmp/sbt-test-cache"
+SBT_STAGING_STRING="THIS_STRING_WILL_BE_OUTPUT_DURING_STAGING"
 
 createSbtProject()
 {
   sbtVersion=${1:-${DEFAULT_SBT_VERSION}}
   projectRoot=${2:-${BUILD_DIR}}
 
-  cat > ${projectRoot}/blah.scala <<EOF
-object Hi {
-  def main(args: Array[String]) = println("Hi!")
+  cat > ${projectRoot}/helloworld.scala <<EOF
+object WorldlyGreeter {
+  def main(args: Array[String]) = println("Hello, World!")
 }
 EOF
 
   cat > ${projectRoot}/build.sbt <<EOF
-TaskKey[Unit]("stage") in Compile := { println("Hello Staging!") }
+TaskKey[Unit]("stage") in Compile := { println("${SBT_STAGING_STRING}") }
 EOF
 
   mkdir -p ${projectRoot}/project
@@ -47,7 +48,7 @@ sbt.version=${sbtVersion}
 EOF
 }
 
-primeIvyCache()
+_primeSbtTestCache()
 {
   sbtVersion=${1:-${DEFAULT_SBT_VERSION}}
 
@@ -65,9 +66,17 @@ primeIvyCache()
     BUILD_DIR=${ORIGINAL_BUILD_DIR}
     CACHE_DIR=${ORIGINAL_CACHE_DIR}
   fi
+}
 
-  mkdir -p ${CACHE_DIR}/.sbt_home
-  cp -r ${SBT_TEST_CACHE}/${sbtVersion}/app/cache/.sbt_home/.ivy2 ${CACHE_DIR}/.sbt_home
+primeIvyCache()
+{
+  sbtVersion=${1:-${DEFAULT_SBT_VERSION}}
+
+  _primeSbtTestCache ${sbtVersion}
+  
+  ivy2_path=.sbt_home/.ivy2
+  mkdir -p ${CACHE_DIR}/${ivy2_path}
+  cp -r ${SBT_TEST_CACHE}/${sbtVersion}/app/cache/${ivy2_path}/cache ${CACHE_DIR}/${ivy2_path}
 }
 
 testComplile()
@@ -75,19 +84,20 @@ testComplile()
   createSbtProject
   primeIvyCache
 
+  # create `testfile`s in CACHE_DIR and later assert `compile` copied them to BUILD_DIR
   mkdir -p ${CACHE_DIR}/.sbt_home/.ivy2
+  touch    ${CACHE_DIR}/.sbt_home/.ivy2/testfile
   mkdir -p ${CACHE_DIR}/.sbt_home/bin
-  touch ${CACHE_DIR}/.sbt_home/.ivy2/testfile
-  touch ${CACHE_DIR}/.sbt_home/bin/testfile
+  touch    ${CACHE_DIR}/.sbt_home/bin/testfile
 
   compile
 
   assertCapturedSuccess
-  assertFileContains "Hello Staging!" "${STD_OUT}"
+  assertFileContains "${SBT_STAGING_STRING}" "${STD_OUT}"
   assertTrue "Ivy2 cache should have been unpacked" "[ -f ${BUILD_DIR}/.sbt_home/.ivy2/testfile ]"
   assertTrue "SBT bin cache should have been unpacked" "[ -f ${BUILD_DIR}/.sbt_home/bin/testfile ]"
   assertTrue "Ivy2 cache should exist" "[ -d ${BUILD_DIR}/.ivy2/cache ]"
-  assertFileContains "Building app with sbt" "${STD_OUT}"
+  assertFileContains "SBT should have been installed" "Building app with sbt" "${STD_OUT}"
 }
 
 testComplile_NoBuildPropertiesFile()
