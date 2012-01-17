@@ -3,25 +3,16 @@
 . ${BUILDPACK_TEST_RUNNER_HOME}/lib/test_utils.sh
 
 # .sbt_home
-# cache unpacking
-# making ivy2 cache
 # only using one version of sbt even though build might specify others?
 # installation of SBT if doesn't exist
 # clean up of old SBT
 # use version number from var??
 # ---> extraneous? some of the downloads don't have the version in the name,
-# sha1 test
 # sbt script gets copied to $SBT_BINDIR/sbt
 # sbt.boot.properties is downloaded
-# download plugins
-# download plugin config
-# building app
-# failed build
-# cache repacking
 # no stage target
 # build.sbt??
 # force with sbt.version??
-# build.sbt: TaskKey[Unit]("stage") in Compile := { println("Hello Staging!") }
 
 DEFAULT_SBT_VERSION="0.11.0"
 SBT_TEST_CACHE="/tmp/sbt-test-cache"
@@ -32,7 +23,7 @@ createSbtProject()
   sbtVersion=${1:-${DEFAULT_SBT_VERSION}}
   projectRoot=${2:-${BUILD_DIR}}
 
-  cat > ${projectRoot}/helloworld.scala <<EOF
+  cat > ${projectRoot}/WorldlyGreeter.scala <<EOF
 object WorldlyGreeter {
   def main(args: Array[String]) = println("Hello, World!")
 }
@@ -79,11 +70,11 @@ primeIvyCache()
   cp -r ${SBT_TEST_CACHE}/${sbtVersion}/app/cache/${ivy2_path}/cache ${CACHE_DIR}/${ivy2_path}
 }
 
-testComplile()
+testCompile()
 {
-  createSbtProject
   primeIvyCache
-
+  createSbtProject
+  
   # create `testfile`s in CACHE_DIR and later assert `compile` copied them to BUILD_DIR
   mkdir -p ${CACHE_DIR}/.sbt_home/.ivy2
   touch    ${CACHE_DIR}/.sbt_home/.ivy2/testfile
@@ -91,13 +82,40 @@ testComplile()
   touch    ${CACHE_DIR}/.sbt_home/bin/testfile
 
   compile
+  #${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
 
   assertCapturedSuccess
-  assertFileContains "${SBT_STAGING_STRING}" "${STD_OUT}"
   assertTrue "Ivy2 cache should have been unpacked" "[ -f ${BUILD_DIR}/.sbt_home/.ivy2/testfile ]"
   assertTrue "SBT bin cache should have been unpacked" "[ -f ${BUILD_DIR}/.sbt_home/bin/testfile ]"
   assertTrue "Ivy2 cache should exist" "[ -d ${BUILD_DIR}/.ivy2/cache ]"
+  assertFileMD5 "fa57b75cbc45763b7188a71928f4cd9a" "${BUILD_DIR}/.sbt_home/bin/sbt-launch-${DEFAULT_SBT_VERSION}.jar"
+  assertFileMD5 "7fef33ac6fc019bb361fa85c7dc07f7c" "${BUILD_DIR}/.sbt_home/.sbt/plugins/Heroku-${DEFAULT_SBT_VERSION}.scala"
+  assertFileMD5 "13cf615379347d6f1ef10a4334f578f7" "${BUILD_DIR}/.sbt_home/.sbt/plugins/heroku-plugins-${DEFAULT_SBT_VERSION}.sbt"
+  assertEquals "SBT script should have been copied from buildpack" "" "$(diff ${BUILDPACK_HOME}/opt/sbt-${DEFAULT_SBT_VERSION} ${BUILD_DIR}/.sbt_home/bin/sbt)"
+
   assertFileContains "SBT should have been installed" "Building app with sbt" "${STD_OUT}"
+  assertFileContains "SBT should have been installed" "Running: sbt clean compile stage" "${STD_OUT}"
+  assertFileContains "${SBT_STAGING_STRING}" "${STD_OUT}"
+ 
+  assertEquals "Ivy2 cache should have been repacked" "" "$(diff -r ${BUILD_DIR}/.sbt_home/.ivy2 ${CACHE_DIR}/.sbt_home/.ivy2)"
+  assertEquals "SBT home should have been repacked" "" "$(diff -r ${BUILD_DIR}/.sbt_home/bin ${CACHE_DIR}/.sbt_home/bin)"
+
+}
+
+testCompile_BuildFailure()
+{
+  primeIvyCache
+  createSbtProject
+  cat > ${BUILD_DIR}/MissingBracket.scala <<EOF
+object MissingBracket {
+  def main(args: Array[String) = println("This should not compile")
+}
+EOF
+
+  compile
+  
+  assertEquals "1" "${RETURN}"
+  assertFileContains "Failed to build app with SBT" "${STD_OUT}"
 }
 
 testComplile_NoBuildPropertiesFile()
