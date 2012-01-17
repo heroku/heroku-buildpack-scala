@@ -20,8 +20,8 @@ SBT_STAGING_STRING="THIS_STRING_WILL_BE_OUTPUT_DURING_STAGING"
 
 createSbtProject()
 {
-  sbtVersion=${1:-${DEFAULT_SBT_VERSION}}
-  projectRoot=${2:-${BUILD_DIR}}
+  local sbtVersion=${1:-${DEFAULT_SBT_VERSION}}
+  local projectRoot=${2:-${BUILD_DIR}}
 
   cat > ${projectRoot}/WorldlyGreeter.scala <<EOF
 object WorldlyGreeter {
@@ -41,7 +41,7 @@ EOF
 
 _primeSbtTestCache()
 {
-  sbtVersion=${1:-${DEFAULT_SBT_VERSION}}
+  local sbtVersion=${1:-${DEFAULT_SBT_VERSION}}
 
   if [ ! -d ${SBT_TEST_CACHE}/${sbtVersion} ]; then
     ORIGINAL_BUILD_DIR=${BUILD_DIR}
@@ -61,7 +61,7 @@ _primeSbtTestCache()
 
 primeIvyCache()
 {
-  sbtVersion=${1:-${DEFAULT_SBT_VERSION}}
+  local sbtVersion=${1:-${DEFAULT_SBT_VERSION}}
 
   _primeSbtTestCache ${sbtVersion}
   
@@ -69,6 +69,8 @@ primeIvyCache()
   mkdir -p ${CACHE_DIR}/${ivy2_path}
   cp -r ${SBT_TEST_CACHE}/${sbtVersion}/app/cache/${ivy2_path}/cache ${CACHE_DIR}/${ivy2_path}
 }
+
+###
 
 testCompile()
 {
@@ -82,24 +84,31 @@ testCompile()
   touch    ${CACHE_DIR}/.sbt_home/bin/testfile
 
   compile
-  #${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR}
-
   assertCapturedSuccess
+
+  # setup
   assertTrue "Ivy2 cache should have been unpacked" "[ -f ${BUILD_DIR}/.sbt_home/.ivy2/testfile ]"
   assertTrue "SBT bin cache should have been unpacked" "[ -f ${BUILD_DIR}/.sbt_home/bin/testfile ]"
   assertTrue "Ivy2 cache should exist" "[ -d ${BUILD_DIR}/.ivy2/cache ]"
+  assertFileContains "SBT should have been installed" "Building app with sbt" "${STD_OUT}"
   assertFileMD5 "fa57b75cbc45763b7188a71928f4cd9a" "${BUILD_DIR}/.sbt_home/bin/sbt-launch-${DEFAULT_SBT_VERSION}.jar"
   assertFileMD5 "7fef33ac6fc019bb361fa85c7dc07f7c" "${BUILD_DIR}/.sbt_home/.sbt/plugins/Heroku-${DEFAULT_SBT_VERSION}.scala"
   assertFileMD5 "13cf615379347d6f1ef10a4334f578f7" "${BUILD_DIR}/.sbt_home/.sbt/plugins/heroku-plugins-${DEFAULT_SBT_VERSION}.sbt"
   assertEquals "SBT script should have been copied from buildpack" "" "$(diff ${BUILDPACK_HOME}/opt/sbt-${DEFAULT_SBT_VERSION} ${BUILD_DIR}/.sbt_home/bin/sbt)"
 
-  assertFileContains "SBT should have been installed" "Building app with sbt" "${STD_OUT}"
-  assertFileContains "SBT should have been installed" "Running: sbt clean compile stage" "${STD_OUT}"
-  assertFileContains "${SBT_STAGING_STRING}" "${STD_OUT}"
+  # run
+  assertFileContains "SBT tasks to run should be output" "Running: sbt clean compile stage" "${STD_OUT}"
+  assertFileContains "SBT should run stage task" "${SBT_STAGING_STRING}" "${STD_OUT}"
  
+  # clean up
   assertEquals "Ivy2 cache should have been repacked" "" "$(diff -r ${BUILD_DIR}/.sbt_home/.ivy2 ${CACHE_DIR}/.sbt_home/.ivy2)"
   assertEquals "SBT home should have been repacked" "" "$(diff -r ${BUILD_DIR}/.sbt_home/bin ${CACHE_DIR}/.sbt_home/bin)"
 
+  # re-deploy
+  compile
+  assertCapturedSuccess
+  assertFileNotContains "SBT should not be re-installed on re-run" "Building app with sbt" "${STD_OUT}"
+  assertFileContains "SBT tasks to run should still be outputed" "Running: sbt clean compile stage" "${STD_OUT}"
 }
 
 testCompile_BuildFailure()
