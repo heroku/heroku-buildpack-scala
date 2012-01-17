@@ -28,7 +28,7 @@ for DIR in $CACHED_DIRS; do
   rm -rf $DIR
   if [ -d $CACHE_DIR/$DIR ]; then
     mkdir -p $DIR
-    cp -r $CACHE_DIR/$DIR/* $DIR
+    cp -r $CACHE_DIR/$DIR/ $DIR
   fi
 done
 
@@ -127,5 +127,5 @@ mkdir -p $CACHE_DIR
 for DIR in $CACHED_DIRS ; do
   rm -rf $CACHE_DIR/$DIR
   mkdir -p $CACHE_DIR/$DIR
-  cp -r $DIR/* $CACHE_DIR/$DIR
+  cp -r $DIR/ $CACHE_DIR/$DIR
 done
