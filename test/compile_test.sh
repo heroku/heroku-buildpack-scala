@@ -45,7 +45,7 @@ _primeSbtTestCache()
     mkdir -p ${BUILD_DIR} ${CACHE_DIR}
 
     _createSbtProject ${sbtVersion} ${BUILD_DIR} 
-    ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR} &> /dev/null
+    ${BUILDPACK_HOME}/bin/compile ${BUILD_DIR} ${CACHE_DIR} >/dev/null 2>&1
     echo "$?" > ${compileStatusFile}
 
     BUILD_DIR=${ORIGINAL_BUILD_DIR}
