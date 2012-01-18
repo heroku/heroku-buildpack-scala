@@ -28,7 +28,7 @@ for DIR in $CACHED_DIRS; do
   rm -rf $DIR
   if [ -d $CACHE_DIR/$DIR ]; then
     mkdir -p $DIR
-    cp -r --no-target-directory $CACHE_DIR/$DIR $DIR
+    cp -r $CACHE_DIR/$DIR/.  $DIR
   fi
 done
 
@@ -58,6 +58,8 @@ SBT_JAR="sbt-launch-$SBT_VERSION.jar"
 SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
 SBT_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_JAR"
 SBT_PROPS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_PROPS"
+#0.10.1 SBT_SHA1="b41d79cb2d919a0e8732fb8ef4e71347cceea90a" 
+#0.11.0-RC1 SBT_SHA1="85abf74a24593c2b2ea5b033ef01c47b11c04740"
 SBT_SHA1="5b15ba0fc63e355d47293def4bc2e58da6f03787"
 ## in 0.10 start-script will depend on package, if packaging
 ## is required - it may not be, we can run .class files or a package-war
@@ -86,7 +88,7 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   fi
 
   ## verify SHA1
-  FOUND_SHA1=`sha1sum $SBT_JAR | cut -d ' ' -f 1`
+  FOUND_SHA1=`openssl sha1 $SBT_JAR | sed -r "s/^.*= (.*)$/\1/"`
   if test "$SBT_SHA1" != "$FOUND_SHA1" ; then
       echo " failed"
       echo " !     Expected SHA1 \"$SBT_SHA1\" but found \"$FOUND_SHA1\" for $SBT_JAR from $SBT_URL"
@@ -127,5 +129,5 @@ mkdir -p $CACHE_DIR
 for DIR in $CACHED_DIRS ; do
   rm -rf $CACHE_DIR/$DIR
   mkdir -p $CACHE_DIR/$DIR
-  cp -r --no-target-directory $DIR $CACHE_DIR/$DIR
+  cp -r $DIR/.  $CACHE_DIR/$DIR
 done
