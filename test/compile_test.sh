@@ -90,6 +90,7 @@ testCompile()
   touch    ${CACHE_DIR}/.sbt_home/bin/sbt-launch-OLD.jar
 
   compile
+
   assertCapturedSuccess
 
   # setup
@@ -114,6 +115,7 @@ testCompile()
 
   # re-deploy
   compile
+
   assertCapturedSuccess
   assertFileNotContains "SBT should not be re-installed on re-run" "Building app with sbt" "${STD_OUT}"
   assertFileContains "SBT tasks to run should still be outputed" "Running: sbt clean compile stage" "${STD_OUT}"
@@ -144,9 +146,7 @@ EOF
 
   compile
   
-  assertEquals "1" "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-  assertFileContains "Failed to build app with SBT" "${STD_OUT}"
+  assertCapturedError "Failed to build app with SBT"  
 }
 
 testCompile_NoStageTask()
@@ -156,12 +156,9 @@ testCompile_NoStageTask()
 
   compile
 
-  assertEquals "1" "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-  assertFileContains "Not a valid key: stage" "${STD_OUT}"
-  assertFileContains "Failed to build app with SBT" "${STD_OUT}"
+  assertCapturedError "Not a valid key: stage"
+  assertCapturedError "Failed to build app with SBT"
 }
-
 
 testComplile_NoBuildPropertiesFile()
 {
@@ -170,10 +167,8 @@ testComplile_NoBuildPropertiesFile()
 
   compile
   
-  assertEquals "1" "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-  assertFileContains "Error, your scala project must include project/build.properties and define sbt.version" "${STD_OUT}"
-  assertFileContains "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater" "${STD_OUT}"
+  assertCapturedError "Error, your scala project must include project/build.properties and define sbt.version" 
+  assertCapturedError "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
 }
 
 testComplile_BuildPropertiesFileWithUnsupportedVersion()
@@ -182,10 +177,8 @@ testComplile_BuildPropertiesFileWithUnsupportedVersion()
 
   compile
   
-  assertEquals "1" "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-  assertFileContains "Error, you have defined an unsupported sbt.version in project/build.properties" "${STD_OUT}"
-  assertFileContains "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater" "${STD_OUT}"
+  assertCapturedError "Error, you have defined an unsupported sbt.version in project/build.properties" 
+  assertCapturedError "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
 }
 
 testComplile_BuildPropertiesFileWithUnsupportedVersion()
@@ -194,8 +187,6 @@ testComplile_BuildPropertiesFileWithUnsupportedVersion()
 
   compile
   
-  assertEquals "1" "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-  assertFileContains "Error, you have defined an unsupported sbt.version in project/build.properties" "${STD_OUT}"
-  assertFileContains "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater" "${STD_OUT}"
+  assertCapturedError "Error, you have defined an unsupported sbt.version in project/build.properties"
+  assertCapturedError "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
 }
