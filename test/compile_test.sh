@@ -90,6 +90,7 @@ testCompile()
   touch    ${CACHE_DIR}/.sbt_home/bin/sbt-launch-OLD.jar
 
   compile
+
   assertCapturedSuccess
 
   # setup
@@ -97,7 +98,7 @@ testCompile()
   assertTrue "SBT bin cache should have been unpacked" "[ -f ${BUILD_DIR}/.sbt_home/bin/testfile ]"
   assertTrue "Ivy2 cache should exist" "[ -d ${BUILD_DIR}/.ivy2/cache ]"
   assertFalse "Old SBT launch jar should have been deleted" "[ -f ${BUILD_DIR}/.sbt_home/bin/sbt-launch-OLD.jar ]"
-  assertFileContains "SBT should have been installed" "Building app with sbt" "${STD_OUT}"
+  assertCaptured "SBT should have been installed" "Building app with sbt" 
   assertFileMD5 "fa57b75cbc45763b7188a71928f4cd9a" "${BUILD_DIR}/.sbt_home/bin/sbt-launch-${DEFAULT_SBT_VERSION}.jar"
   assertFileMD5 "13edddc0e7a326a8bce014363270b6cc" "${BUILD_DIR}/.sbt_home/bin/sbt.boot.properties"
   assertFileMD5 "7fef33ac6fc019bb361fa85c7dc07f7c" "${BUILD_DIR}/.sbt_home/.sbt/plugins/Heroku-${DEFAULT_SBT_VERSION}.scala"
@@ -105,8 +106,8 @@ testCompile()
   assertEquals "SBT script should have been copied from buildpack and replaced old version" "" "$(diff ${BUILDPACK_HOME}/opt/sbt-${DEFAULT_SBT_VERSION} ${BUILD_DIR}/.sbt_home/bin/sbt)"
 
   # run
-  assertFileContains "SBT tasks to run should be output" "Running: sbt clean compile stage" "${STD_OUT}"
-  assertFileContains "SBT should run stage task" "${SBT_STAGING_STRING}" "${STD_OUT}"
+  assertCaptured "SBT tasks to run should be output" "Running: sbt clean compile stage" 
+  assertCaptured "SBT should run stage task" "${SBT_STAGING_STRING}" 
  
   # clean up
   assertEquals "Ivy2 cache should have been repacked" "" "$(diff -r ${BUILD_DIR}/.sbt_home/.ivy2 ${CACHE_DIR}/.sbt_home/.ivy2)"
@@ -114,9 +115,10 @@ testCompile()
 
   # re-deploy
   compile
+
   assertCapturedSuccess
-  assertFileNotContains "SBT should not be re-installed on re-run" "Building app with sbt" "${STD_OUT}"
-  assertFileContains "SBT tasks to run should still be outputed" "Running: sbt clean compile stage" "${STD_OUT}"
+  assertNotCaptured "SBT should not be re-installed on re-run" "Building app with sbt" 
+  assertCaptured "SBT tasks to run should still be outputed" "Running: sbt clean compile stage" 
 }
 
 testCompile_WithNonDefaultVersion()
@@ -129,8 +131,8 @@ testCompile_WithNonDefaultVersion()
   compile
 
   assertCapturedSuccess
-  assertFileContains "Default version of SBT should always be installed" "Building app with sbt v${DEFAULT_SBT_VERSION}" "${STD_OUT}"
-  assertFileContains "Specified SBT version should actually be used" "Getting org.scala-tools.sbt sbt_2.9.1 ${specifiedSbtVersion}" "${STD_OUT}"
+  assertCaptured "Default version of SBT should always be installed" "Building app with sbt v${DEFAULT_SBT_VERSION}" 
+  assertCaptured "Specified SBT version should actually be used" "Getting org.scala-tools.sbt sbt_2.9.1 ${specifiedSbtVersion}" 
 }
 
 testCompile_BuildFailure()
@@ -144,9 +146,7 @@ EOF
 
   compile
   
-  assertEquals "1" "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-  assertFileContains "Failed to build app with SBT" "${STD_OUT}"
+  assertCapturedError "Failed to build app with SBT"  
 }
 
 testCompile_NoStageTask()
@@ -156,12 +156,9 @@ testCompile_NoStageTask()
 
   compile
 
-  assertEquals "1" "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-  assertFileContains "Not a valid key: stage" "${STD_OUT}"
-  assertFileContains "Failed to build app with SBT" "${STD_OUT}"
+  assertCapturedError "Not a valid key: stage"
+  assertCapturedError "Failed to build app with SBT"
 }
-
 
 testComplile_NoBuildPropertiesFile()
 {
@@ -170,10 +167,8 @@ testComplile_NoBuildPropertiesFile()
 
   compile
   
-  assertEquals "1" "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-  assertFileContains "Error, your scala project must include project/build.properties and define sbt.version" "${STD_OUT}"
-  assertFileContains "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater" "${STD_OUT}"
+  assertCapturedError "Error, your scala project must include project/build.properties and define sbt.version" 
+  assertCapturedError "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
 }
 
 testComplile_BuildPropertiesFileWithUnsupportedVersion()
@@ -182,10 +177,8 @@ testComplile_BuildPropertiesFileWithUnsupportedVersion()
 
   compile
   
-  assertEquals "1" "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-  assertFileContains "Error, you have defined an unsupported sbt.version in project/build.properties" "${STD_OUT}"
-  assertFileContains "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater" "${STD_OUT}"
+  assertCapturedError "Error, you have defined an unsupported sbt.version in project/build.properties" 
+  assertCapturedError "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
 }
 
 testComplile_BuildPropertiesFileWithUnsupportedVersion()
@@ -194,8 +187,6 @@ testComplile_BuildPropertiesFileWithUnsupportedVersion()
 
   compile
   
-  assertEquals "1" "${RETURN}"
-  assertEquals "" "$(cat ${STD_ERR})"
-  assertFileContains "Error, you have defined an unsupported sbt.version in project/build.properties" "${STD_OUT}"
-  assertFileContains "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater" "${STD_OUT}"
+  assertCapturedError "Error, you have defined an unsupported sbt.version in project/build.properties"
+  assertCapturedError "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
 }
