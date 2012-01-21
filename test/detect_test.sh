@@ -7,6 +7,7 @@ testDetect_SbtFileFoundInRoot()
   touch ${BUILD_DIR}/something.sbt
 
   detect  
+
   assertAppDetected "Scala"
 }
 
@@ -16,6 +17,7 @@ testDetect_ScalaFileFoundInProjectDir()
   touch ${BUILD_DIR}/project/something.scala
 
   detect
+
   assertAppDetected "Scala"
 }
 
@@ -25,6 +27,7 @@ testDetect_ScalaFileFoundInScalaDir()
   touch ${BUILD_DIR}/.sbt/something.scala
 
   detect
+
   assertAppDetected "Scala"
 }
 
@@ -34,11 +37,13 @@ testDetect_BuildPropertiesFileFoundInProjectDir()
   touch ${BUILD_DIR}/project/build.properties
 
   detect
+
   assertAppDetected "Scala"
 }
 
 testDetect_NotFound()
 {
   detect  
+  
   assertNoAppDetected
 }
