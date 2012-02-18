@@ -1,7 +1,7 @@
 Heroku buildpack: Scala
 =========================
 
-This is a [Heroku buildpack](http://devcenter.heroku.com/articles/buildpack) for Scala apps.
+This is a [Heroku buildpacks](http://devcenter.heroku.com/articles/buildpacks) for Scala apps.
 It uses [sbt](https://github.com/harrah/xsbt/) 0.11.0+.
 
 Usage
