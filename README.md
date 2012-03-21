@@ -46,3 +46,7 @@ Commit and push the changes to your buildpack to your Github fork, then push you
     ...
     -----> Dropping ivy cache from the slug
 
+License
+-------
+
+Licensed under the MIT License. See LICENSE file.
