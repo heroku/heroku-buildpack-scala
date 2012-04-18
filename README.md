@@ -18,7 +18,7 @@ Example usage:
     ...
     -----> Heroku receiving push
     -----> Scala app detected
-    -----> Building app with sbt v0.11.0
+    -----> Building app with sbt
     -----> Running: sbt clean compile stage
 
 The buildpack will detect your app as Scala if it has the project/build.properties and either .sbt or .scala based build config.  It vendors a version of sbt and your popluated .ivy/cache into your slug.  The .ivy2 directory will be cached between builds to allow for faster build times.
