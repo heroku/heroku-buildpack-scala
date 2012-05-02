@@ -4,7 +4,7 @@
 BIN_DIR=$(cd $(dirname $0); pwd)
 BUILD_DIR=$1
 
-. $BIN_DIR/bin/common
+. $BIN_DIR/common
 
 ## SBT 0.10 allows either *.sbt in the root dir, or project/*.scala or .sbt/*.scala
 if detect_sbt $BUILD_DIR ; then
