@@ -23,7 +23,7 @@ SBT_BINDIR="$SBT_USER_HOME"/bin
 cd $BUILD_DIR
 
 # unpack cache
-CACHED_DIRS="$SBT_USER_HOME/.ivy2 $SBT_BINDIR"
+CACHED_DIRS="$SBT_USER_HOME"
 for DIR in $CACHED_DIRS; do
   rm -rf $DIR
   if [ -d $CACHE_DIR/$DIR ]; then
@@ -130,4 +130,6 @@ for DIR in $CACHED_DIRS ; do
   rm -rf $CACHE_DIR/$DIR
   mkdir -p $CACHE_DIR/$DIR
   cp -r $DIR/.  $CACHE_DIR/$DIR
+  echo "-----> Dropping ivy cache from the slug" 
+  rm -rf $SBT_USER_HOME/.ivy2 
 done
