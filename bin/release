@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 # bin/release <build-dir>
 
+BIN_DIR=$(cd $(dirname $0); pwd)
+. $BIN_DIR/common
+BUILD_DIR=$1
+
 cat <<EOF
 ---
 config_vars:
@@ -12,3 +16,10 @@ addons:
   shared-database:5mb
 
 EOF
+
+if is_play20 $BUILD_DIR ; then
+cat <<EOF
+default_process_types:
+  web: target/start -Dhttp.port=$PORT $JAVA_OPTS 
+EOF
+fi
