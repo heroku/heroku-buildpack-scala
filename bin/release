@@ -20,6 +20,6 @@ EOF
 if is_play20 $BUILD_DIR ; then
 cat <<EOF
 default_process_types:
-  web: target/start -Dhttp.port=\$PORT $JAVA_OPTS 
+  web: target/start -Dhttp.port=\$PORT \$JAVA_OPTS 
 EOF
 fi
