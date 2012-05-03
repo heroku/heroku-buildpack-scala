@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+## SBT 0.10 allows either *.sbt in the root dir, or project/*.scala or .sbt/*.scala
+detect_sbt() {
+  local ctxDir=$1
+  if _has_sbtFile $ctxDir || \
+     _has_projectScalaFile $ctxDir || \
+     _has_hiddenSbtDir $ctxDir || \
+     _has_buildPropertiesFile $ctxDir ; then
+    return 0 
+  else
+    return 1 
+  fi
+}
+
+is_play() {
+  _has_playConfig $1
+}
+
+_has_sbtFile() {
+  local ctxDir=$1
+  test -n "$(find $ctxDir -maxdepth 1 -name '*.sbt' -print -quit)"
+}
+
+_has_projectScalaFile() {
+  local ctxDir=$1
+  test -d $ctxDir/project && test -n "$(find $ctxDir/project -maxdepth 1 -name '*.scala' -print -quit)"
+}
+
+_has_hiddenSbtDir() {
+  local ctxDir=$1
+  test -d $ctxDir/.sbt && test -n "$(find $ctxDir/.sbt -maxdepth 1 -name '*.scala' -print -quit)"
+}
+
+_has_buildPropertiesFile() {
+  local ctxDir=$1
+  test -e $ctxDir/project/build.properties
+}
+
+_has_playConfig() {
+  local ctxDir=$1
+  test -e $ctxDir/conf/application.conf
+}

@@ -1,14 +1,18 @@
 #!/usr/bin/env bash
 # bin/use <build-dir>
 
-cd $1
+BIN_DIR=$(cd $(dirname $0); pwd)
+BUILD_DIR=$1
+
+. $BIN_DIR/common
 
 ## SBT 0.10 allows either *.sbt in the root dir, or project/*.scala or .sbt/*.scala
-if test -n "$(find . -maxdepth 1 -name '*.sbt' -print -quit)" || \
-   (test -d project && test -n "$(find project -maxdepth 1 -name '*.scala' -print -quit)") || \
-   (test -d .sbt && test -n "$(find .sbt -maxdepth 1 -name '*.scala' -print -quit)") || \
-   test -e project/build.properties ; then
-  echo "Scala" && exit 0
+if detect_sbt $BUILD_DIR ; then
+  if is_play $BUILD_DIR ; then
+    echo "Play 2.0" && exit 0
+  else
+    echo "Scala" && exit 0
+  fi
 else
   echo "no" && exit 1
 fi
