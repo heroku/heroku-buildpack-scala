@@ -110,7 +110,6 @@ testCompile()
   assertCaptured "SBT should run stage task" "${SBT_STAGING_STRING}" 
  
   # clean up
-  assertEquals "Ivy2 cache should have been repacked" "" "$(diff -r ${BUILD_DIR}/.sbt_home/.ivy2 ${CACHE_DIR}/.sbt_home/.ivy2)"
   assertEquals "SBT home should have been repacked" "" "$(diff -r ${BUILD_DIR}/.sbt_home/bin ${CACHE_DIR}/.sbt_home/bin)"
 
   # re-deploy
@@ -146,7 +145,6 @@ EOF
 
   compile
   
-  echo "testCompile_BuildFailure: $(cat $STD_OUT)"
   assertCapturedError "Failed to build app with sbt"  
 }
 
