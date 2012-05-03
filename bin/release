@@ -17,7 +17,7 @@ addons:
 
 EOF
 
-if is_play20 $BUILD_DIR ; then
+if is_play20 $BUILD_DIR && [ ! -f $BUILD_DIR/Procfile ] ; then
 cat <<EOF
 default_process_types:
   web: target/start -Dhttp.port=\$PORT \$JAVA_OPTS 
