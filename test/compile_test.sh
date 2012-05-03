@@ -94,7 +94,7 @@ testCompile()
   assertCapturedSuccess
 
   # setup
-  assertTrue "Ivy2 cache should have been unpacked" "[ -f ${BUILD_DIR}/.sbt_home/.ivy2/testfile ]"
+  assertFalse "Ivy2 cache should have been removed." "[ -d ${BUILD_DIR}/.sbt_home/.ivy2 ]"
   assertTrue "SBT bin cache should have been unpacked" "[ -f ${BUILD_DIR}/.sbt_home/bin/testfile ]"
   assertTrue "Ivy2 cache should exist" "[ -d ${BUILD_DIR}/.ivy2/cache ]"
   assertFalse "Old SBT launch jar should have been deleted" "[ -f ${BUILD_DIR}/.sbt_home/bin/sbt-launch-OLD.jar ]"
@@ -131,7 +131,7 @@ testCompile_WithNonDefaultVersion()
   compile
 
   assertCapturedSuccess
-  assertCaptured "Default version of SBT should always be installed" "Building app with sbt v${DEFAULT_SBT_VERSION}" 
+  assertCaptured "Default version of SBT should always be installed" "Building app with sbt" 
   assertCaptured "Specified SBT version should actually be used" "Getting org.scala-tools.sbt sbt_2.9.1 ${specifiedSbtVersion}" 
 }
 
@@ -146,7 +146,8 @@ EOF
 
   compile
   
-  assertCapturedError "Failed to build app with SBT"  
+  echo "testCompile_BuildFailure: $(cat $STD_OUT)"
+  assertCapturedError "Failed to build app with sbt"  
 }
 
 testCompile_NoStageTask()
@@ -157,7 +158,7 @@ testCompile_NoStageTask()
   compile
 
   assertCapturedError "Not a valid key: stage"
-  assertCapturedError "Failed to build app with SBT"
+  assertCapturedError "Failed to build app with sbt"
 }
 
 testComplile_NoBuildPropertiesFile()
