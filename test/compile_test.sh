@@ -134,6 +134,25 @@ testCompile_WithNonDefaultVersion()
   assertCaptured "Specified SBT version should actually be used" "Getting org.scala-tools.sbt sbt_2.9.1 ${specifiedSbtVersion}" 
 }
 
+testCompile_WithRCVersion() {
+  local specifiedSbtVersion="${DEFAULT_SBT_VERSION}-RC"
+  createSbtProject ${specifiedSbtVersion}
+  compile
+  assertCaptured "A release candidate version should not be supported." "Error, you have defined an unsupported sbt.version in project/build.properties" 
+}
+
+testCompile_WithMultilineBuildProperties() {
+  createSbtProject
+  mkdir -p ${BUILD_DIR}/project
+  cat > ${BUILD_DIR}/project/build.properties <<EOF
+sbt.version   =  0.11.9
+
+abc=xyz
+EOF
+  compile
+  assertCaptured "Multiline properties file should detect sbt version" "Building app with sbt"
+}
+
 testCompile_BuildFailure()
 {
   createSbtProject
