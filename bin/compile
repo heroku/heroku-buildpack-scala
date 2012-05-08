@@ -5,6 +5,7 @@
 set -e
 
 BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
+. bin/common
 
 # parse args
 BUILD_DIR=$(cd $1; pwd)
@@ -122,12 +123,18 @@ if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   exit 1
 fi
 
+if is_play $BUILD_DIR && [ -d $SBT_USER_HOME/.ivy2 ] ; then
+  echo "-----> Dropping ivy cache from the slug" 
+  rm -rf $SBT_USER_HOME/.ivy2 
+fi
+
 # repack cache
 mkdir -p $CACHE_DIR
-echo "-----> Dropping ivy cache from the slug" 
 for DIR in $CACHED_DIRS ; do
   rm -rf $CACHE_DIR/$DIR
   mkdir -p $CACHE_DIR/$DIR
-  cp -r $DIR/.  $CACHE_DIR/$DIR
-  rm -rf $SBT_USER_HOME/.ivy2 
+  if [ -d $DIR ] ; then
+    cp -r $DIR/.  $CACHE_DIR/$DIR
+  fi
 done
+

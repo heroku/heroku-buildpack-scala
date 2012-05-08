@@ -94,7 +94,7 @@ testCompile()
   assertCapturedSuccess
 
   # setup
-  assertFalse "Ivy2 cache should have been removed." "[ -d ${BUILD_DIR}/.sbt_home/.ivy2 ]"
+  assertTrue "Ivy2 cache should have been repacked." "[ -d ${BUILD_DIR}/.sbt_home/.ivy2 ]"
   assertTrue "SBT bin cache should have been unpacked" "[ -f ${BUILD_DIR}/.sbt_home/bin/testfile ]"
   assertTrue "Ivy2 cache should exist" "[ -d ${BUILD_DIR}/.ivy2/cache ]"
   assertFalse "Old SBT launch jar should have been deleted" "[ -f ${BUILD_DIR}/.sbt_home/bin/sbt-launch-OLD.jar ]"
@@ -110,6 +110,7 @@ testCompile()
   assertCaptured "SBT should run stage task" "${SBT_STAGING_STRING}" 
  
   # clean up
+  assertEquals "Ivy2 cache should have been repacked for a non-play project" "" "$(diff -r ${BUILD_DIR}/.sbt_home/.ivy2 ${CACHE_DIR}/.sbt_home/.ivy2)"
   assertEquals "SBT home should have been repacked" "" "$(diff -r ${BUILD_DIR}/.sbt_home/bin ${CACHE_DIR}/.sbt_home/bin)"
 
   # re-deploy
@@ -118,6 +119,15 @@ testCompile()
   assertCapturedSuccess
   assertNotCaptured "SBT should not be re-installed on re-run" "Building app with sbt" 
   assertCaptured "SBT tasks to run should still be outputed" "Running: sbt clean compile stage" 
+}
+
+testCompile_Play20Project() {
+  createSbtProject
+  mkdir -p ${BUILD_DIR}/conf
+  touch ${BUILD_DIR}/conf/application.conf
+  compile
+  assertCapturedSuccess
+  assertTrue "Ivy2 cache should not have been repacked for a play project." "[ -d ${CACHE_DIR}/.sbt_home/.ivy2 ]"
 }
 
 testCompile_WithNonDefaultVersion()
