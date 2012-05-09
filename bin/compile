@@ -5,7 +5,7 @@
 set -e
 
 BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
-. bin/common
+. $BIN_DIR/common
 
 # parse args
 BUILD_DIR=$(cd $1; pwd)
