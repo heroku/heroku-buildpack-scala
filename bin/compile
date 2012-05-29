@@ -53,13 +53,13 @@ fi
 
 
 SBT_VERSION="0.11.0"
-SBT_JAR="sbt-launch-$SBT_VERSION.jar"
+SBT_JAR="sbt-launch-0.11.3-2.jar"
 SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
 SBT_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_JAR"
 SBT_PROPS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_PROPS"
 #0.10.1 SBT_SHA1="b41d79cb2d919a0e8732fb8ef4e71347cceea90a"
 #0.11.0-RC1 SBT_SHA1="85abf74a24593c2b2ea5b033ef01c47b11c04740"
-SBT_SHA1="5b15ba0fc63e355d47293def4bc2e58da6f03787"
+SBT_SHA1="cfdb2c9d63776a5faaf681b06b9cf5c077375d43"
 ## in 0.10 start-script will depend on package, if packaging
 ## is required - it may not be, we can run .class files or a package-war
 ## instead.
