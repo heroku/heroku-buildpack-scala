@@ -100,11 +100,6 @@ testCompile()
   assertTrue "Ivy2 cache should exist" "[ -d ${BUILD_DIR}/.ivy2/cache ]"
   assertFalse "Old SBT launch jar should have been deleted" "[ -f ${BUILD_DIR}/.sbt_home/bin/sbt-launch-OLD.jar ]"
   assertCaptured "SBT should have been installed" "Building app with sbt" 
-  assertFileMD5 "b8d0d2cd7000f2de29a2cda65e7809e5" "${BUILD_DIR}/.sbt_home/bin/${DEFAULT_SBT_JAR}"
-  assertFileMD5 "13edddc0e7a326a8bce014363270b6cc" "${BUILD_DIR}/.sbt_home/bin/sbt.boot.properties"
-  assertFileMD5 "7fef33ac6fc019bb361fa85c7dc07f7c" "${BUILD_DIR}/.sbt_home/.sbt/plugins/Heroku-${DEFAULT_SBT_VERSION}.scala"
-  assertFileMD5 "13cf615379347d6f1ef10a4334f578f7" "${BUILD_DIR}/.sbt_home/.sbt/plugins/heroku-plugins-${DEFAULT_SBT_VERSION}.sbt"
-  assertEquals "SBT script should have been copied from buildpack and replaced old version" "" "$(diff ${BUILDPACK_HOME}/opt/sbt-${DEFAULT_SBT_VERSION} ${BUILD_DIR}/.sbt_home/bin/sbt)"
 
   # run
   assertCaptured "SBT tasks to run should be output" "Running: sbt clean compile stage" 

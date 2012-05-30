@@ -41,3 +41,21 @@ _has_playConfig() {
   local ctxDir=$1
   test -e $ctxDir/conf/application.conf
 }
+
+get_supported_sbt_version() {
+  local detectedVersion=$(sed -E 's/sbt.version *= *(0\.11\.[0-9])$/\1/' project/build.properties)
+  if [[ "$detectedVersion" =~ 0\.11\.[0-3] ]] ; then
+    echo "$detectedVersion"
+  else
+    echo ""
+  fi
+}
+
+has_supported_sbt_version() {
+  local supportedVersion="$(get_supported_sbt_version)"
+  if [ "$supportedVersion" != "" ] ; then
+    return 0
+  else
+    return 1
+  fi
+}

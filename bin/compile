@@ -51,15 +51,11 @@ if ! grep -q 'sbt.version *= *0\.11\.[0-9]$' project/build.properties; then
 	exit 1
 fi
 
-
-SBT_VERSION="0.11.0"
+SBT_VERSION="$(get_supported_sbt_version)"
 SBT_JAR="sbt-launch-0.11.3-2.jar"
 SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
 SBT_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_JAR"
 SBT_PROPS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_PROPS"
-#0.10.1 SBT_SHA1="b41d79cb2d919a0e8732fb8ef4e71347cceea90a"
-#0.11.0-RC1 SBT_SHA1="85abf74a24593c2b2ea5b033ef01c47b11c04740"
-SBT_SHA1="cfdb2c9d63776a5faaf681b06b9cf5c077375d43"
 ## in 0.10 start-script will depend on package, if packaging
 ## is required - it may not be, we can run .class files or a package-war
 ## instead.
@@ -86,20 +82,8 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
       mv "sbt-launch.jar" "$SBT_JAR"
   fi
 
-  ## verify SHA1
-  FOUND_SHA1=`openssl sha1 $SBT_JAR | sed -r "s/^.*= (.*)$/\1/"`
-  if test "$SBT_SHA1" != "$FOUND_SHA1" ; then
-      echo " failed"
-      echo " !     Expected SHA1 \"$SBT_SHA1\" but found \"$FOUND_SHA1\" for $SBT_JAR from $SBT_URL"
-      exit 1
-  fi
-
   cd $BUILD_DIR
 fi
-
-#copy the sbt script (do this every time so we can change it if necessary,
-#for example if switching sbt version, or just updates to the script)
-cp "$BIN_DIR/../opt/sbt-$SBT_VERSION" "$SBT_BINDIR"/sbt
 
 #echo -n "-----> Installing sbt.boot.properties..."
 curl --silent --max-time 10 --location $SBT_PROPS_URL --output "$SBT_BINDIR"/sbt.boot.properties
@@ -107,10 +91,10 @@ curl --silent --max-time 10 --location $SBT_PROPS_URL --output "$SBT_BINDIR"/sbt
 
 
 #echo -n "-----> Intsalling plugins..."
-HEROKU_PLUGIN="Heroku-$SBT_VERSION.scala"
+HEROKU_PLUGIN="Heroku-0.11.0.scala"
 mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGIN" --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN"
 
-HEROKU_PLUGINS_CONFIG="heroku-plugins-$SBT_VERSION.sbt"
+HEROKU_PLUGINS_CONFIG="heroku-plugins-0.11.0.sbt"
 mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGINS_CONFIG"  --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG"
 #echo " done"
 
