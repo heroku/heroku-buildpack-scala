@@ -43,20 +43,25 @@ _has_playConfig() {
 }
 
 get_supported_sbt_version() {
-  local buildPropsFile=${1:"Props file not specified"}
-  if [ -f $buildPropsFile ] ; then
-    echo ""
-  fi
-  local sbtVersion=$(grep -P '[ \t]*sbt\.version[ \t]*' ${buildPropsFile} | sed -E -e 's/[ \t]*sbt\.version[ \t]*=[ \t]*(0\.11\.[0-3])$/\1/')
-  if [[ "$sbtVersion" =~ 0\.11\.[0-3]$ ]] ; then
-    echo "$sbtVersion"
+  local ctxDir=$1
+  if _has_buildPropertiesFile $ctxDir; then
+    local sbtVersion=$(\
+      grep -P '[ \t]*sbt\.version[ \t]*=' ${ctxDir}/project/build.properties | \
+      sed -E -e 's/[ \t]*sbt\.version[ \t]*=[ \t]*(0\.11\.[0-3])[ \t\n\r]*/\1/'
+    )
+    if [[ "$sbtVersion" =~ 0\.11\.[0-3]$ ]] ; then
+      echo "$sbtVersion"
+    else
+      echo ""
+    fi
   else
     echo ""
   fi
 }
 
 has_supported_sbt_version() {
-  local supportedVersion=$(get_supported_sbt_version)
+  local ctxDir=$1
+  local supportedVersion="$(get_supported_sbt_version ${ctxDir})"
   if [ "$supportedVersion" != "" ] ; then
     return 0
   else

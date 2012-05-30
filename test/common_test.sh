@@ -7,7 +7,7 @@ EXPECTED_VERSION=0.11.3
 
 testGetSbtVersionFileMissing()
 {  
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
 
   assertCapturedSuccess
   assertCapturedEquals ""
@@ -20,7 +20,7 @@ testGetSbtVersionMissing()
 some.prop=1.2.3
 EOF
 
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
 
   assertCapturedSuccess
   assertCapturedEquals ""
@@ -34,7 +34,7 @@ sbt.version=${EXPECTED_VERSION}
 EOF
   assertEquals "Precondition: Should be a UNIX file" "ASCII text" "$(file -b ${BUILD_DIR}/project/build.properties)"
 
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
 
   assertCapturedSuccess
   assertCapturedEquals "${EXPECTED_VERSION}"
@@ -50,7 +50,7 @@ something.after=1.2.3
 EOF
   assertEquals "Precondition: Should be a UNIX file" "ASCII text" "$(file -b ${BUILD_DIR}/project/build.properties)"
 
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
   
   assertCapturedSuccess
   assertCapturedEquals "${EXPECTED_VERSION}"
@@ -65,7 +65,7 @@ sbt.version=${EXPECTED_VERSION}
 EOF
   assertEquals "Precondition: Should be a Windows file" "ASCII text, with CRLF line terminators" "$(file -b ${BUILD_DIR}/project/build.properties)"
 
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
   
   assertCapturedSuccess
   assertCapturedEquals "${EXPECTED_VERSION}"
@@ -81,7 +81,7 @@ something.after=2.2.2
 EOF
   assertEquals "Precondition: Should be a Windows file" "ASCII text, with CRLF line terminators" "$(file -b ${BUILD_DIR}/project/build.properties)"
 
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
 
   assertCapturedSuccess
   assertCapturedEquals "${EXPECTED_VERSION}"
@@ -94,7 +94,7 @@ testGetSbtVersionWithSpaces()
 sbt.version   =    ${EXPECTED_VERSION}    
 EOF
 
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
 
   assertCapturedSuccess
   assertCapturedEquals "${EXPECTED_VERSION}"
@@ -107,7 +107,7 @@ testGetSbtVersionWithTabs()
 sbt.version   =    ${EXPECTED_VERSION}    
 EOF
 
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
 
   assertCapturedSuccess
   assertCapturedEquals "${EXPECTED_VERSION}"
@@ -120,7 +120,7 @@ testGetSbtVersionWithTrailingLetters()
 sbt.version   =    ${EXPECTED_VERSION}RC    
 EOF
 
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
 
   assertCapturedSuccess
   assertCapturedEquals ""
@@ -131,7 +131,7 @@ testGetSbtVersionWithNoSpaces() {
   cat > ${BUILD_DIR}/project/build.properties <<EOF
 sbt.version${EXPECTED_VERSION}    
 EOF
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
   assertCapturedSuccess
   assertCapturedEquals ""
 }
@@ -141,7 +141,7 @@ testGetSbtVersionWithNoValue() {
   cat > ${BUILD_DIR}/project/build.properties <<EOF
 sbt.version=
 EOF
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
   assertCapturedSuccess
   assertCapturedEquals ""
 }
@@ -153,7 +153,7 @@ sbts.version=0.11.0
 sbt.vversion=0.11.0
 sbt.version=${EXPECTED_VERSION}
 EOF
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
   assertCapturedSuccess
   assertCapturedEquals "${EXPECTED_VERSION}"
 }
@@ -165,7 +165,7 @@ sbt.version=${EXPECTED_VERSION}
 sbts.version=0.11.0
 sbt.vversion=0.11.0
 EOF
-  capture get_supported_sbt_version ${BUILD_DIR}/project/build.properties
+  capture get_supported_sbt_version ${BUILD_DIR}
   assertCapturedSuccess
   assertCapturedEquals "${EXPECTED_VERSION}"
 }
