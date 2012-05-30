@@ -56,7 +56,7 @@ get_supported_sbt_version() {
 }
 
 has_supported_sbt_version() {
-  local supportedVersion="$(get_supported_sbt_version)"
+  local supportedVersion=$(get_supported_sbt_version)
   if [ "$supportedVersion" != "" ] ; then
     return 0
   else

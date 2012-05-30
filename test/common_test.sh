@@ -146,7 +146,7 @@ EOF
   assertCapturedEquals ""
 }
 
-testGetPlayVersionWithSimilarNames() {
+testGetSbtVersionWithSimilarNames() {
   mkdir -p ${BUILD_DIR}/project
   cat > ${BUILD_DIR}/project/build.properties <<EOF
 sbts.version=0.11.0
@@ -158,7 +158,7 @@ EOF
   assertCapturedEquals "${EXPECTED_VERSION}"
 }
 
-testGetPlayVersionWithSimilarNameReverseOrder() {
+testGetSbtVersionWithSimilarNameReverseOrder() {
   mkdir -p ${BUILD_DIR}/project
   cat > ${BUILD_DIR}/project/build.properties <<EOF
 sbt.version=${EXPECTED_VERSION}
