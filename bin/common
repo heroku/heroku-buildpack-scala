@@ -43,9 +43,9 @@ _has_playConfig() {
 }
 
 get_supported_sbt_version() {
-  local detectedVersion=$(sed -E 's/sbt.version *= *(0\.11\.[0-9])$/\1/' project/build.properties)
-  if [[ "$detectedVersion" =~ 0\.11\.[0-3] ]] ; then
-    echo "$detectedVersion"
+  local sbtVersion=$(grep -P '[ \t]*sbt.version[ \t]*' project/build.properties | sed -E -e 's/[ \t]*sbt.version[ \t]*=[ \t]*(0\.11\.[0-3])$/\1/')
+  if [[ "$sbtVersion" =~ 0\.11\.[0-3]$ ]] ; then
+    echo "$sbtVersion"
   else
     echo ""
   fi

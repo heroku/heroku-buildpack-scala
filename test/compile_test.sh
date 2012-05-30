@@ -151,7 +151,7 @@ testCompile_WithMultilineBuildProperties() {
   createSbtProject
   mkdir -p ${BUILD_DIR}/project
   cat > ${BUILD_DIR}/project/build.properties <<EOF
-sbt.version   =  0.11.9
+sbt.version   =  0.11.3
 
 abc=xyz
 EOF
@@ -195,7 +195,7 @@ testComplile_NoBuildPropertiesFile()
   assertCapturedError "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
 }
 
-testComplile_BuildPropertiesFileWithUnsupportedVersion()
+testComplile_BuildPropertiesFileWithUnsupportedOldVersion()
 {
   createSbtProject "0.10.0"
 
@@ -205,7 +205,7 @@ testComplile_BuildPropertiesFileWithUnsupportedVersion()
   assertCapturedError "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
 }
 
-testComplile_BuildPropertiesFileWithUnsupportedVersion()
+testComplile_BuildPropertiesFileWithUnsupportedRCVersion()
 {
   createSbtProject "0.11.0-RC"
 

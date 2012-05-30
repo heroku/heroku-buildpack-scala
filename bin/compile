@@ -39,18 +39,12 @@ if ! test -e project/build.properties; then
         exit 1
 fi
 
-if grep -q 'sbt.version *= *0\.11\.[0-9]-RC' project/build.properties; then
+if ! has_supported_sbt_version; then
 	echo " !      Error, you have defined an unsupported sbt.version in project/build.properties"
 	echo " !      You must use a release verison of sbt, sbt.version=0.11.0 or greater"
 	exit 1
 fi
-
-if ! grep -q 'sbt.version *= *0\.11\.[0-9]$' project/build.properties; then
-	echo " !      Error, you have defined an unsupported sbt.version in project/build.properties"
-	echo " !      You must use a release verison of sbt, sbt.version=0.11.0 or greater"
-	exit 1
-fi
-
+ 
 SBT_VERSION="$(get_supported_sbt_version)"
 SBT_JAR="sbt-launch-0.11.3-2.jar"
 SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
