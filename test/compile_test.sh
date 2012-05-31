@@ -3,6 +3,7 @@
 . ${BUILDPACK_TEST_RUNNER_HOME}/lib/test_utils.sh
 
 DEFAULT_SBT_VERSION="0.11.0"
+DEFAULT_SBT_JAR="sbt-launch-0.11.3-2.jar"
 SBT_TEST_CACHE="/tmp/sbt-test-cache"
 SBT_STAGING_STRING="THIS_STRING_WILL_BE_OUTPUT_DURING_STAGING"
 
@@ -99,11 +100,6 @@ testCompile()
   assertTrue "Ivy2 cache should exist" "[ -d ${BUILD_DIR}/.ivy2/cache ]"
   assertFalse "Old SBT launch jar should have been deleted" "[ -f ${BUILD_DIR}/.sbt_home/bin/sbt-launch-OLD.jar ]"
   assertCaptured "SBT should have been installed" "Building app with sbt" 
-  assertFileMD5 "fa57b75cbc45763b7188a71928f4cd9a" "${BUILD_DIR}/.sbt_home/bin/sbt-launch-${DEFAULT_SBT_VERSION}.jar"
-  assertFileMD5 "13edddc0e7a326a8bce014363270b6cc" "${BUILD_DIR}/.sbt_home/bin/sbt.boot.properties"
-  assertFileMD5 "7fef33ac6fc019bb361fa85c7dc07f7c" "${BUILD_DIR}/.sbt_home/.sbt/plugins/Heroku-${DEFAULT_SBT_VERSION}.scala"
-  assertFileMD5 "13cf615379347d6f1ef10a4334f578f7" "${BUILD_DIR}/.sbt_home/.sbt/plugins/heroku-plugins-${DEFAULT_SBT_VERSION}.sbt"
-  assertEquals "SBT script should have been copied from buildpack and replaced old version" "" "$(diff ${BUILDPACK_HOME}/opt/sbt-${DEFAULT_SBT_VERSION} ${BUILD_DIR}/.sbt_home/bin/sbt)"
 
   # run
   assertCaptured "SBT tasks to run should be output" "Running: sbt clean compile stage" 
@@ -155,7 +151,7 @@ testCompile_WithMultilineBuildProperties() {
   createSbtProject
   mkdir -p ${BUILD_DIR}/project
   cat > ${BUILD_DIR}/project/build.properties <<EOF
-sbt.version   =  0.11.9
+sbt.version   =  0.11.3
 
 abc=xyz
 EOF
@@ -199,7 +195,7 @@ testComplile_NoBuildPropertiesFile()
   assertCapturedError "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
 }
 
-testComplile_BuildPropertiesFileWithUnsupportedVersion()
+testComplile_BuildPropertiesFileWithUnsupportedOldVersion()
 {
   createSbtProject "0.10.0"
 
@@ -209,7 +205,7 @@ testComplile_BuildPropertiesFileWithUnsupportedVersion()
   assertCapturedError "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
 }
 
-testComplile_BuildPropertiesFileWithUnsupportedVersion()
+testComplile_BuildPropertiesFileWithUnsupportedRCVersion()
 {
   createSbtProject "0.11.0-RC"
 
