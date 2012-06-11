@@ -101,11 +101,6 @@ if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   exit 1
 fi
 
-if is_play $BUILD_DIR && [ -d $SBT_USER_HOME/.ivy2 ] ; then
-  echo "-----> Dropping ivy cache from the slug" 
-  rm -rf $SBT_USER_HOME/.ivy2 
-fi
-
 # repack cache
 mkdir -p $CACHE_DIR
 for DIR in $CACHED_DIRS ; do
@@ -115,4 +110,10 @@ for DIR in $CACHED_DIRS ; do
     cp -r $DIR/.  $CACHE_DIR/$DIR
   fi
 done
+
+# drop ivy cache from slug for play only
+if is_play $BUILD_DIR && [ -d $SBT_USER_HOME/.ivy2 ] ; then
+  echo "-----> Dropping ivy cache from the slug" 
+  rm -rf $SBT_USER_HOME/.ivy2 
+fi
 
