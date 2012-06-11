@@ -66,3 +66,29 @@ has_supported_sbt_version() {
     return 1
   fi
 }
+
+count_files() {
+  local location=$1
+  local pattern=$2
+
+  if [ -d ${location} ]; then
+    find ${location} -name ${pattern} | wc -l | sed 's/ //g'
+  else
+    echo "0"
+  fi
+}
+
+detect_play_lang() {
+  local appDir=$1/app
+  
+  local num_scala_files=$(count_files ${appDir} '*.scala')
+  local num_java_files=$(count_files ${appDir} '*.java')
+
+  if   [ ${num_scala_files} -gt ${num_java_files} ] ; then
+    echo "Scala"
+  elif [ ${num_scala_files} -lt ${num_java_files} ] ; then
+    echo "Java"
+  else
+    echo "Unknown"
+  fi
+}
