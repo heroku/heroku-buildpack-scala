@@ -123,7 +123,8 @@ testCompile_Play20Project() {
   touch ${BUILD_DIR}/conf/application.conf
   compile
   assertCapturedSuccess
-  assertTrue "Ivy2 cache should not have been repacked for a play project." "[ -d ${CACHE_DIR}/.sbt_home/.ivy2 ]"
+  assertTrue  "Ivy2 cache should have been repacked for a play project." "[ -d ${CACHE_DIR}/.sbt_home/.ivy2 ]"
+  assertFalse "Ivy2 cache should not have been included in slug for a play project." "[ -d ${BUILD_DIR}/.sbt_home/.ivy2 ]"
 }
 
 testCompile_WithNonDefaultVersion()
