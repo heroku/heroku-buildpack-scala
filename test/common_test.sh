@@ -192,3 +192,9 @@ testCountFiles_BadDir() {
    assertCapturedSuccess
    assertCapturedEquals "0"
 }
+
+testDetectPlayLang_BadDir() {
+  capture detect_play_lang non_existant_dir
+  assertCapturedSuccess
+  assertCapturedEquals ""
+}
