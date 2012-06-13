@@ -50,7 +50,7 @@ testDetect_ApplicationConfFileDetectsAsPlay20Unknown()
 
   detect
 
-  assertAppDetected "Play 2.0 - Unknown"
+  assertAppDetected "Play 2.0"
 }
 
 testDetect_ApplicationConfFileDetectsAsPlay20Scala()

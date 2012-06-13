@@ -89,6 +89,6 @@ detect_play_lang() {
   elif [ ${num_scala_files} -lt ${num_java_files} ] ; then
     echo "Java"
   else
-    echo "Unknown"
+    echo ""
   fi
 }

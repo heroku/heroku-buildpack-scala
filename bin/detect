@@ -9,10 +9,17 @@ BUILD_DIR=$1
 ## SBT 0.10 allows either *.sbt in the root dir, or project/*.scala or .sbt/*.scala
 if detect_sbt $BUILD_DIR ; then
   if is_play $BUILD_DIR ; then
-    echo "Play 2.0 - $(detect_play_lang $BUILD_DIR)" && exit 0
+    PLAY_2_0="Play 2.0"
+    DETECTED_PLAY_LANG=$(detect_play_lang $BUILD_DIR);
+    if [ $DETECTED_PLAY_LANG ] ; then
+      echo "$PLAY_2_0 - $DETECTED_PLAY_LANG"
+    else
+      echo "$PLAY_2_0"
+    fi
   else
-    echo "Scala" && exit 0
+    echo "Scala"
   fi
+  exit 0
 else
   echo "no" && exit 1
 fi
