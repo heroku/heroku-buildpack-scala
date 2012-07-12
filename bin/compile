@@ -85,10 +85,10 @@ curl --silent --max-time 10 --location $SBT_PROPS_URL --output "$SBT_BINDIR"/sbt
 
 
 #echo -n "-----> Intsalling plugins..."
-HEROKU_PLUGIN="Heroku-0.11.0.scala"
+HEROKU_PLUGIN="Heroku-0.11.3.scala"
 mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGIN" --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN"
 
-HEROKU_PLUGINS_CONFIG="heroku-plugins-0.11.0.sbt"
+HEROKU_PLUGINS_CONFIG="heroku-plugins-0.11.3.sbt"
 mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGINS_CONFIG"  --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG"
 #echo " done"
 
