@@ -13,7 +13,7 @@ config_vars:
   SBT_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
   REPO: /app/.sbt_home/.ivy2/cache
 addons:
-  shared-database:5mb
+  heroku-postgresql:dev
 
 EOF
 
