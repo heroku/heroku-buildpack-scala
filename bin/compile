@@ -33,6 +33,7 @@ for DIR in $CACHED_DIRS; do
   fi
 done
 
+# these are preliminary checks. actual version check happens below when attempting to download sbt boot.properties
 if ! test -e project/build.properties; then
 	echo " !      Error, your scala project must include project/build.properties and define sbt.version"
 	echo " !      You must use a release verison of sbt, sbt.version=0.11.0 or greater"
@@ -82,7 +83,7 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   cd $BUILD_DIR
 fi
 
-curl --silent --max-time 10 --location $SBT_PROPS_URL --output "$SBT_BINDIR"/sbt.boot.properties --fail || error "Failed to download $SBT_PROPS"
+curl --silent --max-time 10 --location $SBT_PROPS_URL --output "$SBT_BINDIR"/sbt.boot.properties --fail || error "Error, SBT version $SBT_VERSION not supported"
 
 HEROKU_PLUGIN="Heroku-0.11.3.scala"
 mkdir -p "$SBT_USER_HOME/.sbt/plugins"
