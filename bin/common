@@ -92,3 +92,8 @@ detect_play_lang() {
     echo ""
   fi
 }
+
+error() {
+    echo " !     $1"
+    exit 1
+}
