@@ -68,7 +68,12 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   /bin/rm -f sbt sbt-launch-*.jar || true
 
   echo "-----> Building app with sbt"
-  curl --silent --max-time 60 -O --location $SBT_URL
+  curl --silent --max-time 60 -O --location $SBT_URL --fail 2>&1 | sed -u 's/^/       /'
+  if [ "${PIPESTATUS[*]}" != "0 0" ]; then
+    echo " !     Failed to download sbt-launch.jar"
+    exit 1
+  fi
+
   echo "#!/usr/bin/env bash" > sbt
   echo "/usr/bin/java -Dsbt.boot.properties=/app/.sbt_home/bin/sbt.boot.properties  -Duser.home=/app/.sbt_home -Divy.default.ivy.user.dir=/app/.sbt_home/.ivy2 -jar /app/.sbt_home/bin/$SBT_JAR \"\$@\"" >> sbt
   chmod a+x sbt
