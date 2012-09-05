@@ -89,11 +89,6 @@ HEROKU_PLUGIN="Heroku-0.11.3.scala"
 mkdir -p "$SBT_USER_HOME/.sbt/plugins"
 curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGIN" --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN" --fail || error "Failed to download $HEROKU_PLUGIN"
 
-
-HEROKU_PLUGINS_CONFIG="heroku-plugins-0.11.3.sbt"
-mkdir -p "$SBT_USER_HOME/.sbt/plugins"
-curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGINS_CONFIG"  --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG" --fail || error "Failed to download $HEROKU_PLUGINS_CONFIG"
-
 # build app
 echo "-----> Running: sbt $SBT_TASKS"
 test -e "$SBT_BINDIR"/sbt.boot.properties && PROPS_OPTION="-Dsbt.boot.properties=$SBT_BINDIR/sbt.boot.properties"
