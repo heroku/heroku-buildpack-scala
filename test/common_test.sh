@@ -26,6 +26,32 @@ EOF
   assertCapturedEquals ""
 }
 
+testGetSupportedSbtVersion()
+{  
+  mkdir -p ${BUILD_DIR}/project
+  cat > ${BUILD_DIR}/project/build.properties <<EOF
+sbt.version=0.12.0
+EOF
+
+  capture get_supported_sbt_version ${BUILD_DIR}
+
+  assertCapturedSuccess
+  assertCapturedEquals "0.12.0"
+}
+
+testGetUnsupportedSbtVersion()
+{  
+  mkdir -p ${BUILD_DIR}/project
+  cat > ${BUILD_DIR}/project/build.properties <<EOF
+sbt.version=0.10.0
+EOF
+
+  capture get_supported_sbt_version ${BUILD_DIR}
+
+  assertCapturedSuccess
+  assertCapturedEquals ""
+}
+
 testGetSbtVersionOnSingleLine_Unix()
 {  
   mkdir -p ${BUILD_DIR}/project

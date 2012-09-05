@@ -33,6 +33,7 @@ for DIR in $CACHED_DIRS; do
   fi
 done
 
+# these are preliminary checks. actual version check happens below when attempting to download sbt boot.properties
 if ! test -e project/build.properties; then
 	echo " !      Error, your scala project must include project/build.properties and define sbt.version"
 	echo " !      You must use a release verison of sbt, sbt.version=0.11.0 or greater"
@@ -68,7 +69,8 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   /bin/rm -f sbt sbt-launch-*.jar || true
 
   echo "-----> Building app with sbt"
-  curl --silent --max-time 60 -O --location $SBT_URL
+  curl --silent --max-time 60 -O --location $SBT_URL --fail || error "Failed to download $SBT_JAR"
+
   echo "#!/usr/bin/env bash" > sbt
   echo "/usr/bin/java -Dsbt.boot.properties=/app/.sbt_home/bin/sbt.boot.properties  -Duser.home=/app/.sbt_home -Divy.default.ivy.user.dir=/app/.sbt_home/.ivy2 -jar /app/.sbt_home/bin/$SBT_JAR \"\$@\"" >> sbt
   chmod a+x sbt
@@ -81,18 +83,16 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   cd $BUILD_DIR
 fi
 
-#echo -n "-----> Installing sbt.boot.properties..."
-curl --silent --max-time 10 --location $SBT_PROPS_URL --output "$SBT_BINDIR"/sbt.boot.properties
-#echo " done"
+curl --silent --max-time 10 --location $SBT_PROPS_URL --output "$SBT_BINDIR"/sbt.boot.properties --fail || error "Error, SBT version $SBT_VERSION not supported"
 
-
-#echo -n "-----> Intsalling plugins..."
 HEROKU_PLUGIN="Heroku-0.11.3.scala"
-mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGIN" --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN"
+mkdir -p "$SBT_USER_HOME/.sbt/plugins"
+curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGIN" --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN" --fail || error "Failed to download $HEROKU_PLUGIN"
+
 
 HEROKU_PLUGINS_CONFIG="heroku-plugins-0.11.3.sbt"
-mkdir -p "$SBT_USER_HOME/.sbt/plugins" && curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGINS_CONFIG"  --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG"
-#echo " done"
+mkdir -p "$SBT_USER_HOME/.sbt/plugins"
+curl --silent --max-time 10 --location "http://s3.amazonaws.com/heroku-jvm-langpack-scala/$HEROKU_PLUGINS_CONFIG"  --output "$SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGINS_CONFIG" --fail || error "Failed to download $HEROKU_PLUGINS_CONFIG"
 
 # build app
 echo "-----> Running: sbt $SBT_TASKS"

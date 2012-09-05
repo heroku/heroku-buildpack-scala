@@ -149,6 +149,13 @@ testCompile_WithRCVersion() {
   assertCaptured "A release candidate version should not be supported." "Error, you have defined an unsupported sbt.version in project/build.properties" 
 }
 
+testCompile_WithoutSupportedSbtPropertiesVersion() {
+  local specifiedSbtVersion="0.11.9"
+  createSbtProject ${specifiedSbtVersion}
+  compile
+  assertCaptured "A version that is allowed by premliminary version check but no SBT props should not be supported." "Error, SBT version ${specifiedSbtVersion} not supported" 
+}
+
 testCompile_WithMultilineBuildProperties() {
   createSbtProject
   mkdir -p ${BUILD_DIR}/project
