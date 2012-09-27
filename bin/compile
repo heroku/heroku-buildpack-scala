@@ -11,6 +11,40 @@ BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
 BUILD_DIR=$(cd $1; pwd)
 CACHE_DIR=$2
 
+curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
+. bin/java
+
+# create default system.properties for apps that had the jdk vendored in 
+if [ -f ${CACHE_DIR}/.jdk/vendor ] && [ ! -f ${BUILD_DIR}/system.properties ]; then
+  echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
+fi
+
+if [ -f ${CACHE_DIR}/system.properties ] && [ ! -f ${BUILD_DIR}/system.properties ]; then
+  cp ${CACHE_DIR}/system.properties ${BUILD_DIR}/system.properties
+fi
+
+if [ ! -d $CACHE_DIR ]; then
+  LOGGER_FLAGS="$LOGGER_FLAGS new_java_app"
+  logger -p user.notice -t "slugc[$$]" "language_pack_java new_java_app"
+  if [ ! -f ${BUILD_DIR}/system.properties ]; then 
+    echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties; 
+  fi
+fi
+
+#create the cache dir if it doesn't exist
+mkdir -p $CACHE_DIR
+
+# install JDK 
+if [ -f ${BUILD_DIR}/system.properties ]; then
+  logger -p user.notice -t "slugc[$$]" "language_pack_java download_jdk"
+  LOGGER_FLAGS="$LOGGER_FLAGS download_jdk"
+  javaVersion=$(detect_java_version ${BUILD_DIR})
+  echo -n "-----> Installing OpenJDK ${javaVersion}..."
+  install_java ${BUILD_DIR} ${javaVersion}
+  echo "done"
+  cp ${BUILD_DIR}/system.properties ${CACHE_DIR}/
+fi
+
 # home directory from perspective of SBT; we rename
 # it because otherwise the project root and $HOME
 # are the same, and by default .sbt has a (different)
