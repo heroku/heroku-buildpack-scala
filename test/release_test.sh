@@ -19,7 +19,7 @@ EOF`
   release
 
   assertCapturedSuccess
-  assertCaptured "${expected_release_output}"
+  assertCapturedEquals "${expected_release_output}"
 }
 
 testPlay20Release()
@@ -36,12 +36,13 @@ config_vars:
   REPO: /app/.sbt_home/.ivy2/cache
 addons:
   heroku-postgresql:dev
+
 default_process_types:
-  web: target/start -Dhttp.port=\$PORT \$JAVA_OPTS 
+  web: target/start -Dhttp.port=\\$PORT \\$JAVA_OPTS 
 EOF`
 
   release
 
   assertCapturedSuccess
-  assertCaptured "${expected_release_output}"
+  assertCapturedEquals "${expected_release_output}"
 }
