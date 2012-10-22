@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-
-/usr/bin/java -Dsbt.boot.properties=/app/.sbt_home/bin/sbt.boot.properties  -Duser.home=/app/.sbt_home -Divy.default.ivy.user.dir=/app/.sbt_home/.ivy2 -jar /app/.sbt_home/bin/sbt-launch-0.11.0.jar "$@"
