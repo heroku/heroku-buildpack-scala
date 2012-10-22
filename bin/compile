@@ -4,7 +4,9 @@
 # fail fast
 set -e
 
-BIN_DIR=$(cd $(dirname $0); pwd) # absolute path
+BP_DIR=$(cd $(dirname $0)/..; pwd) # absolute path
+BIN_DIR=$BP_DIR/bin
+OPT_DIR=$BP_DIR/opt
 . $BIN_DIR/common
 
 # parse args
@@ -112,7 +114,11 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   cd $BUILD_DIR
 fi
 
-curl --silent --max-time 10 --location $SBT_PROPS_URL --output "$SBT_BINDIR"/sbt.boot.properties --fail || error "Error, SBT version $SBT_VERSION not supported"
+if [ -f $OPT_DIR/$SBT_PROPS ]; then
+  cp $OPT_DIR/$SBT_PROPS $SBT_BINDIR/sbt.boot.properties
+else
+  error "Error, SBT version $SBT_VERSION not supported"
+fi
 
 HEROKU_PLUGIN="Heroku-0.11.3.scala"
 mkdir -p "$SBT_USER_HOME/.sbt/plugins"
