@@ -7,7 +7,7 @@ testRelease()
   expected_release_output=`cat <<EOF
 ---
 config_vars:
-  PATH: .sbt_home/bin:/usr/local/bin:/usr/bin:/bin
+  PATH: .jdk/bin:.sbt_home/bin:/usr/local/bin:/usr/bin:/bin
   JAVA_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
   SBT_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
   REPO: /app/.sbt_home/.ivy2/cache
@@ -30,7 +30,7 @@ testPlay20Release()
   expected_release_output=`cat <<EOF
 ---
 config_vars:
-  PATH: .sbt_home/bin:/usr/local/bin:/usr/bin:/bin
+  PATH: .jdk/bin:.sbt_home/bin:/usr/local/bin:/usr/bin:/bin
   JAVA_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
   SBT_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
   REPO: /app/.sbt_home/.ivy2/cache
