@@ -128,7 +128,7 @@ cp $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN
 # build app
 echo "-----> Running: sbt $SBT_TASKS"
 test -e "$SBT_BINDIR"/sbt.boot.properties && PROPS_OPTION="-Dsbt.boot.properties=$SBT_BINDIR/sbt.boot.properties"
-HOME="$SBT_USER_HOME_ABSOLUTE" java -Xmx1024M -Dfile.encoding=UTF8 -Duser.home="$SBT_USER_HOME_ABSOLUTE" -Dsbt.log.noformat=true -Divy.default.ivy.user.dir="$SBT_USER_HOME_ABSOLUTE/.ivy2" $PROPS_OPTION -jar "$SBT_BINDIR"/$SBT_JAR $SBT_TASKS 2>&1 | sed -u 's/^/       /'
+HOME="$SBT_USER_HOME_ABSOLUTE" java -Xmx1024M -XX:PermSize=256m -Dfile.encoding=UTF8 -Duser.home="$SBT_USER_HOME_ABSOLUTE" -Dsbt.log.noformat=true -Divy.default.ivy.user.dir="$SBT_USER_HOME_ABSOLUTE/.ivy2" $PROPS_OPTION -jar "$SBT_BINDIR"/$SBT_JAR $SBT_TASKS 2>&1 | sed -u 's/^/       /'
 if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   echo " !     Failed to build app with sbt"
   exit 1
