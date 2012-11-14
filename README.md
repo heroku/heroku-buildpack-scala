@@ -12,7 +12,7 @@ Example usage:
     $ ls
     Procfile build.sbt project src
 
-    $ heroku create --stack cedar --buildpack https://github.com/heroku/heroku-buildpack-scala.git
+    $ heroku create --buildpack https://github.com/heroku/heroku-buildpack-scala.git
 
     $ git push heroku master
     ...
