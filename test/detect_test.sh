@@ -50,7 +50,7 @@ testDetect_ApplicationConfFileDetectsAsPlay20None()
 
   detect
 
-  assertAppDetected "Play 2.0"
+  assertAppDetected "Play 2.x"
 }
 
 testDetect_ApplicationConfFileDetectsAsPlay20Equals()
@@ -65,7 +65,7 @@ testDetect_ApplicationConfFileDetectsAsPlay20Equals()
 
   detect
 
-  assertAppDetected "Play 2.0"
+  assertAppDetected "Play 2.x"
 }
 
 
@@ -82,7 +82,7 @@ testDetect_ApplicationConfFileDetectsAsPlay20Scala()
   
   detect
 
-  assertAppDetected "Play 2.0 - Scala"
+  assertAppDetected "Play 2.x - Scala"
 }
 
 testDetect_ApplicationConfFileDetectsAsPlay20Java()
@@ -98,7 +98,7 @@ testDetect_ApplicationConfFileDetectsAsPlay20Java()
   
   detect
 
-  assertAppDetected "Play 2.0 - Java"
+  assertAppDetected "Play 2.x - Java"
 }
 
 
