@@ -16,11 +16,6 @@ CACHE_DIR=$2
 curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
 . bin/java
 
-if [ ! -d $CACHE_DIR ]; then
-  LOGGER_FLAGS="$LOGGER_FLAGS new_java_app"
-  logger -p user.notice -t "slugc[$$]" "language_pack_java new_java_app"
-fi
-
 #create the cache dir if it doesn't exist
 mkdir -p $CACHE_DIR
 
