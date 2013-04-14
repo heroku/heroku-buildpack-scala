@@ -1,7 +1,7 @@
 import sbt._
 import Keys._
 
-object Heroku extends Plugin {
+object HerokuPlugin extends Plugin {
   override def settings = Seq(
     externalResolvers <<= resolvers map { appResolvers =>
       Seq(Resolver.defaultLocal) ++ appResolvers ++
