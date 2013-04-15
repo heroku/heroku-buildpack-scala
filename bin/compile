@@ -110,7 +110,7 @@ else
 fi
 
 # copy in heroku sbt plugin
-HEROKU_PLUGIN="Heroku-0.11.3.scala"
+HEROKU_PLUGIN="HerokuPlugin.scala"
 mkdir -p "$SBT_USER_HOME/.sbt/plugins"
 cp $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN
 
