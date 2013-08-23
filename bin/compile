@@ -67,9 +67,9 @@ if ! has_supported_sbt_version ${BUILD_DIR}; then
 fi
  
 SBT_VERSION="$(get_supported_sbt_version ${BUILD_DIR})"
-SBT_JAR="sbt-launch-0.11.3-2.jar"
+SBT_JAR="sbt-launch.jar"
 SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
-SBT_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_JAR"
+SBT_URL="http://typesafe.artifactoryonline.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.0/$SBT_JAR"
 SBT_PROPS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_PROPS"
 ## in 0.10 start-script will depend on package, if packaging
 ## is required - it may not be, we can run .class files or a package-war
@@ -94,11 +94,6 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   echo "#!/usr/bin/env bash" > sbt
   echo "/usr/bin/java -Dsbt.boot.properties=/app/.sbt_home/bin/sbt.boot.properties  -Duser.home=/app/.sbt_home -Divy.default.ivy.user.dir=/app/.sbt_home/.ivy2 -jar /app/.sbt_home/bin/$SBT_JAR \"\$@\"" >> sbt
   chmod a+x sbt
-  ## some of the downloads don't have the version in the name,
-  ## fix it.
-  if [ -f "sbt-launch.jar" ] ; then
-      mv "sbt-launch.jar" "$SBT_JAR"
-  fi
 
   cd $BUILD_DIR
 fi
