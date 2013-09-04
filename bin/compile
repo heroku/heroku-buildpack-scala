@@ -68,7 +68,7 @@ fi
  
 SBT_VERSION="$(get_supported_sbt_version ${BUILD_DIR})"
 SBT_JAR="sbt-launch-0.11.3-2.jar"
-SBT_PROPS="sbt-0.12.3.boot.properties"
+SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
 SBT_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_JAR"
 SBT_PROPS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_PROPS"
 ## in 0.10 start-script will depend on package, if packaging
