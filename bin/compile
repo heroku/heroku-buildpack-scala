@@ -132,9 +132,6 @@ for DIR in $CACHED_DIRS ; do
   fi
 done
 
-# drop ivy cache from slug for play only
-if is_play $BUILD_DIR && [ -d $SBT_USER_HOME/.ivy2 ] ; then
-  echo "-----> Dropping ivy cache from the slug" 
-  rm -rf $SBT_USER_HOME/.ivy2 
-fi
+echo "-----> Dropping ivy cache from the slug"
+rm -rf $SBT_USER_HOME/.ivy2
 
