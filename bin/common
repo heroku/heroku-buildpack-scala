@@ -46,7 +46,7 @@ get_supported_sbt_version() {
   local ctxDir=$1
   if _has_buildPropertiesFile $ctxDir; then
     sbtVersionLine="$(grep -P '[ \t]*sbt\.version[ \t]*=' "${ctxDir}"/project/build.properties | sed -E -e 's/[ \t\r\n]//g')"
-    sbtVersion=$(expr "$sbtVersionLine" : 'sbt\.version=\(0\.1[1-2]\.[0-9]\)$')
+    sbtVersion=$(expr "$sbtVersionLine" : 'sbt\.version=\(0\.1[1-3]\.[0-9]\)$')
     if [ "$sbtVersion" != 0 ] ; then
       echo "$sbtVersion"
     else
