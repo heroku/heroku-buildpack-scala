@@ -93,6 +93,30 @@ detect_play_lang() {
   fi
 }
 
+uses_universal_packaging() {
+  local ctxDir=$1
+  test -d $ctxDir/target/universal/stage/bin
+}
+
+_universal_packaging_procs() {
+  local ctxDir=$1
+  ls --ignore=\*.bat $ctxDir/target/universal/stage/bin
+}
+
+_universal_packaging_proc_count() {
+  local ctxDir=$1
+  _universal_packaging_procs $ctxDir | wc -w
+}
+
+universal_packaging_web_proc() {
+  local ctxDir=$1
+  if [ $(_universal_packaging_proc_count $ctxDir) -eq 1 ]; then
+    echo "target/universal/stage/bin/$(_universal_packaging_procs $ctxDir)"
+  else
+    echo ""
+  fi
+}
+
 error() {
     echo " !     $1"
     exit 1
