@@ -100,7 +100,7 @@ uses_universal_packaging() {
 
 _universal_packaging_procs() {
   local ctxDir=$1
-  find $ctxDir/target/universal/stage/bin -type f -executable | sed 's/${ctxDir}\///g'
+  (cd $ctxDir; find target/universal/stage/bin -type f -executable)
 }
 
 _universal_packaging_proc_count() {
