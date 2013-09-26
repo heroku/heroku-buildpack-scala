@@ -100,20 +100,18 @@ uses_universal_packaging() {
 
 _universal_packaging_procs() {
   local ctxDir=$1
-  ls --ignore=\*.bat $ctxDir/target/universal/stage/bin
+  find $ctxDir/target/universal/stage/bin -type f -executable | sed 's/${ctxDir}\///g'
 }
 
 _universal_packaging_proc_count() {
   local ctxDir=$1
-  _universal_packaging_procs $ctxDir | wc -w
+  _universal_packaging_procs $ctxDir | wc -l
 }
 
-universal_packaging_web_proc() {
+universal_packaging_default_web_proc() {
   local ctxDir=$1
   if [ $(_universal_packaging_proc_count $ctxDir) -eq 1 ]; then
-    echo "target/universal/stage/bin/$(_universal_packaging_procs $ctxDir)"
-  else
-    echo ""
+    echo "web: $(_universal_packaging_procs $ctxDir) -Dhttp.port=\$PORT"
   fi
 }
 
