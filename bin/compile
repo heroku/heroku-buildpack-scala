@@ -132,9 +132,20 @@ for DIR in $CACHED_DIRS ; do
   fi
 done
 
-# drop ivy cache from slug for play only
-if is_play $BUILD_DIR && [ -d $SBT_USER_HOME/.ivy2 ] ; then
-  echo "-----> Dropping ivy cache from the slug" 
-  rm -rf $SBT_USER_HOME/.ivy2 
+# drop useless directories from slug for play only
+if is_play $BUILD_DIR ; then
+  if [ -d $SBT_USER_HOME/.ivy2 ]; then
+    echo "-----> Dropping ivy cache from the slug" 
+    rm -rf $SBT_USER_HOME/.ivy2 
+  fi
+  if [ -d $BUILD_DIR/project/boot ] ; then
+    echo "-----> Dropping project boot dir from the slug" 
+    rm -rf $BUILD_DIR/project/boot  
+  fi
+  if [ -d $BUILD_DIR/target ] ; then
+    echo "-----> Dropping compilation artifacts from the slug" 
+    rm -rf $BUILD_DIR/target/scala-*
+    rm -rf $BUILD_DIR/target/streams
+    rm -rf $BUILD_DIR/target/resolution-cache 
+  fi
 fi
-
