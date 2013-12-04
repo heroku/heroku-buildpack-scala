@@ -74,7 +74,7 @@ SBT_PROPS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_PROPS"
 ## in 0.10 start-script will depend on package, if packaging
 ## is required - it may not be, we can run .class files or a package-war
 ## instead.
-SBT_TASKS="clean compile stage"
+SBT_TASKS="compile stage"
 
 
 if [ ! -d .ivy2/cache ]; then

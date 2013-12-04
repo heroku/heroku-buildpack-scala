@@ -103,7 +103,7 @@ testCompile()
   assertCaptured "SBT should have been installed" "Building app with sbt" 
 
   # run
-  assertCaptured "SBT tasks to run should be output" "Running: sbt clean compile stage" 
+  assertCaptured "SBT tasks to run should be output" "Running: sbt compile stage" 
   assertCaptured "SBT should run stage task" "${SBT_STAGING_STRING}" 
  
   # clean up
@@ -115,7 +115,7 @@ testCompile()
 
   assertCapturedSuccess
   assertNotCaptured "SBT should not be re-installed on re-run" "Building app with sbt" 
-  assertCaptured "SBT tasks to run should still be outputed" "Running: sbt clean compile stage" 
+  assertCaptured "SBT tasks to run should still be outputed" "Running: sbt compile stage" 
 }
 
 testCompile_Play20Project() {
