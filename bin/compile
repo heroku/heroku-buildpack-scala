@@ -10,8 +10,11 @@ OPT_DIR=$BP_DIR/opt
 . $BIN_DIR/common
 
 # parse args
-BUILD_DIR=$(cd $1; pwd)
+APP_BUILD_DIR=$(cd $1; pwd)
 CACHE_DIR=$2
+
+BUILD_DIR="/tmp/build_dir"
+mv $APP_BUILD_DIR $BUILD_DIR
 
 curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
 . bin/java
@@ -46,12 +49,11 @@ cd $BUILD_DIR
 # unpack cache
 CACHED_DIRS="$SBT_USER_HOME/.ivy2 $SBT_BINDIR target"
 for DIR in $CACHED_DIRS; do
-  rm -rf $DIR
-  if [ -d $CACHE_DIR/$DIR ]; then
-    mkdir -p $DIR
-    cp -r $CACHE_DIR/$DIR/.  $DIR
-  fi
+  cache_copy $DIR $CACHE_DIR $BUILD_DIR
 done
+
+# Fix Timestamps
+# find src -type f | xargs -P 4 -I{} sh -c 'rev=$(git rev-list HEAD {} | head -n 1); ts=$(git show --pretty=format:%ai --abbrev-commit $rev | head -n 1); touch -d $ts {}'
 
 # these are preliminary checks. actual version check happens below when attempting to download sbt boot.properties
 if ! test -e project/build.properties; then
@@ -99,7 +101,7 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
 fi
 
 if [ -f $OPT_DIR/$SBT_PROPS ]; then
-  cp $OPT_DIR/$SBT_PROPS $SBT_BINDIR/sbt.boot.properties
+  cp -p $OPT_DIR/$SBT_PROPS $SBT_BINDIR/sbt.boot.properties
 else
   error "Error, SBT version $SBT_VERSION not supported"
 fi
@@ -107,16 +109,19 @@ fi
 # copy in heroku sbt plugin
 HEROKU_PLUGIN="HerokuPlugin.scala"
 mkdir -p "$SBT_USER_HOME/.sbt/plugins"
-cp $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN
+cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN
 
 # build app
 echo "-----> Running: sbt $SBT_TASKS"
 test -e "$SBT_BINDIR"/sbt.boot.properties && PROPS_OPTION="-Dsbt.boot.properties=$SBT_BINDIR/sbt.boot.properties"
-HOME="$SBT_USER_HOME_ABSOLUTE" java -Xms768M -Xmx1024M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled -Dfile.encoding=UTF8 -Duser.home="$SBT_USER_HOME_ABSOLUTE" -Dsbt.log.noformat=true -Divy.default.ivy.user.dir="$SBT_USER_HOME_ABSOLUTE/.ivy2" $PROPS_OPTION -jar "$SBT_BINDIR"/$SBT_JAR $SBT_TASKS 2>&1 | sed -u 's/^/       /'
+HOME="$SBT_USER_HOME_ABSOLUTE" java -Xms768M -Xmx1024M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled -Dfile.encoding=UTF8 -Duser.home="$SBT_USER_HOME_ABSOLUTE" -Dsbt.log.noformat=true -Divy.default.ivy.user.dir="$SBT_USER_HOME_ABSOLUTE/.ivy2" -Dsbt.global.base=$SBT_USER_HOME_ABSOLUTE $PROPS_OPTION -jar "$SBT_BINDIR"/$SBT_JAR compile 2>&1 | sed -u 's/^/       /'
 if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   echo " !     Failed to build app with sbt"
   exit 1
 fi
+
+# DEBUG last compile
+# HOME="$SBT_USER_HOME_ABSOLUTE" java -Xms768M -Xmx1024M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled -Dfile.encoding=UTF8 -Duser.home="$SBT_USER_HOME_ABSOLUTE" -Dsbt.log.noformat=true -Divy.default.ivy.user.dir="$SBT_USER_HOME_ABSOLUTE/.ivy2" -Dsbt.global.base=$SBT_USER_HOME_ABSOLUTE $PROPS_OPTION -jar "$SBT_BINDIR"/$SBT_JAR 'last compile' 2>&1 | sed -u 's/^/       /'
 
 PROFILE_PATH="$BUILD_DIR/.profile.d/scala.sh"
 mkdir -p $(dirname $PROFILE_PATH)
@@ -124,12 +129,8 @@ echo 'export PATH="/app/.jdk/bin:$PATH"' >> $PROFILE_PATH
 
 # repack cache
 mkdir -p $CACHE_DIR
-for DIR in $CACHED_DIRS ; do
-  rm -rf $CACHE_DIR/$DIR
-  mkdir -p $CACHE_DIR/$DIR
-  if [ -d $DIR ] ; then
-    cp -r $DIR/.  $CACHE_DIR/$DIR
-  fi
+for DIR in $CACHED_DIRS; do
+  cache_copy $DIR $BUILD_DIR $CACHE_DIR
 done
 
 # drop useless directories from slug for play only
@@ -149,3 +150,5 @@ if is_play $BUILD_DIR ; then
     rm -rf $BUILD_DIR/target/resolution-cache
   fi
 fi
+
+mv $BUILD_DIR $APP_BUILD_DIR
