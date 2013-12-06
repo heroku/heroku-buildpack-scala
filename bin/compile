@@ -52,9 +52,6 @@ for DIR in $CACHED_DIRS; do
   cache_copy $DIR $CACHE_DIR $BUILD_DIR
 done
 
-# Fix Timestamps
-# find src -type f | xargs -P 4 -I{} sh -c 'rev=$(git rev-list HEAD {} | head -n 1); ts=$(git show --pretty=format:%ai --abbrev-commit $rev | head -n 1); touch -d $ts {}'
-
 # these are preliminary checks. actual version check happens below when attempting to download sbt boot.properties
 if ! test -e project/build.properties; then
 	echo " !      Error, your scala project must include project/build.properties and define sbt.version"
@@ -119,9 +116,6 @@ if [ "${PIPESTATUS[*]}" != "0 0" ]; then
   echo " !     Failed to build app with sbt"
   exit 1
 fi
-
-# DEBUG last compile
-# HOME="$SBT_USER_HOME_ABSOLUTE" java -Xms768M -Xmx1024M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled -Dfile.encoding=UTF8 -Duser.home="$SBT_USER_HOME_ABSOLUTE" -Dsbt.log.noformat=true -Divy.default.ivy.user.dir="$SBT_USER_HOME_ABSOLUTE/.ivy2" -Dsbt.global.base=$SBT_USER_HOME_ABSOLUTE $PROPS_OPTION -jar "$SBT_BINDIR"/$SBT_JAR 'last compile' 2>&1 | sed -u 's/^/       /'
 
 PROFILE_PATH="$BUILD_DIR/.profile.d/scala.sh"
 mkdir -p $(dirname $PROFILE_PATH)

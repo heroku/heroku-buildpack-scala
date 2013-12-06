@@ -120,13 +120,6 @@ error() {
     exit 1
 }
 
-trim() {
-    local var="$@"
-    var="${var#"${var%%[![:space:]]*}"}"   # remove leading whitespace characters
-    var="${var%"${var##*[![:space:]]}"}"   # remove trailing whitespace characters
-    echo -n "$var"
-}
-
 cache_copy() {
   rel_dir=$1
   from_dir=$2
