@@ -7,6 +7,11 @@ DEFAULT_SBT_JAR="sbt-launch-0.11.3-2.jar"
 SBT_TEST_CACHE="/tmp/sbt-test-cache"
 SBT_STAGING_STRING="THIS_STRING_WILL_BE_OUTPUT_DURING_STAGING"
 
+afterSetUp() {
+  # Remove scala-specific build dir in case it's already there
+  rm -rf /tmp/scala_buildpack_build_dir
+}
+
 _createSbtProject()
 {
   local sbtVersion=${1:-${DEFAULT_SBT_VERSION}}
@@ -73,7 +78,6 @@ createSbtProject()
   _createSbtProject ${sbtVersion}
 }
 
-
 ###
 
 testCompile()
@@ -100,7 +104,7 @@ testCompile()
   assertTrue "Ivy2 cache should exist" "[ -d ${BUILD_DIR}/.ivy2/cache ]"
   assertFalse "Old SBT launch jar should have been deleted" "[ -f ${BUILD_DIR}/.sbt_home/bin/sbt-launch-OLD.jar ]"
   assertTrue "sbt launch script should be created" "[ -f ${BUILD_DIR}/.sbt_home/bin/sbt ]"
-  assertCaptured "SBT should have been installed" "Building app with sbt" 
+  assertCaptured "SBT should have been installed" "Downloading SBT..." 
 
   # run
   assertCaptured "SBT tasks to run should be output" "Running: sbt compile stage" 
@@ -141,7 +145,7 @@ testCompile_WithNonDefaultVersion()
   compile
 
   assertCapturedSuccess
-  assertCaptured "Default version of SBT should always be installed" "Building app with sbt" 
+  assertCaptured "Default version of SBT should always be installed" "Downloading SBT" 
   assertCaptured "Specified SBT version should actually be used" "Getting org.scala-tools.sbt sbt_2.9.1 ${specifiedSbtVersion}" 
 }
 
@@ -168,7 +172,7 @@ sbt.version   =  0.11.3
 abc=xyz
 EOF
   compile
-  assertCaptured "Multiline properties file should detect sbt version" "Building app with sbt"
+  assertCaptured "Multiline properties file should detect sbt version" "Downloading SBT"
 }
 
 testCompile_BuildFailure()
