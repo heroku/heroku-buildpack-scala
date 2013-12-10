@@ -80,7 +80,7 @@ SBT_TASKS="compile stage"
 # $ heroku labs:enable user-env-compile
 # $ heroku config:set SBT_CLEAN=true
 # $ git push heroku master
-[ "$SBT_CLEAN" == "true" ] && SBT_TASKS="clean $SBT_TASKS"
+[ "$SBT_CLEAN" = "true" ] && SBT_TASKS="clean $SBT_TASKS"
 
 if [ ! -d .ivy2/cache ]; then
    mkdir -p .ivy2/cache

@@ -121,6 +121,8 @@ testCompile()
 
   assertCapturedSuccess
   assertNotCaptured "SBT should not be re-installed on re-run" "Building app with sbt" 
+  assertNotCaptured "SBT should not compile any new classes" "[info] Compiling" 
+  assertNotCaptured "SBT should not resolve any dependencies" "[info] Resolving" 
   assertCaptured "SBT tasks to run should still be outputed" "Running: sbt compile stage" 
 }
 
