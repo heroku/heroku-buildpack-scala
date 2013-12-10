@@ -10,6 +10,8 @@ SBT_STAGING_STRING="THIS_STRING_WILL_BE_OUTPUT_DURING_STAGING"
 afterSetUp() {
   # Remove scala-specific build dir in case it's already there
   rm -rf /tmp/scala_buildpack_build_dir
+  # Clear clean compiles...most apps don't need to clean by default
+  unset SBT_CLEAN
 }
 
 _createSbtProject()
@@ -120,6 +122,18 @@ testCompile()
   assertCapturedSuccess
   assertNotCaptured "SBT should not be re-installed on re-run" "Building app with sbt" 
   assertCaptured "SBT tasks to run should still be outputed" "Running: sbt compile stage" 
+}
+
+testCleanCompile()
+{
+  createSbtProject
+  
+  # set appropriate env to clean
+  export SBT_CLEAN=true
+  compile
+
+  assertCapturedSuccess
+  assertCaptured "SBT tasks to run should still be outputed" "Running: sbt clean compile stage" 
 }
 
 testCompile_Play20Project() {

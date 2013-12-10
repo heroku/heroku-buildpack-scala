@@ -76,6 +76,11 @@ SBT_PROPS_URL="http://s3.amazonaws.com/heroku-jvm-langpack-scala/$SBT_PROPS"
 ## instead.
 SBT_TASKS="compile stage"
 
+# To enable clean compiles, configure the environment to clean:
+# $ heroku labs:enable user-env-compile
+# $ heroku config:set SBT_CLEAN=true
+# $ git push heroku master
+[ "$SBT_CLEAN" == "true" ] && SBT_TASKS="clean $SBT_TASKS"
 
 if [ ! -d .ivy2/cache ]; then
    mkdir -p .ivy2/cache
