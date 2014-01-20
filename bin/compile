@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# bin/compile <build-dir> <cache-dir> <env-file>
+# bin/compile <build-dir> <cache-dir> <env-dir>
 
 # fail fast
 set -e
@@ -12,15 +12,17 @@ OPT_DIR=$BP_DIR/opt
 # parse args
 APP_BUILD_DIR=$(cd $1; pwd)
 CACHE_DIR=$2
-ENV_FILE=$3
-[ -f "$ENV_FILE" ] && export $(grep 'SBT_CLEAN' $ENV_FILE)
+ENV_DIR=$3
 
 # Move app to a static build dir to keep paths the same between builds
 BUILD_DIR="/tmp/scala_buildpack_build_dir"
 mv $APP_BUILD_DIR $BUILD_DIR
 
 curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
+. bin/util
 . bin/java
+
+export_env_dir $ENV_DIR '^SBT_CLEAN$'
 
 #create the cache dir if it doesn't exist
 mkdir -p $CACHE_DIR
