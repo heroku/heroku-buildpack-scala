@@ -131,7 +131,8 @@ testCleanCompile()
   createSbtProject
   
   # set appropriate env to clean
-  export SBT_CLEAN=true
+  echo 'true' > $ENV_DIR/SBT_CLEAN
+  
   compile
 
   assertCapturedSuccess
