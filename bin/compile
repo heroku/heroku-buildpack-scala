@@ -108,12 +108,6 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   cd $BUILD_DIR
 fi
 
-if [ -f $OPT_DIR/$SBT_PROPS ]; then
-  cp -p $OPT_DIR/$SBT_PROPS $SBT_BINDIR/sbt.boot.properties
-else
-  error "Error, SBT version $SBT_VERSION not supported"
-fi
-
 # copy in heroku sbt plugin
 HEROKU_PLUGIN="HerokuPlugin.scala"
 mkdir -p "$SBT_USER_HOME/.sbt/plugins"
