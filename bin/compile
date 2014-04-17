@@ -27,12 +27,12 @@ export_env_dir $ENV_DIR
 #create the cache dir if it doesn't exist
 mkdir -p $CACHE_DIR
 
-# create default system.properties 
+# create default system.properties
 if [ ! -f ${BUILD_DIR}/system.properties ]; then
   echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
 fi
 
-# install JDK 
+# install JDK
 javaVersion=$(detect_java_version ${BUILD_DIR})
 echo -n "-----> Installing OpenJDK ${javaVersion}..."
 install_java ${BUILD_DIR} ${javaVersion}
@@ -69,7 +69,7 @@ if ! has_supported_sbt_version ${BUILD_DIR}; then
 	echo " !      You must use a release verison of sbt, sbt.version=0.11.0 or greater"
 	exit 1
 fi
- 
+
 SBT_VERSION="$(get_supported_sbt_version ${BUILD_DIR})"
 SBT_JAR="sbt-launch.jar"
 SBT_PROPS="sbt-$SBT_VERSION.boot.properties"
@@ -132,22 +132,19 @@ for DIR in $CACHED_DIRS; do
   cache_copy $DIR $BUILD_DIR $CACHE_DIR
 done
 
-# drop useless directories from slug for play only
-if is_play $BUILD_DIR ; then
-  if [ -d $SBT_USER_HOME/.ivy2 ]; then
-    echo "-----> Dropping ivy cache from the slug"
-    rm -rf $SBT_USER_HOME/.ivy2
-  fi
-  if [ -d $BUILD_DIR/project/boot ] ; then
-    echo "-----> Dropping project boot dir from the slug"
-    rm -rf $BUILD_DIR/project/boot
-  fi
-  if [ -d $BUILD_DIR/target ] ; then
-    echo "-----> Dropping compilation artifacts from the slug"
-    rm -rf $BUILD_DIR/target/scala-*
-    rm -rf $BUILD_DIR/target/streams
-    rm -rf $BUILD_DIR/target/resolution-cache
-  fi
+if [ -d $SBT_USER_HOME/.ivy2 ]; then
+  echo "-----> Dropping ivy cache from the slug"
+  rm -rf $SBT_USER_HOME/.ivy2
+fi
+if [ -d $BUILD_DIR/project/boot ] ; then
+  echo "-----> Dropping project boot dir from the slug"
+  rm -rf $BUILD_DIR/project/boot
+fi
+if [ -d $BUILD_DIR/target ] ; then
+  echo "-----> Dropping compilation artifacts from the slug"
+  rm -rf $BUILD_DIR/target/scala-*
+  rm -rf $BUILD_DIR/target/streams
+  rm -rf $BUILD_DIR/target/resolution-cache
 fi
 
 # Move compiled app back to where Heroku expects it
