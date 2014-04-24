@@ -133,7 +133,7 @@ cache_copy() {
 
 create_application_conf() {
   local ctxDir=$1
-  if [ -z "$DATABASE_URL"]; then
+  if [ -z "$DATABASE_URL" ]; then
     return 1
   fi
   if [ -z "$SCALA_ENV" ]; then
