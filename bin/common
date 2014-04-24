@@ -132,7 +132,7 @@ cache_copy() {
 }
 
 create_application_conf() {
-  local ctxDir = $1
+  local ctxDir=$1
   if [ -z "$DATABASE_URL"]; then
     return 1
   fi
