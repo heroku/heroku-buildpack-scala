@@ -166,6 +166,10 @@ create_application_conf() {
   # extract the path (if any)
   path="`echo $url | grep / | cut -d/ -f2-`"
 
+  if [ -f $ctxDir/src/main/resources/application.conf.heroku ]; then
+    cp $ctxDir/src/main/resources/application.conf.heroku $ctxDir/src/main/resources/application.conf
+  fi
+
   # could potentially cat this to the end if file exists
   cat >> $ctxDir/src/main/resources/application.conf <<EOF
 $SCALA_ENV {
