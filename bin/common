@@ -167,7 +167,7 @@ create_application_conf() {
   path="`echo $url | grep / | cut -d/ -f2-`"
 
   # could potentially cat this to the end if file exists
-  cat > $ctxDir/src/main/resources/application.conf <<EOF
+  cat >> $ctxDir/src/main/resources/application.conf <<EOF
 $SCALA_ENV {
   ep2 {
     databaseUser = "$user"
