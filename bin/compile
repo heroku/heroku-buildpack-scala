@@ -90,8 +90,8 @@ if [ ! -d .ivy2/cache ]; then
    mkdir -p .ivy2/cache
 fi
 
-if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
-  mkdir -p "$SBT_BINDIR"
+#if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
+#  mkdir -p "$SBT_BINDIR"
   cd "$SBT_BINDIR"
 
   ## clean up any old versions
@@ -107,7 +107,7 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   chmod a+x sbt
 
   cd $BUILD_DIR
-fi
+#fi
 
 # copy in heroku sbt plugin
 HEROKU_PLUGIN="HerokuPlugin.scala"
