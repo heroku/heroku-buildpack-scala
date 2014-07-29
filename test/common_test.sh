@@ -139,11 +139,24 @@ EOF
   assertCapturedEquals "${EXPECTED_VERSION}"
 }
 
+testGetSbtVersionWithReleaseCandidate()
+{
+  mkdir -p ${BUILD_DIR}/project
+  cat > ${BUILD_DIR}/project/build.properties <<EOF
+sbt.version   =    ${EXPECTED_VERSION}-RC3
+EOF
+
+  capture get_supported_sbt_version ${BUILD_DIR}
+
+  assertCapturedSuccess
+  assertCapturedEquals "${EXPECTED_VERSION}-RC3"
+}
+
 testGetSbtVersionWithTrailingLetters()
 {
   mkdir -p ${BUILD_DIR}/project
   cat > ${BUILD_DIR}/project/build.properties <<EOF
-sbt.version   =    ${EXPECTED_VERSION}RC    
+sbt.version   =    ${EXPECTED_VERSION}-MSERVER-1
 EOF
 
   capture get_supported_sbt_version ${BUILD_DIR}
