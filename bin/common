@@ -115,6 +115,25 @@ universal_packaging_default_web_proc() {
   fi
 }
 
+run_sbt()
+{
+  local home=$1
+  local launcher=$2
+  local tasks=$3
+  JAVA_OPTS="-Xms768M -Xmx1024M -Xss4M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled"
+  JAVA_OPTS="$JAVA_OPTS -Dfile.encoding=UTF8 -Dsbt.log.noformat=true"
+  JAVA_OPTS="$JAVA_OPTS -Duser.home=$home"
+  JAVA_OPTS="$JAVA_OPTS -Divy.default.ivy.user.dir=$home/.ivy2"
+  JAVA_OPTS="$JAVA_OPTS -Dsbt.global.base=$home"
+  
+  echo "-----> Running: sbt $tasks"
+  HOME="$home" java $JAVA_OPTS -jar $launcher $tasks 2>&1 | sed -u 's/^/       /'
+  
+  if [ "${PIPESTATUS[*]}" != "0 0" ]; then
+    error "Failed to run sbt task: $tasks"
+  fi
+}
+
 error() {
     echo " !     $1"
     exit 1
