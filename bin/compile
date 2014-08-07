@@ -99,12 +99,13 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   curl --silent --max-time 60 -O --location $SBT_URL --fail || error "Failed to download $SBT_JAR"
   echo "done"
 
-  echo "#!/usr/bin/env bash" > sbt
-  echo "java -Dsbt.boot.properties=/app/.sbt_home/bin/sbt.boot.properties  -Duser.home=/app/.sbt_home -Divy.default.ivy.user.dir=/app/.sbt_home/.ivy2 -jar /app/.sbt_home/bin/$SBT_JAR \"\$@\"" >> sbt
-  chmod a+x sbt
-
   cd $BUILD_DIR
 fi
+
+rm -f $SBT_BINDIR/sbt
+echo "#!/usr/bin/env bash" > $SBT_BINDIR/sbt
+echo "java  -Duser.home=/app/.sbt_home -Divy.default.ivy.user.dir=/app/.sbt_home/.ivy2 -jar /app/.sbt_home/bin/$SBT_JAR \"\$@\"" >> $SBT_BINDIR/sbt
+chmod a+x $SBT_BINDIR/sbt
 
 # copy in heroku sbt plugin
 HEROKU_PLUGIN="HerokuPlugin.scala"
