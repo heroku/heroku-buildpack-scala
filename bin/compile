@@ -18,7 +18,7 @@ ENV_DIR=$3
 BUILD_DIR="/tmp/scala_buildpack_build_dir"
 mv $APP_BUILD_DIR $BUILD_DIR
 
-curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
+curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xzm
 . bin/util
 . bin/java
 
@@ -52,7 +52,7 @@ SBT_BINDIR="$SBT_USER_HOME"/bin
 cd $BUILD_DIR
 
 # unpack cache
-CACHED_DIRS="$SBT_USER_HOME/.ivy2 $SBT_BINDIR target project/target project/boot"
+CACHED_DIRS="$SBT_USER_HOME/.ivy2 $SBT_USER_HOME/boot $SBT_BINDIR target project/target project/boot"
 for DIR in $CACHED_DIRS; do
   cache_copy $DIR $CACHE_DIR $BUILD_DIR
 done
@@ -113,6 +113,17 @@ cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN
 
 # download and cache the dependencies if this is the first build
 if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
+  echo -n "-----> Priming Ivy Cache..."
+  if is_play $BUILD_DIR ; then
+    IVY_CACHE_TAR="https://s3-us-west-2.amazonaws.com/jkutner-jvm-langpack-scala/sbt-play-cache.tar.gz"
+  else
+    IVY_CACHE_TAR="https://s3-us-west-2.amazonaws.com/jkutner-jvm-langpack-scala/sbt-cache.tar.gz"
+  fi
+  curl --silent --max-time 60 --location $IVY_CACHE_TAR | tar xzm -C $SBT_USER_HOME
+  mv $SBT_USER_HOME/.sbt/* $SBT_USER_HOME
+  rm -rf $SBT_USER_HOME/.sbt
+  echo " done"
+  
   run_sbt "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "update"
   cache_copy $SBT_USER_HOME/.ivy2 $BUILD_DIR $CACHE_DIR
 fi
