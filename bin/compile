@@ -116,7 +116,7 @@ if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
   echo -n "-----> Priming Ivy Cache..."
   IVY_CACHE_TAR="https://heroku-jvm-langpack-scala.s3.amazonaws.com/sbt-cache-base.tar.gz"
   if is_play $BUILD_DIR ; then
-    PLAY_VERSION=get_play_version $BUILD_DIR
+    PLAY_VERSION=get_supported_play_version $BUILD_DIR
     if [ -z "$PLAY_VERSION" ]; then
       IVY_CACHE_TAR="http://heroku-jvm-langpack-scala.s3.amazonaws.com/sbt-cache-play-$PLAY_VERSION.tar.gz"
     fi

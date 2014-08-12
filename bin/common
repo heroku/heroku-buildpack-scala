@@ -47,7 +47,7 @@ _has_playPluginsFile() {
   test -e $ctxDir/project/plugins.sbt
 }
 
-get_play_version() {
+get_supported_play_version() {
   local ctxDir=$1
   if _has_playPluginsFile $ctxDir; then
     pluginVersionLine="$(grep "addSbtPlugin.\+com\.typesafe\.play" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
