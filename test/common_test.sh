@@ -263,3 +263,16 @@ testDetectPlayLang_BadDir() {
   assertCapturedSuccess
   assertCapturedEquals ""
 }
+
+
+testGetPlayVersion() {
+  mkdir -p ${BUILD_DIR}/project
+  cat > ${BUILD_DIR}/project/plugins.sbt <<EOF
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.0")
+EOF
+
+  capture get_play_version ${BUILD_DIR}
+
+  assertCapturedSuccess
+  assertCapturedEquals "2.3.0"
+}
