@@ -107,9 +107,9 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
 fi
 
 # copy in heroku sbt plugin
-HEROKU_PLUGIN="HerokuPlugin.scala"
-mkdir -p "$SBT_USER_HOME/.sbt/plugins"
-cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN
+#HEROKU_PLUGIN="HerokuPlugin.scala"
+#mkdir -p "$SBT_USER_HOME/.sbt/plugins"
+#cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN
 
 # download and cache the dependencies if this is the first build
 if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
