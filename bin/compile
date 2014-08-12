@@ -114,11 +114,11 @@ cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN
 # download and cache the dependencies if this is the first build
 if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
   echo -n "-----> Priming Ivy Cache..."
-  IVY_CACHE_TAR="https://heroku-jvm-langpack-scala.s3.amazonaws.com/sbt-cache.tar.gz"
+  IVY_CACHE_TAR="https://heroku-jvm-langpack-scala.s3.amazonaws.com/sbt-cache-base.tar.gz"
   if is_play $BUILD_DIR ; then
     PLAY_VERSION=get_play_version $BUILD_DIR
     if [ -z "$PLAY_VERSION" ]; then
-      IVY_CACHE_TAR="http://heroku-jvm-langpack-scala.s3.amazonaws.com/sbt-play-$PLAY_VERSION-cache.tar.gz"
+      IVY_CACHE_TAR="http://heroku-jvm-langpack-scala.s3.amazonaws.com/sbt-cache-play-$PLAY_VERSION.tar.gz"
     fi
   fi
   curl --silent --max-time 60 --location $IVY_CACHE_TAR | tar xzm -C $SBT_USER_HOME
