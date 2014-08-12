@@ -4,6 +4,8 @@
 
 DEFAULT_SBT_VERSION="0.11.0"
 DEFAULT_SBT_JAR="sbt-launch-0.11.3-2.jar"
+DEFAULT_PLAY_VERSION="2.3.1"
+DEFAULT_SCALA_VERSION="2.11.1"
 SBT_TEST_CACHE="/tmp/sbt-test-cache"
 SBT_STAGING_STRING="THIS_STRING_WILL_BE_OUTPUT_DURING_STAGING"
 
@@ -70,6 +72,31 @@ _primeIvyCache()
   ivy2_path=.sbt_home/.ivy2
   mkdir -p ${CACHE_DIR}/${ivy2_path}
   _primeSbtTestCache ${sbtVersion} && cp -r ${SBT_TEST_CACHE}/${sbtVersion}/app/cache/${ivy2_path}/cache ${CACHE_DIR}/${ivy2_path}
+}
+
+createPlayProject()
+{
+  local playVersion=${1:-${DEFAULT_PLAY_VERSION}}
+  local sbtVersion=${2:-${DEFAULT_SBT_VERSION}}
+  local scalaVersion=${3:-${DEFAULT_SCALA_VERSION}}
+  
+  mkdir -p ${BUILD_DIR}/conf ${BUILD_DIR}/project
+  touch ${BUILD_DIR}/conf/application.conf
+  cat > ${BUILD_DIR}/project/plugins.sbt <<EOF
+resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
+
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "${playVersion}")
+EOF
+  
+  cat > ${BUILD_DIR}/build.sbt <<EOF
+scalaVersion := "${scalaVersion}"
+
+TaskKey[Unit]("stage") in Compile := { println("${SBT_STAGING_STRING}") }
+EOF
+
+  cat > ${BUILD_DIR}/project/build.properties <<EOF
+sbt.version=${sbtVersion}
+EOF
 }
 
 createSbtProject()
@@ -139,6 +166,24 @@ testCleanCompile()
   assertCapturedSuccess
   assertCaptured "SBT tasks to run should still be outputed" "Running: sbt clean compile stage" 
 }
+
+testCompile_PrimeIvyCacheForPlay() {
+  createPlayProject "2.3.1" "0.13.5" "2.11.1"
+  
+  compile
+
+  # assertContains "expected output" "$(cat ${STD_OUT})"
+  # assertEquals "" "$(cat ${STD_ERR})"
+
+  assertCapturedSuccess
+  assertCaptured "Ivy cache should be primed" "Priming Ivy Cache" 
+  
+  compile 
+  
+  assertCapturedSuccess
+  assertNotCaptured "Ivy cache should not be primed on re-run" "Priming Ivy Cache"
+}
+
 
 testCompile_Play20Project() {
   createSbtProject
