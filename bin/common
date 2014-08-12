@@ -42,6 +42,26 @@ _has_playConfig() {
   test -e $ctxDir/conf/application.conf
 }
 
+_has_playPluginsFile() {
+  local ctxDir=$1
+  test -e $ctxDir/project/plugins.sbt
+}
+
+get_play_version() {
+  local ctxDir=$1
+  if _has_playPluginsFile $ctxDir; then
+    pluginVersionLine="$(grep "addSbtPlugin.\+com\.typesafe\.play" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
+    pluginVersion=$(expr "$pluginVersionLine" : ".\+\(2\.3\.[0-2]\)")
+    if [ "$pluginVersion" != 0 ] ; then
+      echo "$pluginVersion"
+    else
+      echo ""
+    fi
+  else
+    echo ""
+  fi
+}
+
 get_supported_sbt_version() {
   local ctxDir=$1
   if _has_buildPropertiesFile $ctxDir; then
