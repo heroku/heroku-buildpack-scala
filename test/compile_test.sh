@@ -120,6 +120,7 @@ testCompile()
   compile
 
   assertCapturedSuccess
+  assertNotCaptured "Ivy cache should not be primed on re-run" "Priming Ivy Cache" 
   assertNotCaptured "SBT should not be re-installed on re-run" "Building app with sbt" 
   assertNotCaptured "SBT should not compile any new classes" "[info] Compiling" 
   assertNotCaptured "SBT should not resolve any dependencies" "[info] Resolving" 
