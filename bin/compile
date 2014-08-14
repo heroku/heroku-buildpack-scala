@@ -27,12 +27,12 @@ export_env_dir $ENV_DIR
 #create the cache dir if it doesn't exist
 mkdir -p $CACHE_DIR
 
-# create default system.properties 
+# create default system.properties
 if [ ! -f ${BUILD_DIR}/system.properties ]; then
   echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
 fi
 
-# install JDK 
+# install JDK
 javaVersion=$(detect_java_version ${BUILD_DIR})
 echo -n "-----> Installing OpenJDK ${javaVersion}..."
 install_java ${BUILD_DIR} ${javaVersion}
@@ -69,7 +69,7 @@ if ! has_supported_sbt_version ${BUILD_DIR}; then
 	echo " !      You must use a release verison of sbt, sbt.version=0.11.0 or greater"
 	exit 1
 fi
- 
+
 SBT_VERSION="$(get_supported_sbt_version ${BUILD_DIR})"
 SBT_JAR="sbt-launch.jar"
 SBT_URL="http://typesafe.artifactoryonline.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.5/$SBT_JAR"
@@ -108,19 +108,7 @@ fi
 
 # download and cache the dependencies if this is the first build
 if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
-  echo -n "-----> Priming Ivy Cache..."
-  IVY_CACHE_TAR="https://heroku-jvm-langpack-scala.s3.amazonaws.com/sbt-cache-base.tar.gz"
-  if is_play $BUILD_DIR ; then
-    PLAY_VERSION=`get_supported_play_version ${BUILD_DIR}`
-    if [ -n "$PLAY_VERSION" ]; then
-      IVY_CACHE_TAR="http://heroku-jvm-langpack-scala.s3.amazonaws.com/sbt-cache-play-$PLAY_VERSION.tar.gz"
-    fi
-  fi
-  curl --silent --max-time 60 --location $IVY_CACHE_TAR | tar xzm -C $SBT_USER_HOME
-  mv $SBT_USER_HOME/.sbt/* $SBT_USER_HOME
-  rm -rf $SBT_USER_HOME/.sbt
-  echo " done"
-  
+  prime_ivy_cache "$BUILD_DIR" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR"
   run_sbt "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "update"
   cache_copy $SBT_USER_HOME/.ivy2 $BUILD_DIR $CACHE_DIR
 fi
