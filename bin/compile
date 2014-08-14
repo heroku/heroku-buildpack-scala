@@ -27,12 +27,12 @@ export_env_dir $ENV_DIR
 #create the cache dir if it doesn't exist
 mkdir -p $CACHE_DIR
 
-# create default system.properties 
+# create default system.properties
 if [ ! -f ${BUILD_DIR}/system.properties ]; then
   echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
 fi
 
-# install JDK 
+# install JDK
 javaVersion=$(detect_java_version ${BUILD_DIR})
 echo -n "-----> Installing OpenJDK ${javaVersion}..."
 install_java ${BUILD_DIR} ${javaVersion}
@@ -69,7 +69,7 @@ if ! has_supported_sbt_version ${BUILD_DIR}; then
 	echo " !      You must use a release verison of sbt, sbt.version=0.11.0 or greater"
 	exit 1
 fi
- 
+
 SBT_VERSION="$(get_supported_sbt_version ${BUILD_DIR})"
 SBT_JAR="sbt-launch.jar"
 SBT_URL="http://typesafe.artifactoryonline.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.5/$SBT_JAR"
@@ -105,6 +105,19 @@ fi
 rm -f $SBT_BINDIR/sbt
 cat << EOF > $SBT_BINDIR/sbt
 #!/usr/bin/env bash
+
+if [ "\$@" == "console" ]
+  scalaLibraryJar=\$(ls . | grep "org.scala-lang.scala-library")
+  scalaVersion=\$(expr \${scalaLibraryJar} : "\(2\.[0-9]\+\.[0-9]\+\(\-[a-zA-Z0-9]\+\)\?\)")
+  scalaCompilerJar="scala-compiler-\${scalaVersion}.jar"
+  scalaCompilerUrl="http://central.maven.org/maven2/org/scala-lang/scala-compiler/\${scalaVersion}/\${scalaCompilerJar}"
+
+  curl --silent --max-time 60 -o target/universal/stage/lib/\$scalaCompilerJar \$scalaCompilerUrl --fail || error "Failed to download \${scalaCompilerJar}"
+
+  java -cp target/universal/stage/lib/* scala.tools.nsc.MainGenericRunner -usejavacp
+else
+  echo "[error] Not a valid command: \$@"
+fi
 java  -Duser.home=/app/.sbt_home -Divy.default.ivy.user.dir=/app/.sbt_home/.ivy2 -jar /app/.sbt_home/bin/$SBT_JAR "\$@"
 EOF
 chmod a+x $SBT_BINDIR/sbt
