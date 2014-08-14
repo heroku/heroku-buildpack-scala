@@ -102,24 +102,8 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   cd $BUILD_DIR
 fi
 
-rm -f $SBT_BINDIR/sbt
-cat << EOF > $SBT_BINDIR/sbt
-#!/usr/bin/env bash
-
-if [ "\$@" == "console" ]
-  scalaLibraryJar=\$(ls . | grep "org.scala-lang.scala-library")
-  scalaVersion=\$(expr \${scalaLibraryJar} : "\(2\.[0-9]\+\.[0-9]\+\(\-[a-zA-Z0-9]\+\)\?\)")
-  scalaCompilerJar="scala-compiler-\${scalaVersion}.jar"
-  scalaCompilerUrl="http://central.maven.org/maven2/org/scala-lang/scala-compiler/\${scalaVersion}/\${scalaCompilerJar}"
-
-  curl --silent --max-time 60 -o target/universal/stage/lib/\$scalaCompilerJar \$scalaCompilerUrl --fail || error "Failed to download \${scalaCompilerJar}"
-
-  java -cp target/universal/stage/lib/* scala.tools.nsc.MainGenericRunner -usejavacp
-else
-  echo "[error] Not a valid command: \$@"
-fi
-java  -Duser.home=/app/.sbt_home -Divy.default.ivy.user.dir=/app/.sbt_home/.ivy2 -jar /app/.sbt_home/bin/$SBT_JAR "\$@"
-EOF
+# Install the custom sbt script for cmds like `heroku run sbt console`
+cp -p $OPT_DIR/sbt-launcher.sh $SBT_BINDIR/sbt
 chmod a+x $SBT_BINDIR/sbt
 
 # copy in heroku sbt plugin
