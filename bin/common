@@ -58,11 +58,6 @@ get_scala_version() {
       # if we don't grep for the version, and instead use `sbt scala-version`,
       # then sbt will try to download the internet
       scalaVersionLine="$(grep "scalaVersion" "${ctxDir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g')"
-      # if empty
-      #   search with play.sbt-plugn
-      #   if empty
-      #     sbt play-version
-
       scalaVersion=$(expr "$scalaVersionLine" : ".\+\(2\.1[0-1]\)\.[0-9]")
       echo "$scalaVersion"
     elif [ "${playVersion}" = "2.2" ]; then
@@ -85,8 +80,17 @@ get_scala_version() {
 
 get_supported_play_version() {
   local ctxDir=$1
+  local sbtUserHome=$2
+  local launcher=$3
+
   if _has_playPluginsFile $ctxDir; then
-    pluginVersionLine="$(grep "addSbtPlugin.\+com\.typesafe\.play" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
+    pluginVersionLine="$(grep "addSbtPlugin(.\+com\.typesafe\.play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
+    if [ -z "$pluginVersionLine" ]; then
+      pluginVersionLine="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
+      if [ -z "$pluginVersionLine" ]; then
+        pluginVersionLine=$(run_sbt "$sbtUserHome" "$launcher" "play-version" | grep "\[info\][ \t]\+2.[0-9].[0-9]")
+      fi
+    fi
     pluginVersion=$(expr "$pluginVersionLine" : ".\+\(2\.[0-3]\)\.[0-9]")
     if [ "$pluginVersion" != 0 ] ; then
       echo "$pluginVersion"
@@ -119,16 +123,16 @@ prime_ivy_cache() {
   local launcher=$3
 
   if is_play $ctxDir ; then
-    playVersion=`get_supported_play_version ${BUILD_DIR}`
+    playVersion=`get_supported_play_version ${BUILD_DIR} ${sbtUserHome} ${launcher}`
   fi
   scalaVersion=$(get_scala_version "$ctxDir" "$sbtUserHome" "$launcher" "$playVersion")
 
   if [ -n "$scalaVersion" ]; then
-    echo -n "-----> Priming Ivy cache: Scala-${scalaVersion} "
+    echo -n "-----> Priming Ivy cache: Scala-${scalaVersion}"
     if [ -n "$playVersion" ]; then
-      echo -n "Play-${playVersion} "
+      echo -n " Play-${playVersion}"
     fi
-    echo -n "..."
+    echo -n " ..."
     if _download_and_unpack_ivy_cache "$sbtUserHome" "$scalaVersion" "$playVersion"; then
       echo " done"
     else

@@ -5,8 +5,8 @@
 
 EXPECTED_VERSION=0.11.3
 
-FAKE_SCALA_VERSION="2.99"
-RUN_SBT_OUTPUT="[info] ${FAKE_SCALA_VERSION}.1"
+FAKE_VERSION="2.1"
+RUN_SBT_OUTPUT="[info] ${FAKE_VERSION}.1"
 
 ### Mocks!
 
@@ -44,19 +44,13 @@ EOF
 
 testPrimeIvyCache_NoApp() {
   capture prime_ivy_cache "${BUILD_DIR}"
-  assertCaptured "Should have detected correct version" "Priming Ivy cache: Scala-${FAKE_SCALA_VERSION} ... done"
+  assertCaptured "Should have detected correct version" "Priming Ivy cache: Scala-${FAKE_VERSION} ... done"
 }
 
 testPrimeIvyCache_Scala_210_Play_23() {
   _createPlay_23_Project "2.3.2" "2.10.4"
   capture prime_ivy_cache "${BUILD_DIR}"
   assertCaptured "Should have detected correct versions" "Priming Ivy cache: Scala-2.10 Play-2.3 ... done"
-}
-
-testPrimeIvyCache_Scala_211_Play_23() {
-  _createPlay_23_Project "2.3.2" "2.11.1"
-  capture prime_ivy_cache "${BUILD_DIR}"
-  assertCaptured "Should have detected correct versions" "Priming Ivy cache: Scala-2.11 Play-2.3 ... done"
 }
 
 testPrimeIvyCache_Scala_211_Play_23() {
@@ -114,7 +108,7 @@ testGetScalaVersion_Sbt()
 {
   capture get_scala_version "${BUILD_DIR}"
   assertCapturedSuccess
-  assertCapturedEquals "2.99"
+  assertCapturedEquals "${FAKE_VERSION}"
 }
 
 testGetSbtVersionFileMissing()
@@ -422,4 +416,14 @@ EOF
 
   assertCapturedSuccess
   assertCapturedEquals "2.0"
+}
+
+testGetSupportedPlayVersion_NoPlugin() {
+  mkdir -p ${BUILD_DIR}/project
+  touch ${BUILD_DIR}/project/plugins.sbt 
+
+  capture get_supported_play_version ${BUILD_DIR}
+
+  assertCapturedSuccess
+  assertCapturedEquals "${FAKE_VERSION}"
 }
