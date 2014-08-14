@@ -7,9 +7,9 @@ detect_sbt() {
      _has_projectScalaFile $ctxDir || \
      _has_hiddenSbtDir $ctxDir || \
      _has_buildPropertiesFile $ctxDir ; then
-    return 0 
+    return 0
   else
-    return 1 
+    return 1
   fi
 }
 
@@ -47,11 +47,47 @@ _has_playPluginsFile() {
   test -e $ctxDir/project/plugins.sbt
 }
 
+get_scala_version() {
+  local ctxDir=$1
+  local sbtUserHome=$2
+  local launcher=$3
+  local playVersion=$4
+
+  if [ -n "${playVersion}" ]; then
+    if [ "${playVersion}" = "2.3" ]; then
+      # if we don't grep for the version, and instead use `sbt scala-version`,
+      # then sbt will try to download the internet
+      scalaVersionLine="$(grep "scalaVersion" "${ctxDir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g')"
+      # if empty
+      #   search with play.sbt-plugn
+      #   if empty
+      #     sbt play-version
+
+      scalaVersion=$(expr "$scalaVersionLine" : ".\+\(2\.1[0-1]\)\.[0-9]")
+      echo "$scalaVersion"
+    elif [ "${playVersion}" = "2.2" ]; then
+      echo '2.10'
+    elif [ "${playVersion}" = "2.1" ]; then
+      echo '2.10'
+    elif [ "${playVersion}" = "2.0" ]; then
+      # 2.0.x
+      echo '2.9'
+    else
+      echo ''
+    fi
+  else
+    # sbt might try to download the internet. so be it.
+    scalaVersionLine=$(run_sbt "$sbtUserHome" "$launcher" "scala-version" | grep "\[info\][ \t]\+2.[0-9]\{1,2\}.[0-9]")
+    scalaVersion=$(expr "$scalaVersionLine" : ".\+\(2\.[0-9]\{1,2\}\)\.[0-9]")
+    echo "$scalaVersion"
+  fi
+}
+
 get_supported_play_version() {
   local ctxDir=$1
   if _has_playPluginsFile $ctxDir; then
     pluginVersionLine="$(grep "addSbtPlugin.\+com\.typesafe\.play" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
-    pluginVersion=$(expr "$pluginVersionLine" : ".\+\(2\.3\.[0-2]\)")
+    pluginVersion=$(expr "$pluginVersionLine" : ".\+\(2\.[0-3]\)\.[0-9]")
     if [ "$pluginVersion" != 0 ] ; then
       echo "$pluginVersion"
     else
@@ -74,6 +110,54 @@ get_supported_sbt_version() {
     fi
   else
     echo ""
+  fi
+}
+
+prime_ivy_cache() {
+  local ctxDir=$1
+  local sbtUserHome=$2
+  local launcher=$3
+
+  if is_play $ctxDir ; then
+    playVersion=`get_supported_play_version ${BUILD_DIR}`
+  fi
+  scalaVersion=$(get_scala_version "$ctxDir" "$sbtUserHome" "$launcher" "$playVersion")
+
+  if [ -n "$scalaVersion" ]; then
+    echo -n "-----> Priming Ivy cache: Scala-${scalaVersion} "
+    if [ -n "$playVersion" ]; then
+      echo -n "Play-${playVersion} "
+    fi
+    echo -n "..."
+    if _download_and_unpack_ivy_cache "$sbtUserHome" "$scalaVersion" "$playVersion"; then
+      echo " done"
+    else
+      echo " no cache found"
+    fi
+  else
+    echo "-----> Skipping Ivy cache. Scala version not known..."
+  fi
+}
+
+_download_and_unpack_ivy_cache() {
+  local sbtUserHome=$1
+  local scalaVersion=$2
+  local playVersion=$3
+
+  baseUrl="http://heroku-jvm-langpack-scala.s3.amazonaws.com/sbt-cache"
+  if [ -n "$playVersion" ]; then
+    ivyCacheUrl="$baseUrl-play-${playVersion}_${scalaVersion}.tar.gz"
+  else
+    ivyCacheUrl="$baseUrl-base-0.13_${scalaVersion}.tar.gz"
+  fi
+
+  curl --silent --max-time 60 --location $ivyCacheUrl | tar xzm -C $sbtUserHome
+  if [ $? -eq 0 ]; then
+    mv $sbtUserHome/.sbt/* $sbtUserHome
+    rm -rf $sbtUserHome/.sbt
+    return 0
+  else
+    return 1
   fi
 }
 
@@ -100,7 +184,7 @@ count_files() {
 
 detect_play_lang() {
   local appDir=$1/app
-  
+
   local num_scala_files=$(count_files ${appDir} '*.scala')
   local num_java_files=$(count_files ${appDir} '*.java')
 
@@ -145,10 +229,10 @@ run_sbt()
   JAVA_OPTS="$JAVA_OPTS -Duser.home=$home"
   JAVA_OPTS="$JAVA_OPTS -Divy.default.ivy.user.dir=$home/.ivy2"
   JAVA_OPTS="$JAVA_OPTS -Dsbt.global.base=$home"
-  
+
   echo "-----> Running: sbt $tasks"
   HOME="$home" java $JAVA_OPTS -jar $launcher $tasks < /dev/null 2>&1 | sed -u 's/^/       /'
-  
+
   if [ "${PIPESTATUS[*]}" != "0 0" ]; then
     error "Failed to run sbt task: $tasks"
   fi
@@ -168,4 +252,10 @@ cache_copy() {
     mkdir -p $to_dir/$rel_dir
     cp -pr $from_dir/$rel_dir/. $to_dir/$rel_dir
   fi
+}
+
+
+get_something_func()
+{
+  echo "the real mccoy!"
 }
