@@ -59,7 +59,12 @@ get_scala_version() {
       # then sbt will try to download the internet
       scalaVersionLine="$(grep "scalaVersion" "${ctxDir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g')"
       scalaVersion=$(expr "$scalaVersionLine" : ".\+\(2\.1[0-1]\)\.[0-9]")
-      echo "$scalaVersion"
+
+      if [ -n "${scalaVersion}" ]; then
+        echo "$scalaVersion"
+      else
+        echo "2.11"
+      fi
     elif [ "${playVersion}" = "2.2" ]; then
       echo '2.10'
     elif [ "${playVersion}" = "2.1" ]; then
@@ -71,10 +76,7 @@ get_scala_version() {
       echo ''
     fi
   else
-    # sbt might try to download the internet. so be it.
-    scalaVersionLine=$(run_sbt "$sbtUserHome" "$launcher" "scala-version" | grep "\[info\][ \t]\+2.[0-9]\{1,2\}.[0-9]")
-    scalaVersion=$(expr "$scalaVersionLine" : ".\+\(2\.[0-9]\{1,2\}\)\.[0-9]")
-    echo "$scalaVersion"
+    echo ''
   fi
 }
 
@@ -83,23 +85,24 @@ get_supported_play_version() {
   local sbtUserHome=$2
   local launcher=$3
 
-  if _has_playPluginsFile $ctxDir; then
-    pluginVersionLine="$(grep "addSbtPlugin(.\+com\.typesafe\.play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
-    if [ -z "$pluginVersionLine" ]; then
-      pluginVersionLine="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
+  if is_play $ctxDir; then
+    if _has_playPluginsFile $ctxDir; then
+      pluginVersionLine="$(grep "addSbtPlugin(.\+com\.typesafe\.play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
       if [ -z "$pluginVersionLine" ]; then
-        pluginVersionLine=$(run_sbt "$sbtUserHome" "$launcher" "play-version" | grep "\[info\][ \t]\+2.[0-9].[0-9]")
+        pluginVersionLine="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
       fi
     fi
-    pluginVersion=$(expr "$pluginVersionLine" : ".\+\(2\.[0-3]\)\.[0-9]")
-    if [ "$pluginVersion" != 0 ] ; then
-      echo "$pluginVersion"
-    else
-      echo ""
+
+    if [ -z "$pluginVersionLine" ]; then
+      pluginVersionLine=$(run_sbt "$sbtUserHome" "$launcher" "play-version" | grep "\[info\][ \t]\+2.[0-9].[0-9]")
     fi
-  else
-    echo ""
+
+    pluginVersion=$(expr "$pluginVersionLine" : ".\+\(2\.[0-3]\)\.[0-9]")
+    if [ "$pluginVersion" != 0 ]; then
+      echo "$pluginVersion"
+    fi
   fi
+  echo ""
 }
 
 get_supported_sbt_version() {
@@ -127,19 +130,19 @@ prime_ivy_cache() {
   fi
   scalaVersion=$(get_scala_version "$ctxDir" "$sbtUserHome" "$launcher" "$playVersion")
 
+  echo -n "-----> Priming Ivy cache"
   if [ -n "$scalaVersion" ]; then
-    echo -n "-----> Priming Ivy cache: Scala-${scalaVersion}"
+    echo -n " (Scala-${scalaVersion}"
     if [ -n "$playVersion" ]; then
-      echo -n " Play-${playVersion}"
+      echo -n ", Play-${playVersion}"
     fi
-    echo -n " ..."
-    if _download_and_unpack_ivy_cache "$sbtUserHome" "$scalaVersion" "$playVersion"; then
-      echo " done"
-    else
-      echo " no cache found"
-    fi
+    echo -n ")"
+  fi
+  echo -n "..."
+  if _download_and_unpack_ivy_cache "$sbtUserHome" "$scalaVersion" "$playVersion"; then
+    echo " done"
   else
-    echo "-----> Skipping Ivy cache. Scala version not known..."
+    echo " no cache found"
   fi
 }
 
@@ -153,7 +156,7 @@ _download_and_unpack_ivy_cache() {
   if [ -n "$playVersion" ]; then
     ivyCacheUrl="$baseUrl-play-${playVersion}_${scalaVersion}.tar.gz"
   else
-    ivyCacheUrl="$baseUrl-base-0.13_${scalaVersion}.tar.gz"
+    ivyCacheUrl="$baseUrl-base.tar.gz"
   fi
 
   curl --silent --max-time 60 --location $ivyCacheUrl | tar xzm -C $sbtUserHome
@@ -257,10 +260,4 @@ cache_copy() {
     mkdir -p $to_dir/$rel_dir
     cp -pr $from_dir/$rel_dir/. $to_dir/$rel_dir
   fi
-}
-
-
-get_something_func()
-{
-  echo "the real mccoy!"
 }

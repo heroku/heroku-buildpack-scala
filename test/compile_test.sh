@@ -128,9 +128,8 @@ testCompile()
   assertCapturedSuccess
 
   # setup
-  assertTrue "Ivy2 cache should have been repacked." "[ -d ${BUILD_DIR}/.sbt_home/.ivy2 ]"
+  assertFalse "Ivy2 cache should have been removed." "[ -d ${BUILD_DIR}/.sbt_home/.ivy2 ]"
   assertTrue "SBT bin cache should have been unpacked" "[ -f ${BUILD_DIR}/.sbt_home/bin/testfile ]"
-  assertTrue "Ivy2 cache should exist" "[ -d ${BUILD_DIR}/.ivy2/cache ]"
   assertFalse "Old SBT launch jar should have been deleted" "[ -f ${BUILD_DIR}/.sbt_home/bin/sbt-launch-OLD.jar ]"
   assertTrue "sbt launch script should be created" "[ -f ${BUILD_DIR}/.sbt_home/bin/sbt ]"
   assertCaptured "SBT should have been installed" "Downloading SBT..."
@@ -140,7 +139,6 @@ testCompile()
   assertCaptured "SBT should run stage task" "${SBT_STAGING_STRING}"
 
   # clean up
-  assertEquals "Ivy2 cache should have been repacked for a non-play project" "" "$(diff -r ${BUILD_DIR}/.sbt_home/.ivy2 ${CACHE_DIR}/.sbt_home/.ivy2)"
   assertEquals "SBT home should have been repacked" "" "$(diff -r ${BUILD_DIR}/.sbt_home/bin ${CACHE_DIR}/.sbt_home/bin)"
 
   # re-deploy
@@ -173,7 +171,7 @@ testCompile_PrimeIvyCacheForPlay() {
   compile
 
   assertCapturedSuccess
-  assertCaptured "Ivy cache should be primed" "Priming Ivy cache: Scala-2.11 Play-2.3 ... done" 
+  assertCaptured "Ivy cache should be primed" "Priming Ivy cache (Scala-2.11, Play-2.3)... done"
 
   compile
 

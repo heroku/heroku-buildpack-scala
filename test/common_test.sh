@@ -44,19 +44,19 @@ EOF
 
 testPrimeIvyCache_NoApp() {
   capture prime_ivy_cache "${BUILD_DIR}"
-  assertCaptured "Should have detected correct version" "Priming Ivy cache: Scala-${FAKE_VERSION} ... done"
+  assertCaptured "Should have detected correct version" "Priming Ivy cache... done"
 }
 
 testPrimeIvyCache_Scala_210_Play_23() {
   _createPlay_23_Project "2.3.2" "2.10.4"
   capture prime_ivy_cache "${BUILD_DIR}"
-  assertCaptured "Should have detected correct versions" "Priming Ivy cache: Scala-2.10 Play-2.3 ... done"
+  assertCaptured "Should have detected correct versions" "Priming Ivy cache (Scala-2.10, Play-2.3)... done"
 }
 
 testPrimeIvyCache_Scala_211_Play_23() {
   _createPlay_23_Project "2.3.2" "2.11.1"
   capture prime_ivy_cache "${BUILD_DIR}"
-  assertCaptured "Should have detected correct versions" "Priming Ivy cache: Scala-2.11 Play-2.3 ... done"
+  assertCaptured "Should have detected correct versions" "Priming Ivy cache (Scala-2.11, Play-2.3)... done"
 }
 
 testGetScalaVersion_Play_23()
@@ -70,6 +70,13 @@ EOF
 
   cat > ${BUILD_DIR}/build.sbt <<EOF
 scalaVersion := "2.11.1"
+EOF
+  capture get_scala_version "${BUILD_DIR}" ".sbt" "null" "2.3"
+  assertCapturedSuccess
+  assertCapturedEquals "2.11"
+
+  cat > ${BUILD_DIR}/build.sbt <<EOF
+
 EOF
   capture get_scala_version "${BUILD_DIR}" ".sbt" "null" "2.3"
   assertCapturedSuccess
@@ -108,7 +115,7 @@ testGetScalaVersion_Sbt()
 {
   capture get_scala_version "${BUILD_DIR}"
   assertCapturedSuccess
-  assertCapturedEquals "${FAKE_VERSION}"
+  assertCapturedEquals ""
 }
 
 testGetSbtVersionFileMissing()
@@ -371,7 +378,8 @@ testDetectPlayLang_BadDir() {
 }
 
 testGetSupportedPlayVersion_23() {
-  mkdir -p ${BUILD_DIR}/project
+  mkdir -p ${BUILD_DIR}/conf ${BUILD_DIR}/project
+  touch ${BUILD_DIR}/conf/application.conf
   cat > ${BUILD_DIR}/project/plugins.sbt <<EOF
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.0")
 EOF
@@ -383,7 +391,8 @@ EOF
 }
 
 testGetSupportedPlayVersion_22() {
-  mkdir -p ${BUILD_DIR}/project
+  mkdir -p ${BUILD_DIR}/conf ${BUILD_DIR}/project
+  touch ${BUILD_DIR}/conf/application.conf
   cat > ${BUILD_DIR}/project/plugins.sbt <<EOF
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.2.0")
 EOF
@@ -395,7 +404,8 @@ EOF
 }
 
 testGetSupportedPlayVersion_21() {
-  mkdir -p ${BUILD_DIR}/project
+  mkdir -p ${BUILD_DIR}/conf ${BUILD_DIR}/project
+  touch ${BUILD_DIR}/conf/application.conf
   cat > ${BUILD_DIR}/project/plugins.sbt <<EOF
 addSbtPlugin("play" % "sbt-plugin" % "2.1.1")
 EOF
@@ -407,7 +417,8 @@ EOF
 }
 
 testGetSupportedPlayVersion_20() {
-  mkdir -p ${BUILD_DIR}/project
+  mkdir -p ${BUILD_DIR}/conf ${BUILD_DIR}/project
+  touch ${BUILD_DIR}/conf/application.conf
   cat > ${BUILD_DIR}/project/plugins.sbt <<EOF
 addSbtPlugin("play" % "sbt-plugin" % "2.0.8")
 EOF
@@ -419,8 +430,9 @@ EOF
 }
 
 testGetSupportedPlayVersion_NoPlugin() {
-  mkdir -p ${BUILD_DIR}/project
-  touch ${BUILD_DIR}/project/plugins.sbt 
+  mkdir -p ${BUILD_DIR}/conf ${BUILD_DIR}/project
+  touch ${BUILD_DIR}/conf/application.conf
+  touch ${BUILD_DIR}/project/plugins.sbt
 
   capture get_supported_play_version ${BUILD_DIR}
 
