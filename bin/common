@@ -70,7 +70,6 @@ get_scala_version() {
     elif [ "${playVersion}" = "2.1" ]; then
       echo '2.10'
     elif [ "${playVersion}" = "2.0" ]; then
-      # 2.0.x
       echo '2.9'
     else
       echo ''
