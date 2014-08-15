@@ -63,7 +63,7 @@ get_scala_version() {
       if [ -n "${scalaVersion}" ]; then
         echo "$scalaVersion"
       else
-        echo "2.11"
+        echo "2.10"
       fi
     elif [ "${playVersion}" = "2.2" ]; then
       echo '2.10'
@@ -84,21 +84,11 @@ get_supported_play_version() {
   local sbtUserHome=$2
   local launcher=$3
 
-  if is_play $ctxDir; then
-    if _has_playPluginsFile $ctxDir; then
-      pluginVersionLine="$(grep "addSbtPlugin(.\+com\.typesafe\.play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
-      if [ -z "$pluginVersionLine" ]; then
-        pluginVersionLine="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
-      fi
-    fi
-
-    if [ -z "$pluginVersionLine" ]; then
-      pluginVersionLine=$(run_sbt "$sbtUserHome" "$launcher" "play-version" | grep "\[info\][ \t]\+2.[0-9].[0-9]")
-    fi
-
+  if _has_playPluginsFile $ctxDir; then
+    pluginVersionLine="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
     pluginVersion=$(expr "$pluginVersionLine" : ".\+\(2\.[0-3]\)\.[0-9]")
     if [ "$pluginVersion" != 0 ]; then
-      echo "$pluginVersion"
+      echo -n "$pluginVersion"
     fi
   fi
   echo ""

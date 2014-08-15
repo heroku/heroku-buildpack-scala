@@ -80,7 +80,7 @@ EOF
 EOF
   capture get_scala_version "${BUILD_DIR}" ".sbt" "null" "2.3"
   assertCapturedSuccess
-  assertCapturedEquals "2.11"
+  assertCapturedEquals "2.10"
 }
 
 testGetScalaVersion_Play_22()
@@ -437,5 +437,5 @@ testGetSupportedPlayVersion_NoPlugin() {
   capture get_supported_play_version ${BUILD_DIR}
 
   assertCapturedSuccess
-  assertCapturedEquals "${FAKE_VERSION}"
+  assertCapturedEquals ""
 }
