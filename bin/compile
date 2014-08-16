@@ -126,6 +126,19 @@ for DIR in $CACHED_DIRS; do
   cache_copy $DIR $BUILD_DIR $CACHE_DIR
 done
 
+# To enable post build explicit file dropping from slug, configure the environment to drop files after building app:
+# $ heroku config:set POST_BUILD_SLUG_IGNORE=true
+if [ "$POST_BUILD_SLUG_IGNORE" = "true" ] ; then
+  if [ -f .slugignore ]; then
+	while read f; do
+		for i in `find . -name "$f"`; do
+	    	echo "-----> Dropping file $i from the slug"
+			rm -rf $i
+		done
+	done < "${BUILD_DIR}"/.slugignore
+  fi
+fi
+
 # drop useless directories from slug for play only
 if [ -d $SBT_USER_HOME/.ivy2 ]; then
   echo "-----> Dropping ivy cache from the slug"
