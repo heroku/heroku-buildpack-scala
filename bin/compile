@@ -18,7 +18,7 @@ ENV_DIR=$3
 BUILD_DIR="/tmp/scala_buildpack_build_dir"
 mv $APP_BUILD_DIR $BUILD_DIR
 
-curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xz
+curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xzm
 . bin/util
 . bin/java
 
@@ -52,7 +52,7 @@ SBT_BINDIR="$SBT_USER_HOME"/bin
 cd $BUILD_DIR
 
 # unpack cache
-CACHED_DIRS="$SBT_USER_HOME/.ivy2 $SBT_BINDIR target project/target project/boot"
+CACHED_DIRS="$SBT_USER_HOME/.ivy2 $SBT_USER_HOME/boot $SBT_BINDIR target project/target project/boot"
 for DIR in $CACHED_DIRS; do
   cache_copy $DIR $CACHE_DIR $BUILD_DIR
 done
@@ -106,19 +106,15 @@ fi
 cp -p $OPT_DIR/sbt-launcher.sh $SBT_BINDIR/sbt
 chmod a+x $SBT_BINDIR/sbt
 
-# copy in heroku sbt plugin
-HEROKU_PLUGIN="HerokuPlugin.scala"
-mkdir -p "$SBT_USER_HOME/.sbt/plugins"
-cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN
+# download and cache the dependencies if this is the first build
+if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
+  prime_ivy_cache "$BUILD_DIR" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR"
+  run_sbt "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "update"
+  cache_copy $SBT_USER_HOME/.ivy2 $BUILD_DIR $CACHE_DIR
+fi
 
 # build app
-echo "-----> Running: sbt $SBT_TASKS"
-test -e "$SBT_BINDIR"/sbt.boot.properties && PROPS_OPTION="-Dsbt.boot.properties=$SBT_BINDIR/sbt.boot.properties"
-HOME="$SBT_USER_HOME_ABSOLUTE" java -Xms768M -Xmx1024M -Xss4M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled -Dfile.encoding=UTF8 -Duser.home="$SBT_USER_HOME_ABSOLUTE" -Dsbt.log.noformat=true -Divy.default.ivy.user.dir="$SBT_USER_HOME_ABSOLUTE/.ivy2" -Dsbt.global.base="$SBT_USER_HOME_ABSOLUTE" -jar "$SBT_BINDIR"/$SBT_JAR $SBT_TASKS 2>&1 | sed -u 's/^/       /'
-if [ "${PIPESTATUS[*]}" != "0 0" ]; then
-  echo " !     Failed to build app with sbt"
-  exit 1
-fi
+run_sbt "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "$SBT_TASKS"
 
 PROFILE_PATH="$BUILD_DIR/.profile.d/scala.sh"
 mkdir -p $(dirname $PROFILE_PATH)
@@ -131,21 +127,19 @@ for DIR in $CACHED_DIRS; do
 done
 
 # drop useless directories from slug for play only
-if is_play $BUILD_DIR ; then
-  if [ -d $SBT_USER_HOME/.ivy2 ]; then
-    echo "-----> Dropping ivy cache from the slug"
-    rm -rf $SBT_USER_HOME/.ivy2
-  fi
-  if [ -d $BUILD_DIR/project/boot ] ; then
-    echo "-----> Dropping project boot dir from the slug"
-    rm -rf $BUILD_DIR/project/boot
-  fi
-  if [ -d $BUILD_DIR/target ] ; then
-    echo "-----> Dropping compilation artifacts from the slug"
-    rm -rf $BUILD_DIR/target/scala-*
-    rm -rf $BUILD_DIR/target/streams
-    rm -rf $BUILD_DIR/target/resolution-cache
-  fi
+if [ -d $SBT_USER_HOME/.ivy2 ]; then
+  echo "-----> Dropping ivy cache from the slug"
+  rm -rf $SBT_USER_HOME/.ivy2
+fi
+if [ -d $BUILD_DIR/project/boot ] ; then
+  echo "-----> Dropping project boot dir from the slug"
+  rm -rf $BUILD_DIR/project/boot
+fi
+if [ -d $BUILD_DIR/target ] ; then
+  echo "-----> Dropping compilation artifacts from the slug"
+  rm -rf $BUILD_DIR/target/scala-*
+  rm -rf $BUILD_DIR/target/streams
+  rm -rf $BUILD_DIR/target/resolution-cache
 fi
 
 # Move compiled app back to where Heroku expects it
