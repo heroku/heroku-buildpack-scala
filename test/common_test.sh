@@ -441,3 +441,26 @@ testGetSupportedPlayVersion_NoPlugin() {
   assertCapturedSuccess
   assertCapturedEquals ""
 }
+
+test_is_sbt_native_packager_success() {
+  mkdir -p ${BUILD_DIR}/project
+  cat > ${BUILD_DIR}/project/plugins.sbt <<EOF
+addSbtPlugin("com.typesafe.sbt" % "sbt-native-packager" % "0.7.4")
+EOF
+
+  capture is_sbt_native_packager ${BUILD_DIR}
+
+  assertCapturedSuccess
+}
+
+test_is_sbt_native_packager_failure() {
+  mkdir -p ${BUILD_DIR}/project
+
+  cat > ${BUILD_DIR}/project/plugins.sbt <<EOF
+addSbtPlugin("com.typesafe.sbt" % "sbt-start-script" % "0.10.0")
+EOF
+
+  capture is_sbt_native_packager ${BUILD_DIR}
+
+  assertEquals 1 "${RETURN}"
+}
