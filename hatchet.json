@@ -13,6 +13,7 @@
     "kissaten/play-2.0.x-java-sample"
   ],
   "sbt": [
-    "kissaten/sbt-minimal-scala-sample"
+    "kissaten/sbt-minimal-scala-sample",
+    "kissaten/sbt-start-script-sample"
   ]
 }

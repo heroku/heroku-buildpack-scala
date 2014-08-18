@@ -14,9 +14,16 @@ describe "Sbt" do
     app = Hatchet::Runner.new("sbt-minimal-scala-sample")
     app.setup!
     app.set_config("SBT_CLEAN" => "true")
-  
+
     app.deploy do |app|
       expect(app.output).to match("Running: sbt clean compile stage")
+    end
+  end
+
+  it "" do
+    Hatchet::Runner.new("sbt-start-script-sample") do |app|
+      expect(app.output).not_to match(/Priming Ivy cache/)
+      expect(app.output).to match("Running: sbt compile stage")
     end
   end
 end
