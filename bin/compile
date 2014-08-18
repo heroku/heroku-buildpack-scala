@@ -108,9 +108,11 @@ chmod a+x $SBT_BINDIR/sbt
 
 # download and cache the dependencies if this is the first build
 if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
-  prime_ivy_cache "$BUILD_DIR" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR"
-  run_sbt "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "update"
-  cache_copy $SBT_USER_HOME/.ivy2 $BUILD_DIR $CACHE_DIR
+  if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
+    prime_ivy_cache "$BUILD_DIR" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR"
+    run_sbt "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "update"
+    cache_copy $SBT_USER_HOME/.ivy2 $BUILD_DIR $CACHE_DIR
+  fi
 fi
 
 # build app
