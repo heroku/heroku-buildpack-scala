@@ -19,8 +19,12 @@ is_play() {
 
 is_sbt_native_packager() {
   local ctxDir=$1
-  pluginVersionLine="$(grep "addSbtPlugin(.\+sbt-native-packager" "${ctxDir}"/project/plugins.sbt)"
-  test -n "$pluginVersionLine"
+  if [ -e "${ctxDir}"/project/plugins.sbt ]; then
+    pluginVersionLine="$(grep "addSbtPlugin(.\+sbt-native-packager" "${ctxDir}"/project/plugins.sbt)"
+    test -n "$pluginVersionLine"
+  else
+    return 1
+  fi
 }
 
 _has_sbtFile() {
