@@ -22,6 +22,7 @@ describe "Sbt" do
 
   it "not prime cache for sbt-start-script projects" do
     Hatchet::Runner.new("sbt-start-script-sample") do |app|
+      # expect(app.output).to match("Running: sbt update")
       expect(app.output).not_to match(/Priming Ivy cache/)
       expect(app.output).to match("Running: sbt compile stage")
     end
