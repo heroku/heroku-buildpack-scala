@@ -254,7 +254,7 @@ testComplile_NoBuildPropertiesFile()
   compile
 
   assertCapturedError "Error, your scala project must include project/build.properties and define sbt.version"
-  assertCapturedError "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
+  assertCapturedError "You must use a release version of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
 }
 
 testComplile_BuildPropertiesFileWithUnsupportedOldVersion()
@@ -264,7 +264,7 @@ testComplile_BuildPropertiesFileWithUnsupportedOldVersion()
   compile
 
   assertCapturedError "Error, you have defined an unsupported sbt.version in project/build.properties"
-  assertCapturedError "You must use a release verison of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
+  assertCapturedError "You must use a release version of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
 }
 
 testComplile_BuildPropertiesFileWithRCVersion()
