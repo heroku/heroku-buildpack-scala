@@ -18,6 +18,6 @@ if [ "Darwin" == `uname` ]; then
   fi
 fi
 
-DIR=$(cd $(dirname $0); pwd)
+DIR=$(cd $(dirname $0)/..; pwd)
 
 docker run -it -v $DIR:/app/buildpack:ro heroku/testrunner
