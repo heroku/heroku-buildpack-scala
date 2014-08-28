@@ -6,7 +6,7 @@ if [ ! -z "$1" ]; then
   git clone git@github.com:heroku/heroku-buildpack-scala.git &&
   cd heroku-buildpack-scala &&
   git checkout master &&
-  find . -not -name 'bin' -maxdepth 1 -delete &&
+  find . ! -name 'bin' ! -name 'opt' -maxdepth 1 -delete &&
   heroku buildpacks:publish $1/scala
   popd > /dev/null 2>&1
   echo "Cleaning up..."
