@@ -10,9 +10,5 @@ object HerokuPlugin extends Plugin {
           "typesafe" at "http://repo.typesafe.com/typesafe/repo/")
     },
     sources in doc in Compile := List()
-
-    publishArtifact in packageSrc := false
-
-    publishArtifact in packageDoc := false
   )
 }
