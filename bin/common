@@ -235,6 +235,7 @@ run_sbt()
   JAVA_OPTS="$JAVA_OPTS -Duser.home=$home"
   JAVA_OPTS="$JAVA_OPTS -Divy.default.ivy.user.dir=$home/.ivy2"
   JAVA_OPTS="$JAVA_OPTS -Dsbt.global.base=$home"
+  JAVA_OPTS="$JAVA_OPTS $SBT_OPTS"
 
   echo "-----> Running: sbt $tasks"
   HOME="$home" java $JAVA_OPTS -jar $launcher $tasks < /dev/null 2>&1 | sed -u 's/^/       /'
