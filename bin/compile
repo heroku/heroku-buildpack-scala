@@ -18,9 +18,11 @@ ENV_DIR=$3
 BUILD_DIR="/tmp/scala_buildpack_build_dir"
 mv $APP_BUILD_DIR $BUILD_DIR
 
-curl --silent --location http://heroku-jvm-common.s3.amazonaws.com/jvm-buildpack-common.tar.gz | tar xzm
-. bin/util
-. bin/java
+JVM_COMMON_BUILDPACK=http://lang-jvm.s3.amazonaws.com/jvm-buildpack-common-v1.0.tar.gz
+mkdir -p /tmp/jvm-common
+curl --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-common
+. /tmp/jvm-common/bin/util
+. /tmp/jvm-common/bin/java
 
 export_env_dir $ENV_DIR
 
