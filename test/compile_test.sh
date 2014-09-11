@@ -14,6 +14,7 @@ afterSetUp() {
   rm -rf /tmp/scala_buildpack_build_dir
   # Clear clean compiles...most apps don't need to clean by default
   unset SBT_CLEAN
+  unset SBT_OPTS
 }
 
 _createSbtProject()
@@ -283,4 +284,21 @@ testComplile_BuildPropertiesFileWithMServerVersion()
   compile
 
   assertCaptured "Multiline properties file should detect sbt version" "Downloading SBT"
+}
+
+testSbtOpts()
+{
+  createSbtProject
+
+  cat > ${BUILD_DIR}/build.sbt <<EOF
+TaskKey[Unit]("stage") in Compile := { println(sys.props("test.var")) }
+EOF
+
+  export SBT_OPTS="-Dtest.var=monkeys"
+  
+  compile
+
+  assertCapturedSuccess
+
+  assertCaptured "SBT should use SBT_OPTS" "monkeys"
 }
