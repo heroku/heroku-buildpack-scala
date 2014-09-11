@@ -13,7 +13,7 @@ install: true
 
 script: $TEST_CMD
 
-after_script: heroku keys:remove ~/.ssh/id_rsa
+after_script: heroku keys:remove $USER@`hostname`
 
 env:
   global:
