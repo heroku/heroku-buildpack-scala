@@ -285,20 +285,3 @@ testComplile_BuildPropertiesFileWithMServerVersion()
 
   assertCaptured "Multiline properties file should detect sbt version" "Downloading SBT"
 }
-
-testSbtOpts()
-{
-  createSbtProject
-
-  cat > ${BUILD_DIR}/build.sbt <<EOF
-TaskKey[Unit]("stage") in Compile := { println(sys.props("test.var")) }
-EOF
-
-  export SBT_OPTS="-Dtest.var=monkeys"
-  
-  compile
-
-  assertCapturedSuccess
-
-  assertCaptured "SBT should use SBT_OPTS" "monkeys"
-}
