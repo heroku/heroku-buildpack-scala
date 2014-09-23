@@ -11,7 +11,7 @@ before_install:
 
 install: true
 
-script: "$TEST_CMD"
+script: eval "$TEST_CMD"
 
 after_script:
   # just this once
