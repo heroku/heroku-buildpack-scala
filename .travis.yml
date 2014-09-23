@@ -13,10 +13,7 @@ install: true
 
 script: eval "$TEST_CMD"
 
-after_script:
-  # just this once
-  - heroku keys:clear
-  - heroku keys:remove $USER@`hostname`
+after_script: heroku keys:remove $USER@`hostname`
 
 env:
   global:
