@@ -13,7 +13,10 @@ install: true
 
 script: "$TEST_CMD"
 
-after_script: heroku keys:remove $USER@`hostname`
+after_script:
+  # just this once
+  - heroku keys:clear
+  - heroku keys:remove $USER@`hostname`
 
 env:
   global:
@@ -24,5 +27,5 @@ env:
   - SHUNIT_HOME="/tmp/shunit2-2.1.6"
   - secure: y5GCEayc55azXFhTgx1J3tqb5YeMTwXqpsvhyzcYUMVU46oHOkc/9KsBM4JQiLqShNqknT4lJwSu13Ra2/9uw8P8CjBdbrCBwfI4+nTdfGjSaX79AM4To7rYSUTpXHrr6YI7HiZemI8VQOjjo/0lsQ4B8qWxv09XevdetPzCmIc=
   matrix:
-  - TEST_CMD="sbt hatchet"
+  - TEST_CMD='[ "$TRAVIS_PULL_REQUEST" = "false" ] && sbt hatchet || true'
   - TEST_CMD="/tmp/testrunner/bin/run -c ."
