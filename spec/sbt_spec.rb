@@ -8,14 +8,12 @@ describe "Sbt" do
       expect(app.output).to include("Priming Ivy cache")
       expect(app.output).not_to include("downloading http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt")
       expect(app.output).not_to include("Main Scala API documentation to")
+      expect(app.output).to include("[info] Done packaging.")
 
       `git commit -am "redeploy" --allow-empty`
       app.push!
-      expect(app.output).not_to include("Running: sbt update")
-      expect(app.output).not_to include("Priming Ivy cache")
       expect(app.output).to include("Running: sbt compile stage")
-      expect(app.output).not_to include("downloading http://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt")
-      expect(app.output).not_to include("Main Scala API documentation to")
+      expect(app.output).to include("[info] Done packaging.")
     end
   end
 
