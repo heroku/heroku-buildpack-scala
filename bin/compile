@@ -147,12 +147,12 @@ done
 #    echo "-----> Dropping project boot dir from the slug"
 #    rm -rf $BUILD_DIR/project/boot
 #  fi
-  if [ -d $BUILD_DIR/target ] ; then
-    echo "-----> Dropping compilation artifacts from the slug"
-    rm -rf $BUILD_DIR/target/scala-*
-    rm -rf $BUILD_DIR/target/streams
-    rm -rf $BUILD_DIR/target/resolution-cache
-  fi
+#  if [ -d $BUILD_DIR/target ] ; then
+#    echo "-----> Dropping compilation artifacts from the slug"
+#    rm -rf $BUILD_DIR/target/scala-*
+#    rm -rf $BUILD_DIR/target/streams
+#    rm -rf $BUILD_DIR/target/resolution-cache
+#  fi
 #fi
 
 # Move compiled app back to where Heroku expects it
