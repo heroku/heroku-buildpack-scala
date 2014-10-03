@@ -12,7 +12,7 @@ config_vars:
   SBT_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
   REPO: /app/.sbt_home/.ivy2/cache
 addons:
-  heroku-postgresql:dev
+  heroku-postgresql:hobby-dev
 
 EOF`
 
@@ -35,7 +35,7 @@ config_vars:
   SBT_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
   REPO: /app/.sbt_home/.ivy2/cache
 addons:
-  heroku-postgresql:dev
+  heroku-postgresql:hobby-dev
 
 default_process_types:
   web: target/start -Dhttp.port=\\$PORT \\$JAVA_OPTS

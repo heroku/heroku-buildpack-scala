@@ -1,0 +1,22 @@
+{
+  "hatchet": {
+    "directory": "spec/fixtures"
+  },
+  "play": [
+    "kissaten/play-2.3.x-scala-sample",
+    "kissaten/play-2.2.x-scala-sample",
+    "kissaten/play-2.1.x-scala-sample",
+    "kissaten/play-2.0.x-scala-sample",
+    "kissaten/play-2.3.x-java-sample",
+    "kissaten/play-2.2.x-java-sample",
+    "kissaten/play-2.1.x-java-sample",
+    "kissaten/play-2.0.x-java-sample"
+  ],
+  "sbt": [
+    "kissaten/sbt-minimal-scala-sample",
+    "kissaten/sbt-start-script-sample"
+  ],
+  "lift": [
+    "kissaten/lift-2.5-sample"
+  ]
+}

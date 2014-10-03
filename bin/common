@@ -7,14 +7,24 @@ detect_sbt() {
      _has_projectScalaFile $ctxDir || \
      _has_hiddenSbtDir $ctxDir || \
      _has_buildPropertiesFile $ctxDir ; then
-    return 0 
+    return 0
   else
-    return 1 
+    return 1
   fi
 }
 
 is_play() {
   _has_playConfig $1
+}
+
+is_sbt_native_packager() {
+  local ctxDir=$1
+  if [ -e "${ctxDir}"/project/plugins.sbt ]; then
+    pluginVersionLine="$(grep "addSbtPlugin(.\+sbt-native-packager" "${ctxDir}"/project/plugins.sbt)"
+    test -n "$pluginVersionLine"
+  else
+    return 1
+  fi
 }
 
 _has_sbtFile() {
@@ -42,11 +52,63 @@ _has_playConfig() {
   test -e $ctxDir/conf/application.conf
 }
 
+_has_playPluginsFile() {
+  local ctxDir=$1
+  test -e $ctxDir/project/plugins.sbt
+}
+
+get_scala_version() {
+  local ctxDir=$1
+  local sbtUserHome=$2
+  local launcher=$3
+  local playVersion=$4
+
+  if [ -n "${playVersion}" ]; then
+    if [ "${playVersion}" = "2.3" ]; then
+      # if we don't grep for the version, and instead use `sbt scala-version`,
+      # then sbt will try to download the internet
+      scalaVersionLine="$(grep "scalaVersion" "${ctxDir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g')"
+      scalaVersion=$(expr "$scalaVersionLine" : ".\+\(2\.1[0-1]\)\.[0-9]")
+
+      if [ -n "${scalaVersion}" ]; then
+        echo "$scalaVersion"
+      else
+        echo "2.10"
+      fi
+    elif [ "${playVersion}" = "2.2" ]; then
+      echo '2.10'
+    elif [ "${playVersion}" = "2.1" ]; then
+      echo '2.10'
+    elif [ "${playVersion}" = "2.0" ]; then
+      echo '2.9'
+    else
+      echo ''
+    fi
+  else
+    echo ''
+  fi
+}
+
+get_supported_play_version() {
+  local ctxDir=$1
+  local sbtUserHome=$2
+  local launcher=$3
+
+  if _has_playPluginsFile $ctxDir; then
+    pluginVersionLine="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
+    pluginVersion=$(expr "$pluginVersionLine" : ".\+\(2\.[0-3]\)\.[0-9]")
+    if [ "$pluginVersion" != 0 ]; then
+      echo -n "$pluginVersion"
+    fi
+  fi
+  echo ""
+}
+
 get_supported_sbt_version() {
   local ctxDir=$1
   if _has_buildPropertiesFile $ctxDir; then
     sbtVersionLine="$(grep -P '[ \t]*sbt\.version[ \t]*=' "${ctxDir}"/project/build.properties | sed -E -e 's/[ \t\r\n]//g')"
-    sbtVersion=$(expr "$sbtVersionLine" : 'sbt\.version=\(0\.1[1-3]\.[0-9]\)$')
+    sbtVersion=$(expr "$sbtVersionLine" : 'sbt\.version=\(0\.1[1-3]\.[0-9]\(-[a-zA-Z0-9_]*\)*\)$')
     if [ "$sbtVersion" != 0 ] ; then
       echo "$sbtVersion"
     else
@@ -54,6 +116,54 @@ get_supported_sbt_version() {
     fi
   else
     echo ""
+  fi
+}
+
+prime_ivy_cache() {
+  local ctxDir=$1
+  local sbtUserHome=$2
+  local launcher=$3
+
+  if is_play $ctxDir ; then
+    playVersion=`get_supported_play_version ${BUILD_DIR} ${sbtUserHome} ${launcher}`
+  fi
+  scalaVersion=$(get_scala_version "$ctxDir" "$sbtUserHome" "$launcher" "$playVersion")
+
+  echo -n "-----> Priming Ivy cache"
+  if [ -n "$scalaVersion" ]; then
+    echo -n " (Scala-${scalaVersion}"
+    if [ -n "$playVersion" ]; then
+      echo -n ", Play-${playVersion}"
+    fi
+    echo -n ")"
+  fi
+  echo -n "..."
+  if _download_and_unpack_ivy_cache "$sbtUserHome" "$scalaVersion" "$playVersion"; then
+    echo " done"
+  else
+    echo " no cache found"
+  fi
+}
+
+_download_and_unpack_ivy_cache() {
+  local sbtUserHome=$1
+  local scalaVersion=$2
+  local playVersion=$3
+
+  baseUrl="http://heroku-jvm-langpack-scala.s3.amazonaws.com/sbt-cache"
+  if [ -n "$playVersion" ]; then
+    ivyCacheUrl="$baseUrl-play-${playVersion}_${scalaVersion}.tar.gz"
+  else
+    ivyCacheUrl="$baseUrl-base.tar.gz"
+  fi
+
+  curl --silent --max-time 60 --location $ivyCacheUrl | tar xzm -C $sbtUserHome
+  if [ $? -eq 0 ]; then
+    mv $sbtUserHome/.sbt/* $sbtUserHome
+    rm -rf $sbtUserHome/.sbt
+    return 0
+  else
+    return 1
   fi
 }
 
@@ -80,7 +190,7 @@ count_files() {
 
 detect_play_lang() {
   local appDir=$1/app
-  
+
   local num_scala_files=$(count_files ${appDir} '*.scala')
   local num_java_files=$(count_files ${appDir} '*.java')
 
@@ -112,6 +222,25 @@ universal_packaging_default_web_proc() {
   local ctxDir=$1
   if [ $(_universal_packaging_proc_count $ctxDir) -eq 1 ]; then
     echo "web: $(_universal_packaging_procs $ctxDir) -Dhttp.port=\$PORT"
+  fi
+}
+
+run_sbt()
+{
+  local home=$1
+  local launcher=$2
+  local tasks=$3
+  JAVA_OPTS="-Xms768M -Xmx1024M -Xss4M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled"
+  JAVA_OPTS="$JAVA_OPTS -Dfile.encoding=UTF8 -Dsbt.log.noformat=true"
+  JAVA_OPTS="$JAVA_OPTS -Duser.home=$home"
+  JAVA_OPTS="$JAVA_OPTS -Divy.default.ivy.user.dir=$home/.ivy2"
+  JAVA_OPTS="$JAVA_OPTS -Dsbt.global.base=$home"
+
+  echo "-----> Running: sbt $tasks"
+  HOME="$home" java $JAVA_OPTS -jar $launcher $tasks < /dev/null 2>&1 | sed -u 's/^/       /'
+
+  if [ "${PIPESTATUS[*]}" != "0 0" ]; then
+    error "Failed to run sbt task: $tasks"
   fi
 }
 

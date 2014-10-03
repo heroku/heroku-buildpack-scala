@@ -1,4 +1,4 @@
-Heroku buildpack: Scala
+Heroku buildpack: Scala [![Build Status](https://travis-ci.org/heroku/heroku-buildpack-scala.svg?branch=master)](https://travis-ci.org/heroku/heroku-buildpack-scala)
 =========================
 
 This is a [Heroku buildpack](http://devcenter.heroku.com/articles/buildpacks) for Scala apps.
@@ -30,14 +30,14 @@ To use this buildpack, fork it on Github.  Push up changes to your fork, then cr
 
 For example, to reduce your slug size by not including the .ivy2/cache, you could add the following.
 
-    for DIR in $CACHED_DIRS ; do 
-    rm -rf $CACHE_DIR/$DIR 
-    mkdir -p $CACHE_DIR/$DIR 
-    cp -r $DIR/.  $CACHE_DIR/$DIR 
+    for DIR in $CACHED_DIRS ; do
+    rm -rf $CACHE_DIR/$DIR
+    mkdir -p $CACHE_DIR/$DIR
+    cp -r $DIR/.  $CACHE_DIR/$DIR
     # The following 2 lines are what you would add
-    echo "-----> Dropping ivy cache from the slug" 
-    rm -rf $SBT_USER_HOME/.ivy2 
-    
+    echo "-----> Dropping ivy cache from the slug"
+    rm -rf $SBT_USER_HOME/.ivy2
+
 Note: You will need to have your build copy the necessary jars to run your application to a place that will remain included with the slug.
 
 
