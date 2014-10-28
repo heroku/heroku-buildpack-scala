@@ -149,7 +149,8 @@ if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
     echo "-----> Dropping compilation artifacts from the slug"
     rm -rf $BUILD_DIR/target/scala-*
     rm -rf $BUILD_DIR/target/streams
-    find $BUILD_DIR/target/resolution-cache ! -name "*-compile.xml" -print0 | xargs -0 rm -rf --
+    find $BUILD_DIR/target/resolution-cache/ ! -name "reports" -maxdepth 1 -print0 | xargs -0 rm -rf --
+    find $BUILD_DIR/target/resolution-cache/reports ! -name "*-compile.xml" -print0 | xargs -0 rm -rf --
   fi
 fi
 
