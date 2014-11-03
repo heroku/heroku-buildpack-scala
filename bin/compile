@@ -31,7 +31,14 @@ mkdir -p $CACHE_DIR
 
 # create default system.properties
 if [ ! -f ${BUILD_DIR}/system.properties ]; then
-  echo "java.runtime.version=1.6" > ${BUILD_DIR}/system.properties
+  if [ "$STACK" == "cedar" ]; then
+    defaultJdkVersion="1.6"
+  else
+    defaultJdkVersion="1.8"
+  fi
+  cat > ${BUILD_DIR}/system.properties <<EOF
+java.runtime.version=${defaultJdkVersion}
+EOF
 fi
 
 # install JDK

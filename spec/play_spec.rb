@@ -16,7 +16,10 @@ describe "Play" do
   REPOS.keys.each do |repo|
     context repo do
       it "should not download pre-cached dependencies" do
-        Hatchet::Runner.new(repo).deploy do |app|
+        app = Hatchet::Runner.new(repo)
+        app.setup!
+        app.heroku.put_stack(app.name, "cedar-14")
+        app.deploy do |app|
           expect(app.output).to match("Running: sbt update")
           expect(app.output).to match("Running: sbt compile stage")
           expect(app.output).to match(/Priming Ivy cache \(Scala-2\.[0-9]{1,2}, Play-#{REPOS[repo]}\)/)
