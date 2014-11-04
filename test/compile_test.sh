@@ -2,9 +2,9 @@
 
 . ${BUILDPACK_TEST_RUNNER_HOME}/lib/test_utils.sh
 
-DEFAULT_SBT_VERSION="0.11.0"
-DEFAULT_SBT_JAR="sbt-launch-0.11.3-2.jar"
-DEFAULT_PLAY_VERSION="2.3.1"
+DEFAULT_SBT_VERSION="0.13.6"
+DEFAULT_SBT_JAR="sbt-launch-0.13.6.jar"
+DEFAULT_PLAY_VERSION="2.3.4"
 DEFAULT_SCALA_VERSION="2.11.1"
 SBT_TEST_CACHE="/tmp/sbt-test-cache"
 SBT_STAGING_STRING="THIS_STRING_WILL_BE_OUTPUT_DURING_STAGING"
@@ -200,13 +200,18 @@ testCompile_WithNonDefaultVersion()
   local specifiedSbtVersion="0.11.1"
   assertNotEquals "Precondition" "${specifiedSbtVersion}" "${DEFAULT_SBT_VERSION}"
 
+  export STACK="cedar" # because system.properties isn't working from tests for some reason
+
   createSbtProject ${specifiedSbtVersion}
 
   compile
 
   assertCapturedSuccess
+  assertCaptured "Should install JDK 1.6" "Installing OpenJDK 1.6"
   assertCaptured "Default version of SBT should always be installed" "Downloading SBT"
   assertCaptured "Specified SBT version should actually be used" "Getting org.scala-tools.sbt sbt_2.9.1 ${specifiedSbtVersion}"
+
+  unset STACK
 }
 
 testCompile_WithMultilineBuildProperties() {
@@ -254,7 +259,7 @@ testComplile_NoBuildPropertiesFile()
   compile
 
   assertCapturedError "Error, your scala project must include project/build.properties and define sbt.version"
-  assertCapturedError "You must use a release version of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
+  assertCapturedError "You must use a release version of sbt, sbt.version=0.11.0 or greater"
 }
 
 testComplile_BuildPropertiesFileWithUnsupportedOldVersion()
@@ -264,7 +269,7 @@ testComplile_BuildPropertiesFileWithUnsupportedOldVersion()
   compile
 
   assertCapturedError "Error, you have defined an unsupported sbt.version in project/build.properties"
-  assertCapturedError "You must use a release version of sbt, sbt.version=${DEFAULT_SBT_VERSION} or greater"
+  assertCapturedError "You must use a release version of sbt, sbt.version=0.11.0 or greater"
 }
 
 testComplile_BuildPropertiesFileWithRCVersion()
