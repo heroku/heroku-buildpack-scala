@@ -120,10 +120,6 @@ fi
 # build app
 run_sbt "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "$SBT_TASKS"
 
-PROFILE_PATH="$BUILD_DIR/.profile.d/scala.sh"
-mkdir -p $(dirname $PROFILE_PATH)
-echo 'export PATH="/app/.jdk/bin:$PATH"' >> $PROFILE_PATH
-
 # repack cache
 mkdir -p $CACHE_DIR
 for DIR in $CACHED_DIRS; do
