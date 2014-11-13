@@ -8,7 +8,7 @@ testRelease()
 ---
 config_vars:
   PATH: .jdk/bin:.sbt_home/bin:/usr/local/bin:/usr/bin:/bin
-  JAVA_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
+  JAVA_OPTS: -Xss512k -XX:+UseCompressedOops
   SBT_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
   REPO: /app/.sbt_home/.ivy2/cache
 addons:
@@ -31,7 +31,7 @@ testPlay20Release()
 ---
 config_vars:
   PATH: .jdk/bin:.sbt_home/bin:/usr/local/bin:/usr/bin:/bin
-  JAVA_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
+  JAVA_OPTS: -Xss512k -XX:+UseCompressedOops
   SBT_OPTS: -Xmx384m -Xss512k -XX:+UseCompressedOops
   REPO: /app/.sbt_home/.ivy2/cache
 addons:
