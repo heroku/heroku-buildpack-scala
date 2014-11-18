@@ -231,24 +231,18 @@ run_sbt()
   local launcher=$2
   local tasks=$3
 
-  case $(ulimit -u) in
-  256)   # 1X Dyno
-    maxHeap=384
-    ;;
-  512)   # 2X Dyno
-    maxHeap=768
-    ;;
-  32768) # PX Dyno
-    maxHeap=6144
-    ;;
-  *)
-    maxHeap=384
-    ;;
-  esac
+  if [ ${maxSbtHeap:-""} == "" ]; then
+    case $(ulimit -u) in
+    32768) # PX Dyno
+      export maxSbtHeap==6144
+      ;;
+    *)     # 2X Dyno
+      export maxSbtHeap=1024
+      ;;
+    esac
+  fi
 
-  echo "Setting max heap size to ${maxHeap}"
-
-  JAVA_OPTS="-Xms384M -Xmx${maxHeap}M -Xss4M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled"
+  JAVA_OPTS="-Xms768M -Xmx${maxSbtHeap}M -Xss4M -XX:MaxPermSize=512M -XX:+CMSClassUnloadingEnabled"
   JAVA_OPTS="$JAVA_OPTS -Dfile.encoding=UTF8 -Dsbt.log.noformat=true"
   JAVA_OPTS="$JAVA_OPTS -Duser.home=$home"
   JAVA_OPTS="$JAVA_OPTS -Divy.default.ivy.user.dir=$home/.ivy2"
