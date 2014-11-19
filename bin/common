@@ -234,7 +234,7 @@ run_sbt()
   if [ ${maxSbtHeap:-""} == "" ]; then
     case $(ulimit -u) in
     32768) # PX Dyno
-      export maxSbtHeap==6144
+      export maxSbtHeap=6144
       ;;
     *)     # 2X Dyno
       export maxSbtHeap=1024
