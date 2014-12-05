@@ -150,7 +150,7 @@ _download_and_unpack_ivy_cache() {
   local scalaVersion=$2
   local playVersion=$3
 
-  baseUrl="http://heroku-jvm-langpack-scala.s3.amazonaws.com/sbt-cache"
+  baseUrl="http://lang-jvm.s3.amazonaws.com/sbt/v1/sbt-cache"
   if [ -n "$playVersion" ]; then
     ivyCacheUrl="$baseUrl-play-${playVersion}_${scalaVersion}.tar.gz"
   else
