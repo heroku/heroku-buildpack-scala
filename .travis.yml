@@ -1,20 +1,15 @@
 language: scala
-
 branches:
   only:
-    - master
-
+  - master
 before_install:
-- curl --silent https://shunit2.googlecode.com/files/shunit2-2.1.6.tgz | tar xz -C /tmp/
+- curl --silent https://shunit2.googlecode.com/files/shunit2-2.1.6.tgz | tar xz -C
+  /tmp/
 - git clone https://github.com/ryanbrainard/heroku-buildpack-testrunner.git /tmp/testrunner
 - "./etc/hatchet_travis_setup.sh"
-
 install: true
-
 script: eval "$TEST_CMD"
-
 after_script: heroku keys:remove $USER@`hostname`
-
 env:
   global:
   - IS_RUNNING_ON_TRAVIS=true
@@ -22,7 +17,7 @@ env:
   - HATCHET_DEPLOY_STRATEGY=git
   - HATCHET_BUILDPACK_BASE="https://github.com/heroku/heroku-buildpack-scala.git"
   - SHUNIT_HOME="/tmp/shunit2-2.1.6"
-  - secure: "J/xhZwLEkZ/RMzAQN81S1RPr5UnO+YucjbFtQlwWCBzWL/7HhwvoifitSdmdFVC+HOhTFo1xAB90DdNsdh6e5qDKWgbnkjl5bSApp2fWt02milll6PD7FDJBvwJcAEnxO9lEsH381B3eJH/RIEKqSAX983gus/sDbfHCrssyIRE="
+  - secure: nwCSe3BTuVESxe584hQnv0a1XOHd1Zx4A9v3iQgdEZwnnD237Fc0/NOamcDpcdggfs8q3XyNAq6Y7rhefyVrAZDjgJ2JhYRQqiuqz3Cdxe5v2+xFERqsVDNXPcPFIKfRe8TlGEQ/woB8b18mxUChgtyLhgN01+x/emev6aKzKP8=
   matrix:
   - TEST_CMD='[ "$TRAVIS_PULL_REQUEST" = "false" ] && sbt hatchet || true'
   - TEST_CMD="/tmp/testrunner/bin/run -c ."
