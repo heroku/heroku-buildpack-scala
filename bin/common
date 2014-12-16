@@ -129,17 +129,16 @@ prime_ivy_cache() {
   fi
   scalaVersion=$(get_scala_version "$ctxDir" "$sbtUserHome" "$launcher" "$playVersion")
 
-  echo -n "-----> Priming Ivy cache"
   if [ -n "$scalaVersion" ]; then
-    echo -n " (Scala-${scalaVersion}"
+    cachePkg=" (Scala-${scalaVersion}"
     if [ -n "$playVersion" ]; then
-      echo -n ", Play-${playVersion}"
+      cachePkg="${cachePkg}, Play-${playVersion}"
     fi
-    echo -n ")"
+    cachePkg="${cachePkg})"
   fi
-  echo -n "..."
+  status_pending "Priming Ivy cache${cachePkg}"
   if _download_and_unpack_ivy_cache "$sbtUserHome" "$scalaVersion" "$playVersion"; then
-    echo " done"
+    status_done
   else
     echo " no cache found"
   fi
@@ -248,17 +247,12 @@ run_sbt()
   JAVA_OPTS="$JAVA_OPTS -Divy.default.ivy.user.dir=$home/.ivy2"
   JAVA_OPTS="$JAVA_OPTS -Dsbt.global.base=$home"
 
-  echo "-----> Running: sbt $tasks"
+  status "Running: sbt $tasks"
   HOME="$home" java $JAVA_OPTS -jar $launcher $tasks < /dev/null 2>&1 | sed -u 's/^/       /'
 
   if [ "${PIPESTATUS[*]}" != "0 0" ]; then
     error "Failed to run sbt task: $tasks"
   fi
-}
-
-error() {
-    echo " !     $1"
-    exit 1
 }
 
 cache_copy() {

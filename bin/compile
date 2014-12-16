@@ -18,7 +18,7 @@ ENV_DIR=$3
 BUILD_DIR="/tmp/scala_buildpack_build_dir"
 mv $APP_BUILD_DIR $BUILD_DIR
 
-JVM_COMMON_BUILDPACK=http://lang-jvm.s3.amazonaws.com/jvm-buildpack-common-v8.tar.gz
+JVM_COMMON_BUILDPACK=http://lang-jvm.s3.amazonaws.com/jvm-buildpack-common-v9-SNAPSHOT.tar.gz
 mkdir -p /tmp/jvm-common
 curl --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-common
 . /tmp/jvm-common/bin/util
@@ -31,10 +31,10 @@ mkdir -p $CACHE_DIR
 
 # install JDK
 javaVersion=$(detect_java_version ${BUILD_DIR})
-echo -n "-----> Installing OpenJDK ${javaVersion}..."
+status_pending "Installing OpenJDK ${javaVersion}"
 install_java ${BUILD_DIR} ${javaVersion}
 jdk_overlay ${BUILD_DIR}
-echo "done"
+status_done
 
 # home directory from perspective of SBT; we rename
 # it because otherwise the project root and $HOME
@@ -56,15 +56,13 @@ done
 
 # these are preliminary checks. actual version check happens below when attempting to download sbt boot.properties
 if ! test -e project/build.properties; then
-	echo " !      Error, your scala project must include project/build.properties and define sbt.version"
-	echo " !      You must use a release version of sbt, sbt.version=0.11.0 or greater"
-        exit 1
+  error "Your scala project must include project/build.properties and define sbt.version
+You must use a release version of sbt, sbt.version=0.11.0 or greater"
 fi
 
 if ! has_supported_sbt_version ${BUILD_DIR}; then
-	echo " !      Error, you have defined an unsupported sbt.version in project/build.properties"
-	echo " !      You must use a release version of sbt, sbt.version=0.11.0 or greater"
-	exit 1
+  error "You have defined an unsupported sbt.version in project/build.properties
+You must use a release version of sbt, sbt.version=0.11.0 or greater"
 fi
 
 SBT_VERSION="$(get_supported_sbt_version ${BUILD_DIR})"
@@ -92,9 +90,9 @@ if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
   ## clean up any old versions
   /bin/rm -f sbt sbt-launch-*.jar || true
 
-  echo -n "-----> Downloading SBT..."
+  status_pending "Downloading SBT"
   curl --silent --max-time 60 -O --location $SBT_URL --fail || error "Failed to download $SBT_JAR"
-  echo "done"
+  status_done
 
   cd $BUILD_DIR
 fi
@@ -129,19 +127,19 @@ done
 # drop useless directories from slug for play and sbt-native-launcher only
 if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
   if [ -d $SBT_USER_HOME/.ivy2 ]; then
-    echo "-----> Dropping ivy cache from the slug"
+    status "Dropping ivy cache from the slug"
     rm -rf $SBT_USER_HOME/.ivy2
   fi
   if [ -d $SBT_USER_HOME/boot ] ; then
-    echo "-----> Dropping sbt boot dir from the slug"
+    status "Dropping sbt boot dir from the slug"
     rm -rf $SBT_USER_HOME/boot
   fi
   if [ -d $BUILD_DIR/project/boot ] ; then
-    echo "-----> Dropping project boot dir from the slug"
+    status "Dropping project boot dir from the slug"
     rm -rf $BUILD_DIR/project/boot
   fi
   if [ -d $BUILD_DIR/target ] ; then
-    echo "-----> Dropping compilation artifacts from the slug"
+    status "Dropping compilation artifacts from the slug"
     rm -rf $BUILD_DIR/target/scala-*
     rm -rf $BUILD_DIR/target/streams
     if [ -d $BUILD_DIR/target/resolution-cache ] ; then

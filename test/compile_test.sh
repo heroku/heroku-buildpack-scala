@@ -134,7 +134,7 @@ testCompile()
   assertTrue "Ivy2 cache should exist" "[ -d ${BUILD_DIR}/.ivy2/cache ]"
   assertFalse "Old SBT launch jar should have been deleted" "[ -f ${BUILD_DIR}/.sbt_home/bin/sbt-launch-OLD.jar ]"
   assertTrue "sbt launch script should be created" "[ -f ${BUILD_DIR}/.sbt_home/bin/sbt ]"
-  assertCaptured "SBT should have been installed" "Downloading SBT..."
+  assertCaptured "SBT should have been installed" "Downloading SBT"
 
   # run
   assertCaptured "SBT tasks to run should be output" "Running: sbt compile stage"
@@ -258,7 +258,7 @@ testComplile_NoBuildPropertiesFile()
 
   compile
 
-  assertCapturedError "Error, your scala project must include project/build.properties and define sbt.version"
+  assertCapturedError "Your scala project must include project/build.properties and define sbt.version"
   assertCapturedError "You must use a release version of sbt, sbt.version=0.11.0 or greater"
 }
 
@@ -268,7 +268,7 @@ testComplile_BuildPropertiesFileWithUnsupportedOldVersion()
 
   compile
 
-  assertCapturedError "Error, you have defined an unsupported sbt.version in project/build.properties"
+  assertCapturedError "You have defined an unsupported sbt.version in project/build.properties"
   assertCapturedError "You must use a release version of sbt, sbt.version=0.11.0 or greater"
 }
 
