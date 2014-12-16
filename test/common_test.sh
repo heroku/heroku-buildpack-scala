@@ -10,6 +10,22 @@ RUN_SBT_OUTPUT="[info] ${FAKE_VERSION}.1"
 
 ### Mocks!
 
+status() {
+  echo "$1..."
+}
+
+status_pending() {
+  echo -n "$1..."
+}
+
+status_done() {
+  echo " done"
+}
+
+error() {
+  echo "ERROR: $1"
+}
+
 _download_and_unpack_ivy_cache() {
   # don't actually do it!
   return 0
