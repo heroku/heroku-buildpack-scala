@@ -248,7 +248,9 @@ run_sbt()
   JAVA_OPTS="$JAVA_OPTS -Dsbt.global.base=$home"
 
   status "Running: sbt $tasks"
-  HOME="$home" java $JAVA_OPTS -jar $launcher $tasks < /dev/null 2>&1 | sed -u 's/^/       /'
+  #HOME="$home" java $JAVA_OPTS -jar $launcher $tasks < /dev/null 2>&1 | sed -u 's/^/       /'
+
+  opt/sbt -sbt-dir $home/.sbt_home -ivy $home/.ivy2 -batch $tasks
 
   if [ "${PIPESTATUS[*]}" != "0 0" ]; then
     error "Failed to run sbt task: $tasks"
