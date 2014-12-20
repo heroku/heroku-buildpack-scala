@@ -234,15 +234,16 @@ run_sbt()
     maxSbtHeap=6144
     ;;
   *)     # 2X Dyno
-    maxSbtHeap=1024
+    maxSbtHeap=768
     ;;
   esac
 
   status "Running: sbt $tasks"
-  HOME="$home" sbt \
+  HOME="$home" sbt -J-Xms768M -J-Xmx${maxSbtHeap}M -J-Xss4M \
+    -J-XX:MaxPermSize=512M -J-XX:+CMSClassUnloadingEnabled \
     -sbt-dir $home \
     -ivy $home/.ivy2 \
-    -sbt-launch-dir=$home/bin \
+    -sbt-launch-dir $home/launchers \
     -Duser.home=$home \
     -Divy.default.ivy.user.dir=$home/.ivy2 \
     -Dfile.encoding=UTF8 \
