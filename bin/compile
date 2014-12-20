@@ -66,11 +66,6 @@ You must use a release version of sbt, sbt.version=0.11.0 or greater"
 fi
 
 SBT_VERSION="$(get_supported_sbt_version ${BUILD_DIR})"
-SBT_JAR="sbt-launch.jar"
-SBT_URL="http://typesafe.artifactoryonline.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.6/$SBT_JAR"
-## in 0.10 start-script will depend on package, if packaging
-## is required - it may not be, we can run .class files or a package-war
-## instead.
 SBT_TASKS="compile stage"
 
 # To enable clean compiles, configure the environment to clean:
@@ -79,27 +74,11 @@ SBT_TASKS="compile stage"
 # See: https://devcenter.heroku.com/articles/scala-support#clean-builds
 [ "$SBT_CLEAN" = "true" ] && SBT_TASKS="clean $SBT_TASKS"
 
-if [ ! -d .ivy2/cache ]; then
-   mkdir -p .ivy2/cache
-fi
-
-if [ ! -f "$SBT_BINDIR"/"$SBT_JAR" ]; then
-  mkdir -p "$SBT_BINDIR"
-  cd "$SBT_BINDIR"
-
-  ## clean up any old versions
-  /bin/rm -f sbt sbt-launch-*.jar || true
-
-  status_pending "Downloading SBT"
-  curl --silent --max-time 60 -O --location $SBT_URL --fail || error "Failed to download $SBT_JAR"
-  status_done
-
-  cd $BUILD_DIR
-fi
-
-# Install the custom sbt script for cmds like `heroku run sbt console`
-cp -p $OPT_DIR/sbt-launcher.sh $SBT_BINDIR/sbt
-chmod a+x $SBT_BINDIR/sbt
+# Install the custom sbt script
+mkdir -p $SBT_BINDIR
+cp -p $OPT_DIR/sbt-extras.sh $SBT_BINDIR/sbt
+chmod 0755 $SBT_BINDIR/sbt
+export PATH="$SBT_BINDIR:$PATH"
 
 # copy in heroku sbt plugin
 HEROKU_PLUGIN="HerokuPlugin.scala"
@@ -116,7 +95,7 @@ if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
 fi
 
 # build app
-run_sbt "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "$SBT_TASKS"
+run_sbt "$SBT_USER_HOME_ABSOLUTE" "$SBT_TASKS"
 
 # repack cache
 mkdir -p $CACHE_DIR
