@@ -239,9 +239,10 @@ run_sbt()
   esac
 
   status "Running: sbt $tasks"
-  HOME="$home" sbt -sbt-dir $home \
+  HOME="$home" sbt \
+    -sbt-dir $home \
     -ivy $home/.ivy2 \
-    -sbt-launch-dir $home/bin \
+    -sbt-launch-dir=$home/bin \
     -Duser.home=$home \
     -Divy.default.ivy.user.dir=$home/.ivy2 \
     -Dfile.encoding=UTF8 \
@@ -250,9 +251,9 @@ run_sbt()
     -no-colors -batch \
     $tasks < /dev/null 2>&1 | sed -u 's/^/       /'
 
-  # if [ "${PIPESTATUS[*]}" != "0 0" ]; then
-  #   error "Failed to run sbt task: $tasks"
-  # fi
+  if [ "${PIPESTATUS[*]}" != "0 0" ]; then
+    error "Failed to run sbt task: $tasks"
+  fi
 }
 
 cache_copy() {
