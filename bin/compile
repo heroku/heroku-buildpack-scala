@@ -65,6 +65,19 @@ if ! has_supported_sbt_version ${BUILD_DIR}; then
 You must use a release version of sbt, sbt.version=0.11.0 or greater"
 fi
 
+if has_old_preset_sbt_opts; then
+  warning "Your SBT_OPTS config var looks like its not in the right form. 
+But it's probably not your fault because the buildpack set it 
+this way a long time ago. It's probably best if you unset it by
+running this command:
+
+  $ heroku config:unset SBT_OPTS
+
+The buildpack will pick good defaults for you. For information
+on customizing sbt execution, see this DevCenter article:
+https://todo"
+fi
+
 SBT_VERSION="$(get_supported_sbt_version ${BUILD_DIR})"
 SBT_TASKS="compile stage"
 

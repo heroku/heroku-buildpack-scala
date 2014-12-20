@@ -176,6 +176,14 @@ has_supported_sbt_version() {
   fi
 }
 
+has_old_preset_sbt_opts() {
+  if [ "$SBT_OPTS" = "-Xmx384m -Xss512k -XX:+UseCompressedOops" ]; then
+    return 0
+  else
+    return 1
+  fi
+}
+
 count_files() {
   local location=$1
   local pattern=$2
@@ -239,8 +247,9 @@ run_sbt()
   esac
 
   status "Running: sbt $tasks"
-  HOME="$home" sbt -J-Xms768M -J-Xmx${maxSbtHeap}M -J-Xss4M \
-    -J-XX:MaxPermSize=512M -J-XX:+CMSClassUnloadingEnabled \
+  HOME="$home" sbt -v \
+    -J-Xmx${maxSbtHeap}M \
+    -J-XX:+UseCompressedOops \
     -sbt-dir $home \
     -ivy $home/.ivy2 \
     -sbt-launch-dir $home/launchers \
