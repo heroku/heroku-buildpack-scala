@@ -23,6 +23,20 @@ Example usage:
 
 The buildpack will detect your app as Scala if it has the project/build.properties and either .sbt or .scala based build config.  It vendors a version of sbt and your popluated .ivy/cache into your slug.  The .ivy2 directory will be cached between builds to allow for faster build times.
 
+Customizing
+-----------
+
+This buildpack uses [sbt-extras](https://github.com/paulp/sbt-extras) to run sbt.
+In this way, the execution of sbt can be customized either by setting
+the SBT_OPTS config variable, or by creating a `.sbtopts` file in the
+root directory of your project. When passing options to the underlying
+sbt JVM, you must prefix them with `-J`. Thus, setting stack size for
+the compile process would look like this:
+
+```
+$ heroku config:set SBT_OPTS="-J-Xss4m"
+```
+
 Hacking
 -------
 
