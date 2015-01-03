@@ -23,6 +23,24 @@ Example usage:
 
 The buildpack will detect your app as Scala if it has the project/build.properties and either .sbt or .scala based build config.  It vendors a version of sbt and your popluated .ivy/cache into your slug.  The .ivy2 directory will be cached between builds to allow for faster build times.
 
+Clean builds
+------------
+
+In some cases, builds need to clean artifacts before compiling. If a clean build is necessary, configure builds to perform clean by setting `SBT_CLEAN=true`:
+
+```sh-session
+$ heroku config:set SBT_CLEAN=true
+Setting config vars and restarting example-app... done, v17
+SBT_CLEAN: true
+```
+
+All subsequent deploys will use the clean task. To remove the clean task, unset `SBT_CLEAN`:
+
+```sh-session
+$ heroku config:unset SBT_CLEAN
+Unsetting SBT_CLEAN and restarting example-app... done, v18
+```
+
 Hacking
 -------
 
