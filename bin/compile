@@ -18,13 +18,13 @@ ENV_DIR=$3
 BUILD_DIR="/tmp/scala_buildpack_build_dir"
 mv $APP_BUILD_DIR $BUILD_DIR
 
-JVM_COMMON_BUILDPACK=http://lang-jvm.s3.amazonaws.com/jvm-buildpack-common-v11-SNAPSHOT.tar.gz
+export_env_dir $ENV_DIR
+
+JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-http://lang-jvm.s3.amazonaws.com/jvm-buildpack-common-v11.tar.gz}
 mkdir -p /tmp/jvm-common
-curl --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-common
+curl --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-common --strip-components=1
 . /tmp/jvm-common/bin/util
 . /tmp/jvm-common/bin/java
-
-export_env_dir $ENV_DIR
 
 #create the cache dir if it doesn't exist
 mkdir -p $CACHE_DIR
