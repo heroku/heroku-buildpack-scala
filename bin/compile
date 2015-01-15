@@ -10,15 +10,9 @@ OPT_DIR=$BP_DIR/opt
 . $BIN_DIR/common
 
 # parse args
-APP_BUILD_DIR=$(cd $1; pwd)
+BUILD_DIR=$(cd $1; pwd)
 CACHE_DIR=$2
 ENV_DIR=$3
-
-BUILD_DIR=${APP_BUILD_DIR}
-
-# Move app to a static build dir to keep paths the same between builds
-#BUILD_DIR="/tmp/scala_buildpack_build_dir"
-#mv $APP_BUILD_DIR $BUILD_DIR
 
 export_env_dir $ENV_DIR
 
@@ -69,14 +63,13 @@ fi
 
 if has_old_preset_sbt_opts; then
   warning "Your SBT_OPTS config var looks like its not in the right form.
-But it's probably not your fault because the buildpack set it
-this way a long time ago. It's probably best if you unset it by
-running this command:
+It was probably set this way in an earlier version of the buildpack.
+To avoid any unexpected behavior, please unset it by running this command:
 
   $ heroku config:unset SBT_OPTS
 
-The buildpack will pick good defaults for you. For information
-on customizing sbt execution, see this DevCenter article:
+The buildpack will pick good defaults for you, but you can customize sbt's
+execution. For more information on this topic, see this DevCenter article:
 https://todo"
 fi
 
@@ -146,6 +139,3 @@ if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
     fi
   fi
 fi
-
-# Move compiled app back to where Heroku expects it
-#mv $BUILD_DIR $APP_BUILD_DIR
