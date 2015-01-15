@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # bin/release <build-dir>
 
-BIN_DIR=$(cd $(dirname $0); pwd)
-. $BIN_DIR/common
+BP_DIR=$(cd $(dirname $0)/..; pwd)
+. $BP_DIR/lib/common.sh
+
 BUILD_DIR=$1
 
 cat <<EOF
 ---
 config_vars:
-  PATH: .jdk/bin:.sbt_home/bin:/usr/local/bin:/usr/bin:/bin
   JAVA_OPTS: -Xss512k -XX:+UseCompressedOops
 addons:
   heroku-postgresql:hobby-dev
