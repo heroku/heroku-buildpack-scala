@@ -18,13 +18,13 @@ ENV_DIR=$3
 BUILD_DIR="/tmp/scala_buildpack_build_dir"
 mv $APP_BUILD_DIR $BUILD_DIR
 
-JVM_COMMON_BUILDPACK=http://lang-jvm.s3.amazonaws.com/jvm-buildpack-common-v9.tar.gz
+export_env_dir $ENV_DIR
+
+JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-http://lang-jvm.s3.amazonaws.com/jvm-buildpack-common-v11.tar.gz}
 mkdir -p /tmp/jvm-common
-curl --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-common
+curl --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-common --strip-components=1
 . /tmp/jvm-common/bin/util
 . /tmp/jvm-common/bin/java
-
-export_env_dir $ENV_DIR
 
 #create the cache dir if it doesn't exist
 mkdir -p $CACHE_DIR
@@ -66,8 +66,8 @@ You must use a release version of sbt, sbt.version=0.11.0 or greater"
 fi
 
 if has_old_preset_sbt_opts; then
-  warning "Your SBT_OPTS config var looks like its not in the right form. 
-But it's probably not your fault because the buildpack set it 
+  warning "Your SBT_OPTS config var looks like its not in the right form.
+But it's probably not your fault because the buildpack set it
 this way a long time ago. It's probably best if you unset it by
 running this command:
 
@@ -102,13 +102,13 @@ cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN
 if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
   if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
     prime_ivy_cache "$BUILD_DIR" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR"
-    run_sbt "$SBT_USER_HOME_ABSOLUTE" "update"
+    run_sbt "$javaVersion" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "update"
     cache_copy $SBT_USER_HOME/.ivy2 $BUILD_DIR $CACHE_DIR
   fi
 fi
 
 # build app
-run_sbt "$SBT_USER_HOME_ABSOLUTE" "$SBT_TASKS"
+run_sbt "$javaVersion" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "$SBT_TASKS"
 
 # repack cache
 mkdir -p $CACHE_DIR

@@ -169,7 +169,7 @@ testCleanCompile()
 }
 
 testCompile_PrimeIvyCacheForPlay() {
-  createPlayProject "2.3.1" "0.13.5" "2.11.1"
+  createPlayProject "2.3.7" "0.13.5" "2.11.1"
 
   compile
 

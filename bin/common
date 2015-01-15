@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
 
+export_env_dir() {
+  env_dir=$1
+  whitelist_regex=${2:-''}
+  blacklist_regex=${3:-'^(PATH|GIT_DIR|CPATH|CPPATH|LD_PRELOAD|LIBRARY_PATH|JAVA_OPTS)$'}
+  if [ -d "$env_dir" ]; then
+    for e in $(ls $env_dir); do
+      echo "$e" | grep -E "$whitelist_regex" | grep -qvE "$blacklist_regex" &&
+      export "$e=$(cat $env_dir/$e)"
+      :
+    done
+  fi
+}
+
 ## SBT 0.10 allows either *.sbt in the root dir, or project/*.scala or .sbt/*.scala
 detect_sbt() {
   local ctxDir=$1
@@ -234,17 +247,31 @@ universal_packaging_default_web_proc() {
 
 run_sbt()
 {
-  local home=$1
-  local tasks=$2
+  local javaVersion=$1
+  local home=$2
+  local launcher=$3
+  local tasks=$4
 
-  case $(ulimit -u) in
-  32768) # PX Dyno
-    maxSbtHeap=6144
-    ;;
-  *)     # 2X Dyno
-    maxSbtHeap=768
-    ;;
-  esac
+  #if [ ${maxSbtHeap:-""} == "" ]; then
+    case $(ulimit -u) in
+    32768) # PX Dyno
+      maxSbtHeap=5220
+      ;;
+    *)     # 2X Dyno
+      maxSbtHeap=1024
+      ;;
+    esac
+  #fi
+
+  JAVA_OPTS="-Xms768M -Xmx${maxSbtHeap}M -Xss4M -XX:+CMSClassUnloadingEnabled"
+  JAVA_OPTS="$JAVA_OPTS -Dfile.encoding=UTF8 -Dsbt.log.noformat=true"
+  JAVA_OPTS="$JAVA_OPTS -Duser.home=$home"
+  JAVA_OPTS="$JAVA_OPTS -Divy.default.ivy.user.dir=$home/.ivy2"
+  JAVA_OPTS="$JAVA_OPTS -Dsbt.global.base=$home"
+
+  if [ "$javaVersion" = "1.7" ] || [ "$javaVersion" = "1.6" ]; then
+    JAVA_OPTS="$JAVA_OPTS -XX:MaxPermSize=512M"
+  fi
 
   status "Running: sbt $tasks"
   HOME="$home" sbt -v \
