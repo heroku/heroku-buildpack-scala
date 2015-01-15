@@ -148,4 +148,4 @@ if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
 fi
 
 # Move compiled app back to where Heroku expects it
-mv $BUILD_DIR $APP_BUILD_DIR
+#mv $BUILD_DIR $APP_BUILD_DIR
