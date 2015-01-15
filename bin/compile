@@ -14,9 +14,11 @@ APP_BUILD_DIR=$(cd $1; pwd)
 CACHE_DIR=$2
 ENV_DIR=$3
 
+BUILD_DIR=${APP_BUILD_DIR}
+
 # Move app to a static build dir to keep paths the same between builds
-BUILD_DIR="/tmp/scala_buildpack_build_dir"
-mv $APP_BUILD_DIR $BUILD_DIR
+#BUILD_DIR="/tmp/scala_buildpack_build_dir"
+#mv $APP_BUILD_DIR $BUILD_DIR
 
 export_env_dir $ENV_DIR
 
@@ -98,9 +100,10 @@ HEROKU_PLUGIN="HerokuPlugin.scala"
 mkdir -p "$SBT_USER_HOME/.sbt/plugins"
 cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN
 
-echo "*** PATH  = $PATH"
-echo "*** node  = $(which node)"
-echo "*** grunt = $(which grunt)"
+echo "*** PATH = $PATH"
+echo "*** pwd = $(pwd)"
+echo "*** which node  = $(which node)"
+echo "*** which grunt = $(which grunt)"
 
 # download and cache the dependencies if this is the first build
 if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
