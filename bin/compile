@@ -78,13 +78,14 @@ fi
 
 if has_old_preset_sbt_opts; then
   warning "Your SBT_OPTS config var looks like its not in the right form.
-It was probably set this way in an earlier version of the buildpack.
+It was probably set this way in an earlier version of the buildpack. The
+only ill effect should be a warning like \"The \`-\` command is deprecated\".
 To avoid any unexpected behavior, please unset it by running this command:
 
   $ heroku config:unset SBT_OPTS
 
-The buildpack will pick good defaults for you, but you can customize sbt's
-execution. For more information on this topic, see this DevCenter article:
+The buildpack will pick good defaults for you, but you can still customize
+sbt's execution as described in this DevCenter article:
 https://todo"
 fi
 

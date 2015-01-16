@@ -135,7 +135,7 @@ testCompile()
   assertTrue "sbt launch script should be created" "[ -f ${BUILD_DIR}/.sbt_home/bin/sbt ]"
   assertTrue "sbt plugins dir should exist" "[ -d ${BUILD_DIR}/.sbt_home/plugins ]"
   assertTrue "sbt plugins should be compiled" "[ -d ${BUILD_DIR}/.sbt_home/plugins/target ]"
-  assertTrue "sbt launcher should be installed" "[ -f ${BUILD_DIR}/.sbt_home/launchers/${DEFAULT_SBT_VERSION}/sbt-launcher.jar ]"
+  assertTrue "sbt launcher should be installed" "[ -f ${BUILD_DIR}/.sbt_home/launchers/${DEFAULT_SBT_VERSION}/sbt-launch.jar ]"
   assertCaptured "SBT should have been installed" "Downloading sbt launcher for $DEFAULT_SBT_VERSION"
 
   # run
