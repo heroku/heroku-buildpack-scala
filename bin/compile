@@ -108,11 +108,6 @@ HEROKU_PLUGIN="HerokuPlugin.scala"
 mkdir -p "$SBT_USER_HOME/.sbt/plugins"
 cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/.sbt/plugins/$HEROKU_PLUGIN
 
-echo "*** PATH = $PATH"
-echo "*** pwd = $(pwd)"
-echo "*** which node  = $(which node)"
-echo "*** which grunt = $(which grunt)"
-
 # download and cache the dependencies if this is the first build
 if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
   if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
