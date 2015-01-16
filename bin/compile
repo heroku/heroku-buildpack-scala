@@ -98,6 +98,7 @@ SBT_TASKS="compile stage"
 [ "$SBT_CLEAN" = "true" ] && SBT_TASKS="clean $SBT_TASKS"
 
 # Install the custom sbt script
+rm -f $SBT_BINDIR/*
 mkdir -p $SBT_BINDIR
 cp -p $OPT_DIR/sbt-extras.sh $SBT_BINDIR/sbt
 chmod 0755 $SBT_BINDIR/sbt
