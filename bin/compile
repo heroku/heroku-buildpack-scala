@@ -85,8 +85,8 @@ To avoid any unexpected behavior, please unset it by running this command:
   $ heroku config:unset SBT_OPTS
 
 The buildpack will pick good defaults for you, but you can still customize
-sbt's execution as described in this DevCenter article:
-https://todo"
+sbt's execution as described in this article:
+https://github.com/paulp/sbt-extras#sample-usage"
 fi
 
 SBT_VERSION="$(get_supported_sbt_version ${BUILD_DIR})"
