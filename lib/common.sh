@@ -262,7 +262,7 @@ run_sbt()
   esac
 
   status "Running: sbt $tasks"
-  HOME="$home" sbt -v \
+  HOME="$home" sbt \
     -J-Xmx${maxSbtHeap}M \
     -J-XX:+UseCompressedOops \
     -sbt-dir $home \
