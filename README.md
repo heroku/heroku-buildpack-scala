@@ -4,24 +4,34 @@ Heroku buildpack: Scala [![Build Status](https://travis-ci.org/heroku/heroku-bui
 This is a [Heroku buildpack](http://devcenter.heroku.com/articles/buildpacks) for Scala apps.
 It uses [sbt](https://github.com/harrah/xsbt/) 0.11.0+.
 
-Usage
+How it works
 -----
 
-Example usage:
+The buildpack will detect your app as Scala if it has a `project/build.properties` file and either a `.sbt` or `.scala` based build config (for example, a `build.sbt` file).  It vendors a version of sbt into your slug (if you are not using sbt-native-packager, it also includes your popluated `.ivy/cache` in the slug).  The `.ivy2` directory will be cached between builds to allow for faster build times.
 
-    $ ls
-    Procfile build.sbt project src
+It is strongly recommended that you use sbt-native-packager with this buildpack instead of sbt-start-script. The latter is deprecated, and will result in exessively large slug sizes. 
 
-    $ heroku create --buildpack https://github.com/heroku/heroku-buildpack-scala.git
+Documentation
+------------
 
-    $ git push heroku master
-    ...
-    -----> Heroku receiving push
-    -----> Scala app detected
-    -----> Building app with sbt
-    -----> Running: sbt compile stage
+For more information about using Scala and buildpacks on Heroku, see these articles:
 
-The buildpack will detect your app as Scala if it has the project/build.properties and either .sbt or .scala based build config.  It vendors a version of sbt and your popluated .ivy/cache into your slug.  The .ivy2 directory will be cached between builds to allow for faster build times.
+*  [Heroku's Scala Support](https://devcenter.heroku.com/articles/scala-support)
+*  [Play Documentation: Deploying to Heroku](https://playframework.com/documentation/2.3.x/ProductionHeroku)
+*  [Customizing the JDK](https://devcenter.heroku.com/articles/customizing-the-jdk)
+*  [Running a Remote sbt Console for a Scala or Play Application ](https://devcenter.heroku.com/articles/running-a-remote-sbt-console-for-a-scala-or-play-application)
+*  [Using Node.js to perform JavaScript optimization for Play and Scala applications](https://devcenter.heroku.com/articles/using-node-js-to-perform-javascript-optimization-for-play-and-scala-applications)
+*  [Reducing the Slug Size of Play 2.x Applications](https://devcenter.heroku.com/articles/reducing-the-slug-size-of-play-2-x-applications)
+
+Examples
+------------
+
+There are a number of example applications that demonstrate various ways of configuring a project for use on Heroku. Here are a few:
+
+*  [Play Database seed](https://github.com/mkbehbehani/play-heroku-seed)
+*  [Play Silhouette Angular seed](https://github.com/mohiva/play-silhouette-angular-seed)
+*  [Minimal sbt example](https://github.com/kissaten/sbt-minimal-scala-sample)
+*  [Lift example](https://github.com/kissaten/lift-2.5-sample)
 
 Customizing
 -----------
@@ -58,25 +68,18 @@ Unsetting SBT_CLEAN and restarting example-app... done, v18
 Hacking
 -------
 
-To use this buildpack, fork it on Github.  Push up changes to your fork, then create a test app with `--buildpack <your-github-url>` and push to it.
+To make changes to this buildpack, fork it on Github. Push up changes to your fork, then create a new Heroku app to test it, or configure an existing app to use your buildpack:
 
-For example, to reduce your slug size by not including the .ivy2/cache, you could add the following.
+```
+# Create a new Heroku app that uses your buildpack
+heroku create --buildpack <your-github-url>
 
-    for DIR in $CACHED_DIRS ; do
-    rm -rf $CACHE_DIR/$DIR
-    mkdir -p $CACHE_DIR/$DIR
-    cp -r $DIR/.  $CACHE_DIR/$DIR
-    # The following 2 lines are what you would add
-    echo "-----> Dropping ivy cache from the slug"
-    rm -rf $SBT_USER_HOME/.ivy2
+# Configure an existing Heroku app to use your buildpack
+heroku config:set BUILDPACK_URL=<your-github-url>
 
-Note: You will need to have your build copy the necessary jars to run your application to a place that will remain included with the slug.
-
-
-Commit and push the changes to your buildpack to your Github fork, then push your sample app to Heroku to test.  You should see:
-
-    ...
-    -----> Dropping ivy cache from the slug
+# You can also use a git branch!
+heroku config:set BUILDPACK_URL=<your-github-url>#your-branch
+```
 
 License
 -------
