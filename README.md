@@ -22,7 +22,6 @@ For more information about using Scala and buildpacks on Heroku, see these artic
 *  [Running a Remote sbt Console for a Scala or Play Application ](https://devcenter.heroku.com/articles/running-a-remote-sbt-console-for-a-scala-or-play-application)
 *  [Using Node.js to perform JavaScript optimization for Play and Scala applications](https://devcenter.heroku.com/articles/using-node-js-to-perform-javascript-optimization-for-play-and-scala-applications)
 *  [Reducing the Slug Size of Play 2.x Applications](https://devcenter.heroku.com/articles/reducing-the-slug-size-of-play-2-x-applications)
-*  
 
 Examples
 ------------
