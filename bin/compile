@@ -158,5 +158,12 @@ if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
   fi
 fi
 
+# write profile.d script
+profileScript="${BUILD_DIR}/.profile.d/scala.sh"
+mkdir -p $(dirname $profileScript)
+cat << EOF > $profileScript
+export PATH="\$HOME/.sbt_home/bin:\$PATH"
+EOF
+
 # Move compiled app back to where Heroku expects it
 mv $BUILD_DIR $APP_BUILD_DIR
