@@ -6,7 +6,8 @@ BP_NAME="scala"
 
 if [ ! -z "$1" ]; then
   pushd . > /dev/null 2>&1
-  cd /tmp &&
+  cd /tmp
+  rm -rf heroku-buildpack-$BP_NAME
   git clone git@github.com:heroku/heroku-buildpack-$BP_NAME.git
   cd heroku-buildpack-$BP_NAME
   git checkout master
@@ -14,10 +15,10 @@ if [ ! -z "$1" ]; then
 
   find . ! -name '.' ! -name '..' ! -name 'bin' ! -name 'opt' \
          ! -name 'lib' -maxdepth 1 -print0 | xargs -0 rm -rf --
-  heroku buildpacks:publish $1/$BP_NAME
+  heroku buildkits:publish $1/$BP_NAME
 
   if [ "$1" = "heroku" ]; then
-    newTag=$(heroku buildpacks:revisions heroku/$BP_NAME | sed -n 2p | grep -o -e "v\d*")
+    newTag=$(heroku buildkits:revisions heroku/$BP_NAME | sed -n 2p | grep -o -e "v\d*")
   fi
 
   popd > /dev/null 2>&1
