@@ -60,7 +60,7 @@ SBT_BINDIR="$SBT_USER_HOME"/bin
 cd $BUILD_DIR
 
 # unpack cache
-CACHED_DIRS="$SBT_USER_HOME/.ivy2 $SBT_USER_HOME/boot $SBT_BINDIR target project/target project/boot"
+CACHED_DIRS="$SBT_USER_HOME target project/target project/boot"
 for DIR in $CACHED_DIRS; do
   cache_copy $DIR $CACHE_DIR $BUILD_DIR
 done
@@ -99,7 +99,7 @@ SBT_TASKS="compile stage"
 [ "$SBT_CLEAN" = "true" ] && SBT_TASKS="clean $SBT_TASKS"
 
 # Install the custom sbt script
-rm -f $SBT_BINDIR/sbt-launch-*.jar #legacy launcher
+rm -f $SBT_BINDIR/sbt-launch*.jar #legacy launcher
 mkdir -p $SBT_BINDIR
 cp -p $OPT_DIR/sbt-extras.sh $SBT_BINDIR/sbt
 chmod 0755 $SBT_BINDIR/sbt
@@ -130,13 +130,9 @@ done
 
 # drop useless directories from slug for play and sbt-native-launcher only
 if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
-  if [ -d $SBT_USER_HOME/.ivy2 ]; then
-    status "Dropping ivy cache from the slug"
-    rm -rf $SBT_USER_HOME/.ivy2
-  fi
-  if [ -d $SBT_USER_HOME/boot ] ; then
-    status "Dropping sbt boot dir from the slug"
-    rm -rf $SBT_USER_HOME/boot
+  if [ -d $SBT_USER_HOME ]; then
+    status "Dropping sbt and ivy cache from the slug"
+    rm -rf $SBT_USER_HOME
   fi
   if [ -d $BUILD_DIR/project/boot ] ; then
     status "Dropping project boot dir from the slug"
