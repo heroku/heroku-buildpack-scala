@@ -274,10 +274,17 @@ run_sbt()
     -Dsbt.global.base=$home \
     -Dsbt.log.noformat=true \
     -no-colors -batch \
-    $tasks < /dev/null 2>&1 | sed -u 's/^/       /'
+    $tasks | indent
 
   if [ "${PIPESTATUS[*]}" != "0 0" ]; then
-    error "Failed to run sbt task: $tasks"
+    error "Failed to run sbt!
+We're sorry this build is failing! If you can't find the issue in application
+code, please submit a ticket so we can help: https://help.heroku.com
+You can also try reverting to our legacy Scala buildpack:
+heroku config:set BUILDPACK_URL=https://github.com/heroku/heroku-buildpack-scala
+
+Thanks,
+Heroku"
   fi
 }
 
