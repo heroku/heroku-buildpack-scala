@@ -241,7 +241,7 @@ EOF
 
   compile
 
-  assertCapturedError "Failed to run sbt task"
+  assertCapturedError "Failed to run sbt!"
 }
 
 testCompile_NoStageTask()
@@ -252,7 +252,7 @@ testCompile_NoStageTask()
   compile
 
   assertCapturedError "Not a valid key: stage"
-  assertCapturedError "Failed to run sbt task"
+  assertCapturedError "Failed to run sbt!"
 }
 
 testComplile_NoBuildPropertiesFile()
