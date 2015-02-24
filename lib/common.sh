@@ -274,7 +274,7 @@ run_sbt()
     -Dsbt.global.base=$home \
     -Dsbt.log.noformat=true \
     -no-colors -batch \
-    $tasks < /dev/null 2>&1 | sed -u 's/^/ /'
+    $tasks < /dev/null 2>&1 | indent
 
   if [ "${PIPESTATUS[*]}" != "0 0" ]; then
     error "Failed to run sbt!
