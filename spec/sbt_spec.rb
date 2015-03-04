@@ -19,7 +19,7 @@ describe "Sbt" do
 
   it "should run sbt-clean" do
     app = Hatchet::Runner.new("sbt-minimal-scala-sample")
-    app.setup!
+    init_app(app)
     app.set_config("SBT_CLEAN" => "true")
 
     app.deploy do |app|

@@ -26,6 +26,14 @@ def git_repo
   "https://github.com/heroku/heroku-buildpack-scala.git"
 end
 
+def init_app(app)
+  app.setup!
+  unless ENV['JVM_COMMON_BUILDPACK'].nil? or ENV['JVM_COMMON_BUILDPACK'].empty?
+    app.set_config("JVM_COMMON_BUILDPACK" => ENV['JVM_COMMON_BUILDPACK'])
+    expect(app.get_config['JVM_COMMON_BUILDPACK']).to eq(ENV['JVM_COMMON_BUILDPACK'])
+  end
+end
+
 def add_database(app, heroku)
   Hatchet::RETRIES.times.retry do
     heroku.post_addon(app.name, 'heroku-postgresql:hobby-dev')
