@@ -257,7 +257,7 @@ run_sbt()
     maxSbtHeap=5220
     ;;
   *)     # 2X Dyno
-    maxSbtHeap=1024
+    maxSbtHeap=768
     ;;
   esac
 
