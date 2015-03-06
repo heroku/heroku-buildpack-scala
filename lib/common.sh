@@ -264,6 +264,7 @@ run_sbt()
   status "Running: sbt $tasks"
   HOME="$home" sbt \
     -J-Xmx${maxSbtHeap}M \
+    -J-Xms${maxSbtHeap}M \
     -J-XX:+UseCompressedOops \
     -sbt-dir $home \
     -ivy $home/.ivy2 \

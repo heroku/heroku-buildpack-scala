@@ -125,9 +125,6 @@ testCompile()
 
   compile
 
-  assertContains "expected output" "$(cat ${STD_OUT})"
-  assertEquals "" "$(cat ${STD_ERR})"
-
   assertCapturedSuccess
 
  # setup
