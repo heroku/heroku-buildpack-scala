@@ -3,7 +3,6 @@
 . ${BUILDPACK_TEST_RUNNER_HOME}/lib/test_utils.sh
 
 DEFAULT_SBT_VERSION="0.13.7"
-DEFAULT_SBT_JAR="sbt-launch-0.13.6.jar"
 DEFAULT_PLAY_VERSION="2.3.4"
 DEFAULT_SCALA_VERSION="2.11.1"
 SBT_TEST_CACHE="/tmp/sbt-test-cache"
@@ -125,6 +124,9 @@ testCompile()
   touch    ${CACHE_DIR}/.sbt_home/bin/sbt-launch-OLD.jar
 
   compile
+
+  assertContains "expected output" "$(cat ${STD_OUT})"
+  assertEquals "" "$(cat ${STD_ERR})"
 
   assertCapturedSuccess
 
