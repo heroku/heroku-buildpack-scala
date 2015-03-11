@@ -110,6 +110,9 @@ HEROKU_PLUGIN="HerokuPlugin.scala"
 mkdir -p "$SBT_USER_HOME/plugins"
 cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/plugins/$HEROKU_PLUGIN
 
+# Manually pre-clean because sbt-native-packager doesn't clobber this dir
+rm -rf $BUILD_DIR/target/universal/stage
+
 # download and cache the dependencies if this is the first build
 if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
   if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
