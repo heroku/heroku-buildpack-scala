@@ -328,7 +328,7 @@ usage () {
   Note: "@"-file is overridden by local '.sbtopts' or '-sbt-opts' argument.
   -sbt-opts <path> file containing sbt args (if not given, .sbtopts in project root is used if present)
   -S-X             add -X to sbt's scalacOptions (-S is stripped)
-  EOM
+EOM
 }
 
 process_args ()
@@ -453,7 +453,7 @@ vlog "Detected sbt version $sbt_version"
   If you want to start sbt anyway, run:
   $0 -sbt-create
 
-  EOM
+EOM
   exit 1
 }
 
