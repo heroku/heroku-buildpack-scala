@@ -6,7 +6,7 @@ before_install:
 - curl --silent https://shunit2.googlecode.com/files/shunit2-2.1.6.tgz | tar xz -C
   /tmp/
 - git clone https://github.com/ryanbrainard/heroku-buildpack-testrunner.git /tmp/testrunner
-- ./etc/hatchet_travis_setup.sh
+- "./etc/hatchet_travis_setup.sh"
 install: true
 script: eval "$TEST_CMD"
 after_script: heroku keys:remove $USER@`hostname`
@@ -17,7 +17,7 @@ env:
   - HATCHET_DEPLOY_STRATEGY=git
   - HATCHET_BUILDPACK_BASE="https://github.com/heroku/heroku-buildpack-scala.git"
   - SHUNIT_HOME="/tmp/shunit2-2.1.6"
-  - secure: HZRdhxVe6yCl0wouetfS2ybPT4H9cTm095O2jbMhJmOESPUo80PTfLRxJ75dh9s/93RMYryumWELZtDoLIXYQ9REaIQch973JeRSXkBchx/oFkBOOljResqmnbzJAG59k3dnimKSfS3biaqWexFralISx6RkDGyOLylw1VujHYw=
+  - secure: rHR5IEbwq0xY5zoI++zZmWSBNXADZrLeOoPbFVTeQDMCB6bK/Z2dauR7ev3Qt6JxnMyMJD7PfamkmeSbGDOWIROpVCKl2w9987e8e85X9ORGt+AA9qN/6ChbNr5Tum8od1o9pbXEzam6zih2g3E6H09+RGD9DnA1np7KjVuEJEc=
   matrix:
   - TEST_CMD='[ "$TRAVIS_PULL_REQUEST" = "false" ] && sbt hatchet || true'
   - TEST_CMD="/tmp/testrunner/bin/run -c ."
