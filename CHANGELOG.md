@@ -1,5 +1,7 @@
 ## Master
 
+## 54
+
 * Upgrade default sbt version to 0.13.8
 
 ## v52
