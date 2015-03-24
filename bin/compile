@@ -106,8 +106,9 @@ chmod 0755 $SBT_BINDIR/sbt
 export PATH="$SBT_BINDIR:$PATH"
 
 # copy in heroku sbt plugin
-HEROKU_PLUGIN="HerokuPlugin.scala"
+HEROKU_PLUGIN="HerokuBuildpackPlugin.scala"
 mkdir -p "$SBT_USER_HOME/plugins"
+rm $SBT_USER_HOME/plugins/HerokuPlugin.scala # remove the old ambiguously named plugin
 cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/plugins/$HEROKU_PLUGIN
 
 # Manually pre-clean because sbt-native-packager doesn't clobber this dir
