@@ -1,7 +1,7 @@
 Heroku buildpack: Scala [![Build Status](https://travis-ci.org/heroku/heroku-buildpack-scala.svg?branch=master)](https://travis-ci.org/heroku/heroku-buildpack-scala)
 =========================
 
-This is a [Heroku buildpack](http://devcenter.heroku.com/articles/buildpacks) for Scala apps.
+This This is the official [Heroku buildpack](http://devcenter.heroku.com/articles/buildpacks) for Scala apps.
 It uses [sbt](https://github.com/harrah/xsbt/) 0.11.0+.
 
 How it works
@@ -65,7 +65,7 @@ $ heroku config:unset SBT_CLEAN
 Unsetting SBT_CLEAN and restarting example-app... done, v18
 ```
 
-Hacking
+Development
 -------
 
 To make changes to this buildpack, fork it on Github. Push up changes to your fork, then create a new Heroku app to test it, or configure an existing app to use your buildpack:
