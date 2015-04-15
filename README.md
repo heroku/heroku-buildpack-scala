@@ -1,4 +1,4 @@
-Heroku buildpack: Scala [![Build Status](https://travis-ci.org/heroku/heroku-buildpack-scala.svg?branch=master)](https://travis-ci.org/heroku/heroku-buildpack-scala)
+Heroku Buildpack for Scala [![Build Status](https://travis-ci.org/heroku/heroku-buildpack-scala.svg?branch=master)](https://travis-ci.org/heroku/heroku-buildpack-scala)
 =========================
 
 This This is the official [Heroku buildpack](http://devcenter.heroku.com/articles/buildpacks) for Scala apps.
