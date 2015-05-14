@@ -109,7 +109,7 @@ get_supported_play_version() {
 
   if _has_playPluginsFile $ctxDir; then
     pluginVersionLine="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
-    pluginVersion=$(expr "$pluginVersionLine" : ".\+\(2\.[0-3]\)\.[0-9]")
+    pluginVersion=$(expr "$pluginVersionLine" : ".\+\(2\.[0-4]\)\.[0-9]")
     if [ "$pluginVersion" != 0 ]; then
       echo -n "$pluginVersion"
     fi
