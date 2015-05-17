@@ -97,6 +97,7 @@ SBT_TASKS="compile stage"
 # $ git push heroku master
 # See: https://devcenter.heroku.com/articles/scala-support#clean-builds
 [ "$SBT_CLEAN" = "true" ] && SBT_TASKS="clean $SBT_TASKS"
+[ "$SBT_FLYWAY_MIGRATE" = "true" ] && SBT_TASKS="flyway:migrate $SBT_TASKS"
 
 # Install the custom sbt script
 rm -f $SBT_BINDIR/sbt-launch*.jar #legacy launcher
