@@ -282,7 +282,7 @@ run_sbt()
 We're sorry this build is failing! If you can't find the issue in application
 code, please submit a ticket so we can help: https://help.heroku.com
 You can also try reverting to our legacy Scala buildpack:
-$ heroku buildpack:set https://github.com/heroku/heroku-buildpack-scala#legacy
+$ heroku buildpacks:set https://github.com/heroku/heroku-buildpack-scala#legacy
 
 Thanks,
 Heroku"
