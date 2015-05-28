@@ -1,8 +1,14 @@
 ## Master
 
+## v57
+
+* Added support for Play 2.4
+
+## v56
+
 * Upgrade sbt cache packages
 
-## 54
+## v54
 
 * Upgrade default sbt version to 0.13.8
 
