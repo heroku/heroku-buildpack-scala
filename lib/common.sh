@@ -77,7 +77,7 @@ get_scala_version() {
   local playVersion=$4
 
   if [ -n "${playVersion}" ]; then
-    if [ "${playVersion}" = "2.3" ]; then
+    if [ "${playVersion}" = "2.3" ] || [ "${playVersion}" = "2.4" ]; then
       # if we don't grep for the version, and instead use `sbt scala-version`,
       # then sbt will try to download the internet
       scalaVersionLine="$(grep "scalaVersion" "${ctxDir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g')"
