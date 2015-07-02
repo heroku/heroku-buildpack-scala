@@ -13,10 +13,6 @@ if [ ! -z "$1" ]; then
   git checkout master
   headHash=$(git rev-parse HEAD)
 
-  if [ "$1" = "heroku" ]; then
-    oldTag=$(heroku buildkits:revisions heroku/$BP_NAME | sed -n 2p | grep -o -e "v\d*")
-  fi
-
   find . ! -name '.' ! -name '..' ! -name 'bin' ! -name 'opt' \
          ! -name 'lib' -maxdepth 1 -print0 | xargs -0 rm -rf --
   heroku buildkits:publish $1/$BP_NAME
@@ -31,11 +27,14 @@ if [ ! -z "$1" ]; then
 
   if [ "$1" = "heroku" ]; then
     if [ "$headHash" = "$(git rev-parse HEAD)" ]; then
-      echo "Updating previous-version tag"
-      git tag -d previous-version
-      git tag previous-version $oldTag
       echo "Tagging commit $headHash with $newTag... "
       git tag $newTag
+      echo "Updating previous-version tag"
+      git tag -d previous-version
+      git tag previous-version latest-version
+      echo "Updating latest-version tag"
+      git tag -d latest-version
+      git tag latest-version
       git push --tags
     fi
   fi

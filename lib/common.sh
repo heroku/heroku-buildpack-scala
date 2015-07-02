@@ -262,7 +262,7 @@ run_sbt()
   esac
 
   status "Running: sbt $tasks"
-  HOME="$home" sbt \
+  HOME="$home" sbt ${SBT_EXTRAS_OPTS} \
     -J-Xmx${maxSbtHeap}M \
     -J-Xms${maxSbtHeap}M \
     -J-XX:+UseCompressedOops \
@@ -281,7 +281,7 @@ run_sbt()
     error "Failed to run sbt!
 We're sorry this build is failing! If you can't find the issue in application
 code, please submit a ticket so we can help: https://help.heroku.com
-You can also try reverting to the previous version of the buildpack:
+You can also try reverting to the previous version of the buildpack by running:
 $ heroku buildpacks:set https://github.com/heroku/heroku-buildpack-scala#previous-version
 
 Thanks,
