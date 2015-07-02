@@ -166,9 +166,9 @@ setJavaHome () {
   export PATH="$JAVA_HOME/bin:$PATH"
 }
 setJavaHomeQuietly () {
-  addSbt warn
+  # addSbt warn
   setJavaHome "$1"
-  addSbt info
+  # addSbt info
 }
 
 # if set, use JDK_HOME/JAVA_HOME over java found in path
