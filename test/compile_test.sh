@@ -169,6 +169,19 @@ testCleanCompile()
   assertCaptured "SBT tasks to run should still be outputed" "Running: sbt clean compile stage"
 }
 
+testRemovePlayForkRun()
+{
+  createPlayProject
+  mkdir -p ${BUILD_DIR}/project
+  touch ${BUILD_DIR}/project/play-fork-run.sbt
+
+  compile
+
+  assertCapturedSuccess
+  #assertCaptured "Warns about play-fork-run removal" "Removing project/play-fork-run.sbt."
+  assertFalse "Removes play-fork-run" "[ -f ${BUILD_DIR}/project/play-fork-run.sbt ]"
+}
+
 testCompile_PrimeIvyCacheForPlay() {
   createPlayProject "2.3.7" "0.13.5" "2.11.1"
 
