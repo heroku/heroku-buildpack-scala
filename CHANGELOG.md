@@ -1,5 +1,7 @@
 ## Master
 
+## v59
+
 * Remove play-fork-run.sbt if it exists to workaround Activator bug.
 
 ## v57
