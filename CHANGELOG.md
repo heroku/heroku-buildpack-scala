@@ -1,5 +1,7 @@
 ## Master
 
+* Remove play-fork-run.sbt if it exists to workaround Activator bug.
+
 ## v57
 
 * Added support for Play 2.4
