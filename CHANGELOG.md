@@ -1,5 +1,9 @@
 ## Master
 
+## v60
+
+* Updated sbt cache primer to include Play 2.4.2
+
 ## v59
 
 * Remove play-fork-run.sbt if it exists to workaround Activator bug.
