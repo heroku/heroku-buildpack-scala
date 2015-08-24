@@ -1,20 +1,3 @@
-Nomadly fork of the heroku buildpack for scala
-============
-
-The nomadly fork supports additional tasks to be specified for building play apps on heroku. To add any additional tasks, set the environment variable `SBT_ADDITIONAL_TASKS` to a list of tasks that should be executed. If the following is set:
-
-    SBT_ADDITIONAL_TASKS=flyway:migrate info
-    
-Then, the following command will be run for build:
-
-    sbt flyway:migrate info compile stage
-    
-If `SBT_CLEAN` is set to `true`, then it will run:
-
-    sbt clean flyway:migrate info compile stage
-    
-Follows the documentation of the original repository.
-
 Heroku Buildpack for Scala [![Build Status](https://travis-ci.org/heroku/heroku-buildpack-scala.svg?branch=master)](https://travis-ci.org/heroku/heroku-buildpack-scala)
 =========================
 
@@ -64,6 +47,17 @@ the compile process would look like this:
 $ heroku config:set SBT_OPTS="-J-Xss4m"
 ```
 
+Additional tasks
+----------------
+
+Sometimes, it might be necessary to run additional sbt tasks before a build and deployment (for example, database migrations). Ideally, the tasks should be interdependent such that these tasks run automatically as pre-requisities to `compile stage`, but sometimes this might not be the case. To add any additional tasks, set the environment variable `SBT_ADDITIONAL_TASKS` to a list of tasks that should be executed. If the following is set:
+
+    SBT_ADDITIONAL_TASKS=flyway:migrate info
+    
+Then, the following command will be run for build:
+
+    sbt flyway:migrate info compile stage
+    
 Clean builds
 ------------
 
