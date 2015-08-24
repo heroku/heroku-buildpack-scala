@@ -29,6 +29,14 @@ if [ ! -z "$1" ]; then
     if [ "$headHash" = "$(git rev-parse HEAD)" ]; then
       echo "Tagging commit $headHash with $newTag... "
       git tag $newTag
+      echo "Updating previous-version tag"
+      git tag -d previous-version
+      git push origin :previous-version
+      git tag previous-version latest-version
+      echo "Updating latest-version tag"
+      git tag -d latest-version
+      git push origin :latest-version
+      git tag latest-version
       git push --tags
     fi
   fi

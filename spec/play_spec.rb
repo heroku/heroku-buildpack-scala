@@ -3,6 +3,7 @@ require_relative 'spec_helper'
 describe "Play" do
 
   REPOS={
+    "play-2.4.x-scala" => "2.3",
     "play-2.3.x-scala-sample" => "2.3",
     "play-2.2.x-scala-sample" => "2.2",
     "play-2.1.x-scala-sample" => "2.1",

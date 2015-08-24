@@ -77,7 +77,7 @@ get_scala_version() {
   local playVersion=$4
 
   if [ -n "${playVersion}" ]; then
-    if [ "${playVersion}" = "2.3" ]; then
+    if [ "${playVersion}" = "2.3" ] || [ "${playVersion}" = "2.4" ]; then
       # if we don't grep for the version, and instead use `sbt scala-version`,
       # then sbt will try to download the internet
       scalaVersionLine="$(grep "scalaVersion" "${ctxDir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g')"
@@ -162,7 +162,7 @@ _download_and_unpack_ivy_cache() {
   local scalaVersion=$2
   local playVersion=$3
 
-  baseUrl="http://lang-jvm.s3.amazonaws.com/sbt/v3/sbt-cache"
+  baseUrl="http://lang-jvm.s3.amazonaws.com/sbt/v5/sbt-cache"
   if [ -n "$playVersion" ]; then
     ivyCacheUrl="$baseUrl-play-${playVersion}_${scalaVersion}.tar.gz"
   else
@@ -262,7 +262,7 @@ run_sbt()
   esac
 
   status "Running: sbt $tasks"
-  HOME="$home" sbt \
+  HOME="$home" sbt ${SBT_EXTRAS_OPTS} \
     -J-Xmx${maxSbtHeap}M \
     -J-Xms${maxSbtHeap}M \
     -J-XX:+UseCompressedOops \
@@ -281,8 +281,8 @@ run_sbt()
     error "Failed to run sbt!
 We're sorry this build is failing! If you can't find the issue in application
 code, please submit a ticket so we can help: https://help.heroku.com
-You can also try reverting to our legacy Scala buildpack:
-$ heroku buildpack:set https://github.com/heroku/heroku-buildpack-scala#legacy
+You can also try reverting to the previous version of the buildpack by running:
+$ heroku buildpacks:set https://github.com/heroku/heroku-buildpack-scala#previous-version
 
 Thanks,
 Heroku"

@@ -92,10 +92,10 @@ To make changes to this buildpack, fork it on Github. Push up changes to your fo
 heroku create --buildpack <your-github-url>
 
 # Configure an existing Heroku app to use your buildpack
-heroku config:set BUILDPACK_URL=<your-github-url>
+heroku buildpacks:set <your-github-url>
 
 # You can also use a git branch!
-heroku config:set BUILDPACK_URL=<your-github-url>#your-branch
+heroku buildpacks:set <your-github-url>#your-branch
 ```
 
 License

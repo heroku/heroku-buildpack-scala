@@ -395,6 +395,19 @@ testDetectPlayLang_BadDir() {
   assertCapturedEquals ""
 }
 
+testGetSupportedPlayVersion_24() {
+  mkdir -p ${BUILD_DIR}/conf ${BUILD_DIR}/project
+  touch ${BUILD_DIR}/conf/application.conf
+  cat > ${BUILD_DIR}/project/plugins.sbt <<EOF
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.4.2")
+EOF
+
+  capture get_supported_play_version ${BUILD_DIR}
+
+  assertCapturedSuccess
+  assertCapturedEquals "2.4"
+}
+
 testGetSupportedPlayVersion_23() {
   mkdir -p ${BUILD_DIR}/conf ${BUILD_DIR}/project
   touch ${BUILD_DIR}/conf/application.conf
