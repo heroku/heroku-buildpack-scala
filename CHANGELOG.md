@@ -1,5 +1,8 @@
 ## Master
 
+* Added SBT_PRE_TASKS config var support
+* Upgrade default SBT version to 0.13.9
+
 ## v60
 
 * Updated sbt cache primer to include Play 2.4.2
