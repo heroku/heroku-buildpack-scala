@@ -1,7 +1,7 @@
 ## Master
 
 * Added SBT_PRE_TASKS config var support
-* Upgrade default SBT version to 0.13.9
+* Upgrade SBT launcher version to 0.13.9
 
 ## v60
 
