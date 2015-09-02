@@ -47,12 +47,12 @@ the compile process would look like this:
 $ heroku config:set SBT_OPTS="-J-Xss4m"
 ```
 
-Additional tasks
+Running additional tasks before the build
 ----------------
 
-Sometimes, it might be necessary to run additional sbt tasks before a build and deployment (for example, database migrations). Ideally, the tasks should be interdependent such that these tasks run automatically as pre-requisities to `compile stage`, but sometimes this might not be the case. To add any additional tasks, set the environment variable `SBT_ADDITIONAL_TASKS` to a list of tasks that should be executed. If the following is set:
+Sometimes, it might be necessary to run additional sbt tasks before a build and deployment (for example, database migrations). Ideally, the tasks should be interdependent such that these tasks run automatically as pre-requisities to `compile stage`, but sometimes this might not be the case. To add any additional tasks, set the environment variable `SBT_PRE_TASKS` to a list of tasks that should be executed. If the following is set:
 
-    SBT_ADDITIONAL_TASKS=flyway:migrate info
+    SBT_PRE_TASKS=flyway:migrate info
     
 Then, the following command will be run for build:
 

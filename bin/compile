@@ -103,11 +103,14 @@ fi
 SBT_VERSION="$(get_supported_sbt_version ${BUILD_DIR})"
 SBT_TASKS="compile stage"
 
+# To run any tasks before the actual build, configure the environment
+# $ heroku config:set SBT_PRE_TASKS=flyway:info
+[ "$SBT_PRE_TASKS" ] && SBT_TASKS="$SBT_PRE_TASKS $SBT_TASKS"
+
 # To enable clean compiles, configure the environment to clean:
 # $ heroku config:set SBT_CLEAN=true
 # $ git push heroku master
 # See: https://devcenter.heroku.com/articles/scala-support#clean-builds
-[ "$SBT_ADDITIONAL_TASKS" ] && SBT_TASKS="$SBT_ADDITIONAL_TASKS $SBT_TASKS"
 [ "$SBT_CLEAN" = "true" ] && SBT_TASKS="clean $SBT_TASKS"
 
 # Install the custom sbt script
