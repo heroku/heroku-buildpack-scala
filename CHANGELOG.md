@@ -1,5 +1,9 @@
 ## Master
 
+## v62
+
+* Updated sbt cache primer to include Play 2.4.3
+
 ## v61
 
 * Added SBT_PRE_TASKS config var support
