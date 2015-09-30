@@ -125,7 +125,7 @@ testCompile()
 
   compile
 
-  assertCapturedSuccess
+  assertEquals 0 "${RETURN}"
 
  # setup
   assertTrue "Ivy2 cache should have been repacked." "[ -d ${BUILD_DIR}/.sbt_home/.ivy2 ]"
@@ -135,7 +135,7 @@ testCompile()
   assertTrue "sbt plugins dir should exist" "[ -d ${BUILD_DIR}/.sbt_home/plugins ]"
   assertTrue "sbt plugins should be compiled" "[ -d ${BUILD_DIR}/.sbt_home/plugins/target ]"
   assertTrue "sbt launcher should be installed" "[ -f ${BUILD_DIR}/.sbt_home/launchers/${DEFAULT_SBT_VERSION}/sbt-launch.jar ]"
-  assertCaptured "SBT should have been installed" "Downloading sbt launcher for $DEFAULT_SBT_VERSION"
+  assertContains "SBT should have been installed" "Downloading sbt launcher for $DEFAULT_SBT_VERSION" "$(cat ${STD_ERR})"
 
   # run
   assertCaptured "SBT tasks to run should be output" "Running: sbt compile stage"
@@ -148,7 +148,7 @@ testCompile()
   # re-deploy
   compile
 
-  assertCapturedSuccess
+  assertEquals 0 "${RETURN}"
   assertNotCaptured "Ivy cache should not be primed on re-run" "Priming Ivy Cache"
   assertNotCaptured "SBT should not be re-installed on re-run" "Building app with sbt"
   assertNotCaptured "SBT should not compile any new classes" "[info] Compiling"
@@ -165,7 +165,7 @@ testCleanCompile()
 
   compile
 
-  assertCapturedSuccess
+  assertEquals 0 "${RETURN}"
   assertCaptured "SBT tasks to run should still be outputed" "Running: sbt clean compile stage"
 }
 
@@ -177,7 +177,7 @@ testRemovePlayForkRun()
 
   compile
 
-  assertCapturedSuccess
+  assertEquals 0 "${RETURN}"
   #assertCaptured "Warns about play-fork-run removal" "Removing project/play-fork-run.sbt."
   assertFalse "Removes play-fork-run" "[ -f ${BUILD_DIR}/project/play-fork-run.sbt ]"
 }
@@ -187,12 +187,12 @@ testCompile_PrimeIvyCacheForPlay() {
 
   compile
 
-  assertCapturedSuccess
+  assertEquals 0 "${RETURN}"
   assertCaptured "Ivy cache should be primed" "Priming Ivy cache (Scala-2.11, Play-2.3)... done"
 
   compile
 
-  assertCapturedSuccess
+  assertEquals 0 "${RETURN}"
   assertNotCaptured "Ivy cache should not be primed on re-run" "Priming Ivy Cache"
 }
 
@@ -202,7 +202,7 @@ testCompile_Play20Project() {
   mkdir -p ${BUILD_DIR}/conf
   touch ${BUILD_DIR}/conf/application.conf
   compile
-  assertCapturedSuccess
+  assertEquals 0 "${RETURN}"
   assertTrue  "Ivy2 cache should have been repacked for a play project." "[ -d ${CACHE_DIR}/.sbt_home/.ivy2 ]"
   assertFalse "Ivy2 cache should not have been included in slug for a play project." "[ -d ${BUILD_DIR}/.sbt_home/.ivy2 ]"
   assertFalse "Streams should not have been included in slug for a play project." "[ -d ${BUILD_DIR}/target/streams ]"
@@ -220,9 +220,9 @@ testCompile_WithNonDefaultVersion()
 
   compile
 
-  assertCapturedSuccess
+  assertEquals 0 "${RETURN}"
   assertCaptured "Should install JDK 1.6" "Installing OpenJDK 1.6"
-  assertCaptured "SBT should be installed" "Downloading sbt launcher for 0.11.1"
+  assertContains "SBT should be installed" "Downloading sbt launcher for 0.11.1" "$(cat ${STD_ERR})"
   assertCaptured "Specified SBT version should actually be used" "Getting org.scala-tools.sbt sbt_2.9.1 ${specifiedSbtVersion}"
 
   unset STACK
@@ -239,7 +239,7 @@ sbt.version   =  0.13.5
 abc=xyz
 EOF
   compile
-  assertCaptured "Multiline properties file should detect sbt version" "Downloading sbt launcher for 0.13.5"
+  assertContains "Multiline properties file should detect sbt version" "Downloading sbt launcher for 0.13.5" "$(cat ${STD_ERR})"
 }
 
 testCompile_BuildFailure()
@@ -253,7 +253,8 @@ EOF
 
   compile
 
-  assertCapturedError "Failed to run sbt!"
+  assertEquals 1 "${RETURN}"
+  assertCaptured "Failed to run sbt!"
 }
 
 testCompile_NoStageTask()
@@ -263,8 +264,9 @@ testCompile_NoStageTask()
 
   compile
 
-  assertCapturedError "Not a valid key: stage"
-  assertCapturedError "Failed to run sbt!"
+  assertEquals 1 "${RETURN}"
+  assertCaptured "Not a valid key: stage"
+  assertCaptured "Failed to run sbt!"
 }
 
 testComplile_NoBuildPropertiesFile()
@@ -294,7 +296,7 @@ testComplile_BuildPropertiesFileWithRCVersion()
 
   compile
 
-  assertCaptured "SBT should have been installed" "Downloading sbt launcher for"
+  assertContains "SBT should have been installed" "Downloading sbt launcher for" "$(cat ${STD_ERR})"
 }
 
 testComplile_BuildPropertiesFileWithMServerVersion()
@@ -303,5 +305,5 @@ testComplile_BuildPropertiesFileWithMServerVersion()
 
   compile
 
-  assertCaptured "SBT should have been installed" "Downloading sbt launcher for"
+  assertContains "SBT should have been installed" "Downloading sbt launcher for" "$(cat ${STD_ERR})"
 }
