@@ -9,6 +9,7 @@ BIN_DIR=$BP_DIR/bin
 OPT_DIR=$BP_DIR/opt
 LIB_DIR=$BP_DIR/lib
 . $LIB_DIR/common.sh
+. $LIB_DIR/failures.sh
 
 # parse args
 APP_BUILD_DIR=$(cd $1; pwd)
