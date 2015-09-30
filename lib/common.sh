@@ -245,12 +245,41 @@ universal_packaging_default_web_proc() {
   fi
 }
 
+# sed -l basically makes sed replace and buffer through stdin to stdout
+# so you get updates while the command runs and dont wait for the end
+# e.g. sbt stage | indent
+output() {
+  local logfile="$1"
+  local c='s/^/       /'
+
+  case $(uname) in
+      Darwin) tee -a "$logfile" | sed -l "$c";; # mac/bsd sed: -l buffers on line boundaries
+      *)      tee -a "$logfile" | sed -u "$c";; # unix/gnu sed: -u unbuffered (arbitrary) chunks of data
+  esac
+}
+
+handle_errors() {
+  local logfile="$1"
+
+  error "Failed to run sbt!
+We're sorry this build is failing! If you can't find the issue in application
+code, please submit a ticket so we can help: https://help.heroku.com
+You can also try reverting to the previous version of the buildpack by running:
+$ heroku buildpacks:set https://github.com/heroku/heroku-buildpack-scala#previous-version
+
+Thanks,
+Heroku"
+}
+
 run_sbt()
 {
   local javaVersion=$1
   local home=$2
   local launcher=$3
   local tasks=$4
+  local buildLogFile=".heroku/sbt-build.log"
+
+  echo "" > $buildLogFile
 
   case $(ulimit -u) in
   32768) # PX Dyno
@@ -275,17 +304,10 @@ run_sbt()
     -Dsbt.global.base=$home \
     -Dsbt.log.noformat=true \
     -no-colors -batch \
-    $tasks < /dev/null 2>&1 | indent
+    $tasks | output $buildLogFile
 
   if [ "${PIPESTATUS[*]}" != "0 0" ]; then
-    error "Failed to run sbt!
-We're sorry this build is failing! If you can't find the issue in application
-code, please submit a ticket so we can help: https://help.heroku.com
-You can also try reverting to the previous version of the buildpack by running:
-$ heroku buildpacks:set https://github.com/heroku/heroku-buildpack-scala#previous-version
-
-Thanks,
-Heroku"
+    handle_errors $buildLogFile
   fi
 }
 
