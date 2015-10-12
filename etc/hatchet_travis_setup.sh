@@ -1,4 +1,4 @@
-if [[ "$TEST_CMD" =~ "rspec" ]]; then
+if [[ "$TEST_CMD" =~ "sh hatchet.sh" ]]; then
   if [ -n "`git config --get user.email`" ]; then
     echo 'already set'; else `git config --global user.email 'buildpack@example.com'`
   fi
@@ -22,5 +22,4 @@ EOF
   gem install heroku_hatchet
   gem install rspec-retry
   gem install rspec-expectations
-  hatchet install
 fi
