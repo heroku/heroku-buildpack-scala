@@ -21,5 +21,6 @@ EOF
 
   gem install heroku_hatchet
   gem install rspec-retry
+  gem install rspec-expectations
   hatchet install
 fi
