@@ -1,5 +1,9 @@
 ## Master
 
+## v63
+
+* Added detection for specific failure cases and advised solutions in message.
+
 ## v62
 
 * Updated sbt cache primer to include Play 2.4.3
