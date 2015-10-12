@@ -1,4 +1,4 @@
-if [[ "$TEST_CMD" =~ "sbt hatchet" ]]; then
+if [[ "$TEST_CMD" =~ "rspec" ]]; then
   if [ -n "`git config --get user.email`" ]; then
     echo 'already set'; else `git config --global user.email 'buildpack@example.com'`
   fi
@@ -18,4 +18,8 @@ EOF
   curl --fail --retry 3 --retry-delay 1 --connect-timeout 3 --max-time 30 https://toolbelt.heroku.com/install-ubuntu.sh | sh
 
   yes | heroku keys:add
+
+  gem install heroku_hatchet
+  gem install rspec-retry
+  hatchet install
 fi
