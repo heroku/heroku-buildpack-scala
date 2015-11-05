@@ -147,7 +147,7 @@ for DIR in $CACHED_DIRS; do
 done
 
 # drop useless directories from slug for play and sbt-native-launcher only
-if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
+if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR || [ -n "$KEEP_IVY_CACHE" ]; then
   if [ -d $SBT_USER_HOME/.ivy2 ]; then
     status "Dropping ivy cache from the slug"
     rm -rf $SBT_USER_HOME/.ivy2
