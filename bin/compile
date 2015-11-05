@@ -147,27 +147,25 @@ for DIR in $CACHED_DIRS; do
 done
 
 # drop useless directories from slug for play and sbt-native-launcher only
-if [ "$KEEP_IVY_CACHE" != "true" ]; then
-  if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
-    if [ -d $SBT_USER_HOME/.ivy2 ]; then
-      status "Dropping ivy cache from the slug"
-      rm -rf $SBT_USER_HOME/.ivy2
-    fi
-    if [ -d $SBT_USER_HOME/boot ] ; then
-      status "Dropping sbt boot dir from the slug"
-      rm -rf $SBT_USER_HOME/boot
-    fi
-    if [ -d $BUILD_DIR/project/boot ] ; then
-      status "Dropping project boot dir from the slug"
-      rm -rf $BUILD_DIR/project/boot
-    fi
-    if [ -d $BUILD_DIR/target ] ; then
-      status "Dropping compilation artifacts from the slug"
-      rm -rf $BUILD_DIR/target/scala-*
-      rm -rf $BUILD_DIR/target/streams
-      if [ -d $BUILD_DIR/target/resolution-cache ] ; then
-        find $BUILD_DIR/target/resolution-cache/* ! -name "reports" ! -name "*-compile.xml" -print0 | xargs -0 rm -rf --
-      fi
+if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
+  if [ "$KEEP_IVY_CACHE" != "true" ] && [ -d $SBT_USER_HOME/.ivy2 ]; then
+    status "Dropping ivy cache from the slug"
+    rm -rf $SBT_USER_HOME/.ivy2
+  fi
+  if [ -d $SBT_USER_HOME/boot ] ; then
+    status "Dropping sbt boot dir from the slug"
+    rm -rf $SBT_USER_HOME/boot
+  fi
+  if [ -d $BUILD_DIR/project/boot ] ; then
+    status "Dropping project boot dir from the slug"
+    rm -rf $BUILD_DIR/project/boot
+  fi
+  if [ -d $BUILD_DIR/target ] ; then
+    status "Dropping compilation artifacts from the slug"
+    rm -rf $BUILD_DIR/target/scala-*
+    rm -rf $BUILD_DIR/target/streams
+    if [ -d $BUILD_DIR/target/resolution-cache ] ; then
+      find $BUILD_DIR/target/resolution-cache/* ! -name "reports" ! -name "*-compile.xml" -print0 | xargs -0 rm -rf --
     fi
   fi
 fi
