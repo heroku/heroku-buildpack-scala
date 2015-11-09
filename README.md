@@ -1,6 +1,8 @@
 Heroku Buildpack for Scala [![Build Status](https://travis-ci.org/heroku/heroku-buildpack-scala.svg?branch=master)](https://travis-ci.org/heroku/heroku-buildpack-scala)
 =========================
 
+![](https://cloud.githubusercontent.com/assets/51578/11041625/f2eed216-86e0-11e5-8470-5c01a775fa51.jpg)
+
 This is the official [Heroku buildpack](http://devcenter.heroku.com/articles/buildpacks) for Scala apps.
 It uses [sbt](https://github.com/harrah/xsbt/) 0.11.0+.
 
