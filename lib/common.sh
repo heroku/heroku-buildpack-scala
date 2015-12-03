@@ -162,14 +162,14 @@ _download_and_unpack_ivy_cache() {
   local scalaVersion=$2
   local playVersion=$3
 
-  baseUrl="http://lang-jvm.s3.amazonaws.com/sbt/v6/sbt-cache"
+  baseUrl="http://lang-jvm.s3.amazonaws.com/sbt/v7/sbt-cache"
   if [ -n "$playVersion" ]; then
     ivyCacheUrl="$baseUrl-play-${playVersion}_${scalaVersion}.tar.gz"
   else
     ivyCacheUrl="$baseUrl-base.tar.gz"
   fi
 
-  curl --silent --max-time 60 --location $ivyCacheUrl | tar xzm -C $sbtUserHome
+  curl --retry 3 --silent --max-time 60 --location $ivyCacheUrl | tar xzm -C $sbtUserHome
   if [ $? -eq 0 ]; then
     mv $sbtUserHome/.sbt/* $sbtUserHome
     rm -rf $sbtUserHome/.sbt
