@@ -209,25 +209,6 @@ testCompile_Play20Project() {
   assertFalse "Scala cache should not have been included in slug for a play project." "[ -d ${BUILD_DIR}/target/scala-2.9.1 ]"
 }
 
-testCompile_WithNonDefaultVersion()
-{
-  local specifiedSbtVersion="0.11.1"
-  assertNotEquals "Precondition" "${specifiedSbtVersion}" "${DEFAULT_SBT_VERSION}"
-
-  export STACK="cedar" # because system.properties isn't working from tests for some reason
-
-  createSbtProject ${specifiedSbtVersion}
-
-  compile
-
-  assertEquals 0 "${RETURN}"
-  assertCaptured "Should install JDK 1.6" "Installing OpenJDK 1.6"
-  assertContains "SBT should be installed" "Downloading sbt launcher for 0.11.1" "$(cat ${STD_ERR})"
-  assertCaptured "Specified SBT version should actually be used" "Getting org.scala-tools.sbt sbt_2.9.1 ${specifiedSbtVersion}"
-
-  unset STACK
-}
-
 testCompile_WithMultilineBuildProperties() {
   createSbtProject
   mkdir -p ${BUILD_DIR}/project
