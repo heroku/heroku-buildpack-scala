@@ -62,7 +62,15 @@ _has_buildPropertiesFile() {
 
 _has_playConfig() {
   local ctxDir=$1
-  test -e $ctxDir/conf/application.conf
+  test -e $ctxDir/conf/application.conf ||
+      test "$IS_PLAY_APP" = "true" ||
+      (test -n "$PLAY_CONF_FILE" &&
+          test -e "$PLAY_CONF_FILE") ||
+      (# test for default Play 2.3 and 2.4 setup. But this can't tell if something is commented out
+          test -d $ctxDir/project &&
+          test -n "$(grep -nr "addSbtPlugin(\"com.typesafe.play\" % \"sbt-plugin\"" $ctxDir/project/*.sbt)" &&
+          test -r $ctxDir/build.sbt &&
+          test -n "$(grep -nr "enablePlugins(Play" $ctxDir/build.sbt)")
 }
 
 _has_playPluginsFile() {
