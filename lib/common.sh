@@ -69,7 +69,8 @@ _has_playConfig() {
           test "$IS_PLAY_APP" != "false") ||
       (# test for default Play 2.3 and 2.4 setup.
           test -d $ctxDir/project &&
-          test -n "$(grep "addSbtPlugin(\"com.typesafe.play\" % \"sbt-plugin\"" $ctxDir/project/*.sbt | grep -v ".*//.*addSbtPlugin")" &&
+          test -r $ctxDir/project/plugins.sbt &&
+          test -n "$(grep "addSbtPlugin(\"com.typesafe.play\" % \"sbt-plugin\"" $ctxDir/project/plugins.sbt | grep -v ".*//.*addSbtPlugin")" &&
           test -r $ctxDir/build.sbt &&
           test -n "$(grep "enablePlugins(Play" $ctxDir/build.sbt | grep -v ".*//.*enablePlugins(Play")" &&
           test "$IS_PLAY_APP" != "false")
