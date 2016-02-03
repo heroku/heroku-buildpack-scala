@@ -177,9 +177,5 @@ cat << EOF > $profileScript
 export PATH="\$HOME/.sbt_home/bin:\$PATH"
 EOF
 
-# Must do this at the end so dependency metadata is available
-# and we can determine if postgresql driver is version 9.0 or 9.1
-install_pgconfig_91
-
 # Move compiled app back to where Heroku expects it
 mv $BUILD_DIR $APP_BUILD_DIR
