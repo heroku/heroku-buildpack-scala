@@ -1,5 +1,9 @@
 ## Master
 
+## v66
+
+* Added support for SBT 0.13.11
+
 ## v63
 
 * Added detection for specific failure cases and advised solutions in message.
