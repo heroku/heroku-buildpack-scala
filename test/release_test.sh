@@ -6,8 +6,6 @@ testRelease()
 {
   expected_release_output=`cat <<EOF
 ---
-config_vars:
-  JAVA_OPTS: -Xss512k
 addons:
   - heroku-postgresql
 
@@ -26,8 +24,6 @@ testPlay20Release()
 
   expected_release_output=`cat <<EOF
 ---
-config_vars:
-  JAVA_OPTS: -Xss512k
 addons:
   - heroku-postgresql
 

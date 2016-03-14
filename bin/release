@@ -8,8 +8,6 @@ BUILD_DIR=$1
 
 cat <<EOF
 ---
-config_vars:
-  JAVA_OPTS: -Xss512k
 addons:
   - heroku-postgresql
 
