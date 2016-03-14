@@ -1,5 +1,7 @@
 ## Master
 
+* Removed default JAVA_OPTS from bin/release
+
 ## v66
 
 * Added support for SBT 0.13.11
