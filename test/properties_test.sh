@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 . ${BUILDPACK_TEST_RUNNER_HOME}/lib/test_utils.sh
-. /app/lib/properties.sh
+. ${BUILDPACK_HOME}/lib/properties.sh
 
 testFileNotExists() {
   rm -f test.properties
@@ -59,5 +59,30 @@ testEmptyFile() {
   echo "" > test.properties
   capture get_property "test.properties" "sbt.version" "0.13.11"
   assertCaptured "0.13.11"
+  rm test.properties
+}
+
+testWhitespace() {
+  cat <<EOF > test.properties
+sbt.version=0.11.5
+
+java.runtime.version=1.8
+maven.version = 3.3.9
+
+foo.bar=splat
+EOF
+  capture get_property "test.properties" "maven.version" "foobar"
+  assertCaptured "3.3.9"
+  rm test.properties
+}
+
+testNoValue() {
+  cat <<EOF > test.properties
+sbt.version=0.11.5
+java.runtime.version=1.8
+maven.version=
+EOF
+  capture get_property "test.properties" "maven.version" "foobar"
+  assertCaptured ""
   rm test.properties
 }
