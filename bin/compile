@@ -9,6 +9,7 @@ BIN_DIR=$BP_DIR/bin
 OPT_DIR=$BP_DIR/opt
 LIB_DIR=$BP_DIR/lib
 . $LIB_DIR/common.sh
+. $LIB_DIR/properties.sh
 . $LIB_DIR/failures.sh
 
 # parse args
@@ -32,7 +33,15 @@ export PATH=$(echo "$PATH" | sed -e s/$escAppBuildDir/$escBuildDir/g)
 
 export_env_dir $ENV_DIR
 
+# Set system properties as env vars
 JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-"https://codon-buildpacks.s3.amazonaws.com/buildpacks/heroku/jvm-common.tgz"}
+JVM_COMMON_BUILDPACK=$(get_system_property "heroku.jvm.buildpack" "$JVM_COMMON_BUILDPACK")
+KEEP_PLAY_FORK_RUN=$(get_system_property "sbt.keep-play-fork-run" "${KEEP_PLAY_FORK_RUN:-false}")
+SBT_PROJECT=$(get_system_property "sbt.project")
+SBT_PRE_TASKS=$(get_system_property "sbt.pre-tasks" "$SBT_PRE_TASKS")
+SBT_CLEAN=$(get_system_property "sbt.clean" "${SBT_CLEAN:-false}")
+
+# Install the jvm-common buildpack
 mkdir -p /tmp/jvm-common
 curl --retry 3 --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-common --strip-components=1
 . /tmp/jvm-common/bin/util

@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+get_system_property() {
+  get_property "system.properties" "$1" "$2"
+}
+
 get_property() {
   local propFile=$1
   local propName=$2
