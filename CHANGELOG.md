@@ -1,6 +1,7 @@
-## Master
+## v68
 
 * Removed default JAVA_OPTS from bin/release
+* Added support for sbt.project config
 
 ## v66
 
