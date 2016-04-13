@@ -1,3 +1,7 @@
+## v69
+
+* Fixed a bug in system.properties detection
+
 ## v68
 
 * Removed default JAVA_OPTS from bin/release
