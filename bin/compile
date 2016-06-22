@@ -11,6 +11,7 @@ LIB_DIR=$BP_DIR/lib
 . $LIB_DIR/common.sh
 . $LIB_DIR/properties.sh
 . $LIB_DIR/failures.sh
+. $OPT_DIR/jdbc.sh
 
 # parse args
 APP_BUILD_DIR=$(cd $1; pwd)
