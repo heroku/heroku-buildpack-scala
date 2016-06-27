@@ -11,7 +11,6 @@ LIB_DIR=$BP_DIR/lib
 . $LIB_DIR/common.sh
 . $LIB_DIR/properties.sh
 . $LIB_DIR/failures.sh
-. $OPT_DIR/jdbc.sh
 
 # parse args
 APP_BUILD_DIR=$(cd $1; pwd)
@@ -49,6 +48,7 @@ mkdir -p /tmp/jvm-common
 curl --retry 3 --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-common --strip-components=1
 . /tmp/jvm-common/bin/util
 . /tmp/jvm-common/bin/java
+. /tmp/jvm-common/opt/jdbc.sh
 
 #create the cache dir if it doesn't exist
 mkdir -p $CACHE_DIR
