@@ -17,7 +17,7 @@ env:
   - HATCHET_DEPLOY_STRATEGY=git
   - HATCHET_BUILDPACK_BASE="https://github.com/heroku/heroku-buildpack-scala.git"
   - SHUNIT_HOME="/tmp/shunit2-2.1.6"
-  - secure: CCeP0CWt6kd+PPMRLuPYzKQJy4QFVPgCzEXIp4J5mlDiaYIK5weBdOzS3YaAu2ly4Lw1iikbuQyt/SiJohiwUfcVC08LHATtjp6ZqvpjHA8SEG8g6tHeB5GcN7Vo/qDzXy40KHJ9s/oqrhXuOINE6IkWFg6Z1k0BO0NbTXNqmdQ=
+  - secure: HD8N5mw+1cvQDCxGBX5t2BQIjdax4O/NsNdoPzkarSRLqeMLYlvmk10zufGVUNY6jkTErikvunoA9e2VgYe17VRpp3+R864bh5HH+GJnWUiZXApDAdpMSg3QcPfHTEtxfJBFiK4w2+UVAWP+rf/Q9PpTiDuToPx2Q7l5ZcuRvW4=
   matrix:
   - TEST_CMD='sh hatchet.sh'
   - TEST_CMD="/tmp/testrunner/bin/run -c ."
