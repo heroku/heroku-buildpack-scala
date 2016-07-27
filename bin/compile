@@ -30,6 +30,7 @@ sedReplace="sed -e s/[\/&]/\\\&/g"
 escAppBuildDir="$(echo "$APP_BUILD_DIR" | $sedReplace)"
 escBuildDir="$(echo "$BUILD_DIR" | $sedReplace)"
 export PATH=$(echo "$PATH" | sed -e s/$escAppBuildDir/$escBuildDir/g)
+export GEM_PATH=$(echo "$GEM_PATH" | sed -e s/$escAppBuildDir/$escBuildDir/g)
 
 export_env_dir $ENV_DIR
 
