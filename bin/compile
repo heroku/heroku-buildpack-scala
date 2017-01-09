@@ -20,8 +20,12 @@ ENV_DIR=$3
 # Move app to a static build dir to keep paths the same between builds
 # This is necessary for incremental compile, because sbt invalidates the
 # cache if the path is different.
-BUILD_DIR="/tmp/scala_buildpack_build_dir"
-mv $APP_BUILD_DIR $BUILD_DIR
+if is_app_dir "$APP_BUILD_DIR"; then
+  BUILD_DIR="/tmp/scala_buildpack_build_dir"
+  mv $APP_BUILD_DIR $BUILD_DIR
+else
+  BUILD_DIR="$APP_BUILD_DIR"
+fi
 
 # Now that we've moved into a new tmp dir, we need to fix the PATH
 # This is only necessary when using heroku-buildpack-multi because earlier
@@ -119,7 +123,7 @@ SBT_VERSION="$(get_supported_sbt_version ${BUILD_DIR})"
 if [ -n "$SBT_PROJECT" ]; then
   SBT_TASKS="$SBT_PROJECT/compile $SBT_PROJECT/stage"
 else
-  SBT_TASKS="compile stage"
+  SBT_TASKS="${SBT_TASKS:-"compile stage"}"
 fi
 
 # To run any tasks before the actual build, configure the environment
@@ -133,11 +137,7 @@ fi
 [ "$SBT_CLEAN" = "true" ] && SBT_TASKS="clean $SBT_TASKS"
 
 # Install the custom sbt script
-rm -f $SBT_BINDIR/sbt-launch*.jar #legacy launcher
-mkdir -p $SBT_BINDIR
-cp -p $OPT_DIR/sbt-extras.sh $SBT_BINDIR/sbt
-chmod 0755 $SBT_BINDIR/sbt
-export PATH="$SBT_BINDIR:$PATH"
+install_sbt_extras "$OPT_DIR" "$SBT_BINDIR"
 
 # copy in heroku sbt plugin
 HEROKU_PLUGIN="HerokuBuildpackPlugin.scala"
@@ -166,24 +166,26 @@ done
 
 # drop useless directories from slug for play and sbt-native-launcher only
 if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
-  if [ "$KEEP_IVY_CACHE" != "true" ] && [ -d $SBT_USER_HOME/.ivy2 ]; then
-    status "Dropping ivy cache from the slug"
-    rm -rf $SBT_USER_HOME/.ivy2
-  fi
-  if [ -d $SBT_USER_HOME/boot ] ; then
-    status "Dropping sbt boot dir from the slug"
-    rm -rf $SBT_USER_HOME/boot
-  fi
-  if [ -d $BUILD_DIR/project/boot ] ; then
-    status "Dropping project boot dir from the slug"
-    rm -rf $BUILD_DIR/project/boot
-  fi
-  if [ -d $BUILD_DIR/target ] ; then
-    status "Dropping compilation artifacts from the slug"
-    rm -rf $BUILD_DIR/target/scala-*
-    rm -rf $BUILD_DIR/target/streams
-    if [ -d $BUILD_DIR/target/resolution-cache ] ; then
-      find $BUILD_DIR/target/resolution-cache/* ! -name "reports" ! -name "*-compile.xml" -print0 | xargs -0 rm -rf --
+  if [ "$KEEP_SBT_CACHE" != "true" ]; then
+    if [ "$KEEP_IVY_CACHE" != "true" ] && [ -d $SBT_USER_HOME/.ivy2 ]; then
+      status "Dropping ivy cache from the slug"
+      rm -rf $SBT_USER_HOME/.ivy2
+    fi
+    if [ -d $SBT_USER_HOME/boot ] ; then
+      status "Dropping sbt boot dir from the slug"
+      rm -rf $SBT_USER_HOME/boot
+    fi
+    if [ -d $BUILD_DIR/project/boot ] ; then
+      status "Dropping project boot dir from the slug"
+      rm -rf $BUILD_DIR/project/boot
+    fi
+    if [ -d $BUILD_DIR/target ] ; then
+      status "Dropping compilation artifacts from the slug"
+      rm -rf $BUILD_DIR/target/scala-*
+      rm -rf $BUILD_DIR/target/streams
+      if [ -d $BUILD_DIR/target/resolution-cache ] ; then
+        find $BUILD_DIR/target/resolution-cache/* ! -name "reports" ! -name "*-compile.xml" -print0 | xargs -0 rm -rf --
+      fi
     fi
   fi
 fi
@@ -192,8 +194,11 @@ fi
 profileScript="${BUILD_DIR}/.profile.d/scala.sh"
 mkdir -p $(dirname $profileScript)
 cat << EOF > $profileScript
-export PATH="\$HOME/.sbt_home/bin:\$PATH"
+export SBT_HOME="\$HOME/$SBT_USER_HOME"
+export PATH="\$SBT_HOME/bin:\$PATH"
 EOF
 
 # Move compiled app back to where Heroku expects it
-mv $BUILD_DIR $APP_BUILD_DIR
+if is_app_dir "$APP_BUILD_DIR"; then
+  mv $BUILD_DIR $APP_BUILD_DIR
+fi

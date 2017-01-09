@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# bin/test-compile <build-dir> <cache-dir> <env-dir>
+
+SBT_TASKS="update" KEEP_SBT_CACHE="true" "$(dirname ${0:-})/compile" "$1" "$2" "$3"

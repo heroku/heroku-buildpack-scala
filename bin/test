@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# bin/test <build-dir> <env-dir> <artifact-dir>
+
+cd "$1" && sbt test

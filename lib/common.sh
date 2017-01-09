@@ -234,6 +234,10 @@ detect_play_lang() {
   fi
 }
 
+is_app_dir() {
+  test "$1" != "/app"
+}
+
 uses_universal_packaging() {
   local ctxDir=$1
   test -d $ctxDir/target/universal/stage/bin
@@ -269,8 +273,22 @@ output() {
   esac
 }
 
-run_sbt()
-{
+install_sbt_extras() {
+  local optDir=${1}
+  local sbtBinDir=${2}
+
+  rm -f ${sbtBinDir}/sbt-launch*.jar #legacy launcher
+  mkdir -p ${sbtBinDir}
+  cp -p ${optDir}/sbt-extras.sh ${sbtBinDir}/sbt-extras
+  cp -p ${optDir}/sbt-wrapper.sh ${sbtBinDir}/sbt
+
+  chmod 0755 ${sbtBinDir}/sbt-extras
+  chmod 0755 ${sbtBinDir}/sbt
+
+  export PATH="${sbtBinDir}:$PATH"
+}
+
+run_sbt() {
   local javaVersion=$1
   local home=$2
   local launcher=$3
@@ -279,30 +297,8 @@ run_sbt()
 
   echo "" > $buildLogFile
 
-  case $(ulimit -u) in
-  32768) # PX Dyno
-    maxSbtHeap=5220
-    ;;
-  *)     # 2X Dyno
-    maxSbtHeap=768
-    ;;
-  esac
-
   status "Running: sbt $tasks"
-  HOME="$home" sbt ${SBT_EXTRAS_OPTS} \
-    -J-Xmx${maxSbtHeap}M \
-    -J-Xms${maxSbtHeap}M \
-    -J-XX:+UseCompressedOops \
-    -sbt-dir $home \
-    -ivy $home/.ivy2 \
-    -sbt-launch-dir $home/launchers \
-    -Duser.home=$home \
-    -Divy.default.ivy.user.dir=$home/.ivy2 \
-    -Dfile.encoding=UTF8 \
-    -Dsbt.global.base=$home \
-    -Dsbt.log.noformat=true \
-    -no-colors -batch \
-    $tasks | output $buildLogFile
+  SBT_HOME="$home" sbt ${tasks} | output $buildLogFile
 
   if [ "${PIPESTATUS[*]}" != "0 0" ]; then
     handle_sbt_errors $buildLogFile
