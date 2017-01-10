@@ -14,5 +14,5 @@ env:
   - HATCHET_BUILDPACK_BASE="https://github.com/heroku/heroku-buildpack-scala.git"
   - SHUNIT_HOME="/tmp/shunit2-2.1.6"
   matrix:
-  - TEST_CMD='sh hatchet.sh'
+  - TEST_CMD='sh etc/hatchet-test.sh'
   - TEST_CMD="/tmp/testrunner/bin/run -c ."
