@@ -21,5 +21,5 @@ sbt-extras ${SBT_EXTRAS_OPTS} \
   -Dfile.encoding=UTF8 \
   -Dsbt.global.base=$sbtHome \
   -Dsbt.log.noformat=true \
-  -no-colors -batch \
+  -no-colors $([[ "$@" != *-no-batch* ]] && echo "-batch") \
   "$@"
