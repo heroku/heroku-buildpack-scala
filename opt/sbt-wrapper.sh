@@ -1,9 +1,12 @@
 case $(ulimit -u) in
-32768) # PX Dyno
-  maxSbtHeap=5220
+16384) # PM Dyno
+  maxSbtHeap="2000"
   ;;
-*)     # 2X Dyno
-  maxSbtHeap=768
+32768) # PL Dyno
+  maxSbtHeap="5220"
+  ;;
+*)
+  maxSbtHeap="768"
   ;;
 esac
 
@@ -20,6 +23,5 @@ sbt-extras ${SBT_EXTRAS_OPTS} \
   -Divy.default.ivy.user.dir=$sbtHome/.ivy2 \
   -Dfile.encoding=UTF8 \
   -Dsbt.global.base=$sbtHome \
-  -Dsbt.log.noformat=true \
-  -no-colors $([[ "$@" != *-no-batch* ]] && echo "-batch") \
+  $(([ -n "$HEROKU_TEST_RUN_ID" ] || [[ "$DYNO" != *run.* ]]) && echo "-Dsbt.log.noformat=true -batch") -no-colors \
   $@
