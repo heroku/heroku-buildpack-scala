@@ -18,7 +18,7 @@ if [ ! -z "$1" ]; then
   heroku buildkits:publish $1/$BP_NAME
 
   if [ "$1" = "heroku" ]; then
-    newTag=$(heroku buildkits:revisions heroku/$BP_NAME | sed -e '$!d' | grep -o -e "v\d*")
+    newTag=$(heroku buildkits:revisions heroku/$BP_NAME | sed -n 2p | grep -o -e "v\d*")
   fi
 
   popd > /dev/null 2>&1
