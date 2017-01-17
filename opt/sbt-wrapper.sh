@@ -22,4 +22,4 @@ sbt-extras ${SBT_EXTRAS_OPTS} \
   -Dsbt.global.base=$sbtHome \
   -Dsbt.log.noformat=true \
   -no-colors $([[ "$@" != *-no-batch* ]] && echo "-batch") \
-  "$@"
+  $@
