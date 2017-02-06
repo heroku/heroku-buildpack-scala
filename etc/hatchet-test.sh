@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   echo "Skipping Hatchet tests on Pull Request."
 else
   gem install bundler
