@@ -4,6 +4,8 @@
 # fail fast
 set -e
 
+BPLOG_PREFIX="buildpack.scala"
+
 BP_DIR=$(cd $(dirname $0)/..; pwd) # absolute path
 BIN_DIR=$BP_DIR/bin
 OPT_DIR=$BP_DIR/opt
@@ -16,6 +18,8 @@ LIB_DIR=$BP_DIR/lib
 APP_BUILD_DIR=$(cd $1; pwd)
 CACHE_DIR=$2
 ENV_DIR=$3
+
+source <(curl --retry 3 -fsSL $BUILDPACK_STDLIB_URL)
 
 # Move app to a static build dir to keep paths the same between builds
 # This is necessary for incremental compile, because sbt invalidates the
@@ -36,7 +40,7 @@ escBuildDir="$(echo "$BUILD_DIR" | $sedReplace)"
 export PATH=$(echo "$PATH" | sed -e s/$escAppBuildDir/$escBuildDir/g)
 export GEM_PATH=$(echo "$GEM_PATH" | sed -e s/$escAppBuildDir/$escBuildDir/g)
 
-export_env_dir $ENV_DIR
+export_env $ENV_DIR "." "JAVA_OPTS"
 
 # Set system properties as env vars
 SYSPROPFILE="$BUILD_DIR/system.properties"
@@ -48,22 +52,11 @@ SBT_PROJECT=$(get_property "$SYSPROPFILE" "sbt.project")
 SBT_PRE_TASKS=$(get_property "$SYSPROPFILE" "sbt.pre-tasks" "$SBT_PRE_TASKS")
 SBT_CLEAN=$(get_property "$SYSPROPFILE" "sbt.clean" "${SBT_CLEAN:-false}")
 
-# Install the jvm-common buildpack
-mkdir -p /tmp/jvm-common
-curl --retry 3 --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-common --strip-components=1
-. /tmp/jvm-common/bin/util
-. /tmp/jvm-common/bin/java
-. /tmp/jvm-common/opt/jdbc.sh
+# Install the JDK
+install_jdk $BUILD_DIR
 
 #create the cache dir if it doesn't exist
 mkdir -p $CACHE_DIR
-
-# install JDK
-javaVersion=$(detect_java_version ${BUILD_DIR})
-status_pending "Installing OpenJDK ${javaVersion}"
-install_java ${BUILD_DIR} ${javaVersion}
-jdk_overlay ${BUILD_DIR}
-status_done
 
 # home directory from perspective of SBT; we rename
 # it because otherwise the project root and $HOME
