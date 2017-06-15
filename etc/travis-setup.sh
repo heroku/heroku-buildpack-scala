@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-[ "$TRAVIS" != "true" ] && echo "Not running on Travis!" && exit 1
+[ "$CI" != "true" ] && echo "Not running on CI!" && exit 1
 
 curl --silent https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/shunit2/shunit2-2.1.6.tgz | tar xz -C /tmp/
 git clone https://github.com/heroku/heroku-buildpack-testrunner.git /tmp/testrunner
@@ -23,6 +23,8 @@ machine git.heroku.com
   password ${HEROKU_API_KEY:-"password"}
 EOF
 
-curl --fail --retry 3 --retry-delay 1 --connect-timeout 3 --max-time 30 https://toolbelt.heroku.com/install-ubuntu.sh | sh
+sudo apt-get -qq update
+sudo apt-get install software-properties-common -y
+curl --fail --retry 3 --retry-delay 1 --connect-timeout 3 --max-time 30 https://cli-assets.heroku.com/install-ubuntu.sh | sh
 
 yes | heroku keys:add
