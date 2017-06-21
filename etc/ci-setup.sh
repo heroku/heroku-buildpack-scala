@@ -23,8 +23,8 @@ machine git.heroku.com
   password ${HEROKU_API_KEY:-"password"}
 EOF
 
-sudo apt-get -qq update
-sudo apt-get install software-properties-common -y
-curl --fail --retry 3 --retry-delay 1 --connect-timeout 3 --max-time 30 https://cli-assets.heroku.com/install-ubuntu.sh | sh
+curl --fail --retry 3 --retry-delay 1 --connect-timeout 3 --max-time 30 https://toolbelt.heroku.com/install-ubuntu.sh | sh
 
-yes | heroku keys:add
+if [ -z "$HEROKU_API_KEY" ]; then
+  yes | heroku keys:add
+fi
