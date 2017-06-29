@@ -6,14 +6,11 @@ branches:
 before_install: bash etc/ci-setup.sh
 install: true
 script: eval $TEST_CMD
-after_script: heroku keys:remove $USER@`hostname`
+after_script: if [ -n "$HEROKU_API_KEY" ]; then heroku keys:remove $USER@`hostname`; fi
 env:
   global:
   - IS_RUNNING_ON_TRAVIS=true
-  - HATCHET_RETRIES=3
-  - HATCHET_DEPLOY_STRATEGY=git
-  - HATCHET_BUILDPACK_BASE="https://github.com/heroku/heroku-buildpack-scala.git"
   - SHUNIT_HOME="/tmp/shunit2-2.1.6"
   matrix:
-  - TEST_CMD='sh etc/hatchet-test.sh'
+  - TEST_CMD='sh etc/hatchet.sh'
   - TEST_CMD="/tmp/testrunner/bin/run -c ."
