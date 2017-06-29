@@ -1,5 +1,5 @@
 source "https://rubygems.org"
 
-gem 'heroku_hatchet', :git => 'https://github.com/heroku/hatchet.git'
+gem 'heroku_hatchet', '3.0.0'
 gem 'rspec-retry'
 gem 'rspec-expectations'
