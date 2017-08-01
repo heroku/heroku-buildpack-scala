@@ -1,0 +1,14 @@
+machine:
+  java:
+    version: openjdk8
+  environment:
+    SHUNIT_HOME: /tmp/shunit2-2.1.6
+
+test:
+  pre:
+    - bash etc/ci-setup.sh
+  override:
+    - bash etc/hatchet.sh
+    - /tmp/testrunner/bin/run -c .
+  post:
+    - if [ -n "$HEROKU_API_KEY" ]; then heroku keys:remove $USER@`hostname | sed -e "s/\.localdomain//g"`; fi
