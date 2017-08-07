@@ -170,6 +170,19 @@ EOF
   assertCapturedEquals "0.12.0"
 }
 
+testGetSupportedSbt1Version()
+{
+  mkdir -p ${BUILD_DIR}/project
+  cat > ${BUILD_DIR}/project/build.properties <<EOF
+sbt.version=1.0.0-RC3
+EOF
+
+  capture get_supported_sbt_version ${BUILD_DIR}
+
+  assertCapturedSuccess
+  assertCapturedEquals "1.0.0-RC3"
+}
+
 testGetUnsupportedSbtVersion()
 {
   mkdir -p ${BUILD_DIR}/project
