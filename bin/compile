@@ -82,9 +82,9 @@ if ! test -e project/build.properties; then
 You must use a release version of sbt, sbt.version=0.11.0 or greater"
 fi
 
-if ! has_supported_sbt_version ${BUILD_DIR}; then
+if ! (has_supported_sbt_version ${BUILD_DIR} || has_supported_sbt_1_version ${BUILD_DIR}); then
   error "You have defined an unsupported sbt.version in project/build.properties
-You must use a release version of sbt, sbt.version=0.11.0 or greater"
+You must use a version of sbt between 0.11.0 and 1.x"
 fi
 
 if has_old_preset_sbt_opts; then
@@ -133,7 +133,11 @@ fi
 install_sbt_extras "$OPT_DIR" "$SBT_BINDIR"
 
 # copy in heroku sbt plugin
-HEROKU_PLUGIN="HerokuBuildpackPlugin.scala"
+if has_supported_sbt_1_version ${BUILD_DIR}; then
+  HEROKU_PLUGIN="HerokuBuildpackPlugin_sbt1.scala"
+else
+  HEROKU_PLUGIN="HerokuBuildpackPlugin.scala"
+fi
 mkdir -p "$SBT_USER_HOME/plugins"
 rm -f $SBT_USER_HOME/plugins/HerokuPlugin.scala # remove the old ambiguously named plugin
 cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/plugins/$HEROKU_PLUGIN
