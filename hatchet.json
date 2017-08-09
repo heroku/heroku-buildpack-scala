@@ -17,8 +17,5 @@
   "sbt": [
     "kissaten/sbt-minimal-scala-sample",
     "kissaten/sbt-start-script-sample"
-  ],
-  "lift": [
-    "kissaten/lift-2.5-sample"
   ]
 }
