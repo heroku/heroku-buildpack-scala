@@ -78,8 +78,7 @@ done
 
 # these are preliminary checks. actual version check happens below when attempting to download sbt boot.properties
 if ! test -e project/build.properties; then
-  error "Your scala project must include project/build.properties and define sbt.version
-You must use a release version of sbt, sbt.version=0.11.0 or greater"
+  error "Your scala project must include project/build.properties and define sbt.version"
 fi
 
 if ! (has_supported_sbt_version ${BUILD_DIR} || has_supported_sbt_1_version ${BUILD_DIR}); then
