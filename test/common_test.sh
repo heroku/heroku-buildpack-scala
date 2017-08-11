@@ -177,7 +177,7 @@ testGetSupportedSbt1Version()
 sbt.version=1.0.0-RC3
 EOF
 
-  capture get_supported_sbt_version ${BUILD_DIR}
+  capture get_supported_sbt_version ${BUILD_DIR} ${SBT_1_VERSION_PATTERN}
 
   assertCapturedSuccess
   assertCapturedEquals "1.0.0-RC3"

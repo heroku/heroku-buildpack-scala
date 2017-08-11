@@ -3,7 +3,7 @@
 export BUILDPACK_STDLIB_URL="https://lang-common.s3.amazonaws.com/buildpack-stdlib/v7/stdlib.sh"
 
 SBT_0_VERSION_PATTERN='sbt\.version=\(0\.1[1-3]\.[0-9]*\(-[a-zA-Z0-9_]*\)*\)$'
-SBT_1_VERSION_PATTERN='sbt\.version=1\.[0-9]*\.[0-9]*\(-[a-zA-Z0-9_]*\)*$'
+SBT_1_VERSION_PATTERN='sbt\.version=\(1\.[0-9]*\.[0-9]*\(-[a-zA-Z0-9_]*\)*\)$'
 
 ## SBT 0.10 allows either *.sbt in the root dir, or project/*.scala or .sbt/*.scala
 detect_sbt() {
