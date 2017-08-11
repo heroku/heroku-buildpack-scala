@@ -16,6 +16,7 @@
   ],
   "sbt": [
     "kissaten/sbt-minimal-scala-sample",
-    "kissaten/sbt-start-script-sample"
+    "kissaten/sbt-start-script-sample",
+    "kissaten/sbt-one-example"
   ]
 }

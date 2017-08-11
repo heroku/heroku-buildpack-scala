@@ -2,6 +2,9 @@
 
 export BUILDPACK_STDLIB_URL="https://lang-common.s3.amazonaws.com/buildpack-stdlib/v7/stdlib.sh"
 
+SBT_0_VERSION_PATTERN='sbt\.version=\(0\.1[1-3]\.[0-9]*\(-[a-zA-Z0-9_]*\)*\)$'
+SBT_1_VERSION_PATTERN='sbt\.version=\(1\.[0-9]*\.[0-9]*\(-[a-zA-Z0-9_]*\)*\)$'
+
 ## SBT 0.10 allows either *.sbt in the root dir, or project/*.scala or .sbt/*.scala
 detect_sbt() {
   local ctxDir=$1
@@ -119,9 +122,10 @@ get_supported_play_version() {
 
 get_supported_sbt_version() {
   local ctxDir=$1
+  local sbtVersionPattern=${2:-$SBT_0_VERSION_PATTERN}
   if _has_buildPropertiesFile $ctxDir; then
     sbtVersionLine="$(grep -P '[ \t]*sbt\.version[ \t]*=' "${ctxDir}"/project/build.properties | sed -E -e 's/[ \t\r\n]//g')"
-    sbtVersion=$(expr "$sbtVersionLine" : 'sbt\.version=\(0\.1[1-3]\.[0-9]*\(-[a-zA-Z0-9_]*\)*\)$')
+    sbtVersion=$(expr "$sbtVersionLine" : "$sbtVersionPattern")
     if [ "$sbtVersion" != 0 ] ; then
       echo "$sbtVersion"
     else
@@ -181,8 +185,18 @@ _download_and_unpack_ivy_cache() {
 
 has_supported_sbt_version() {
   local ctxDir=$1
-  local supportedVersion="$(get_supported_sbt_version ${ctxDir})"
-  if [ "$supportedVersion" != "" ] ; then
+  local supportedVersion="$(get_supported_sbt_version ${ctxDir} ${SBT_0_VERSION_PATTERN})"
+  if [ -n "$supportedVersion" ] ; then
+    return 0
+  else
+    return 1
+  fi
+}
+
+has_supported_sbt_1_version() {
+  local ctxDir=$1
+  local supportedVersion="$(get_supported_sbt_version ${ctxDir} ${SBT_1_VERSION_PATTERN})"
+  if [ -n "$supportedVersion" ] ; then
     return 0
   else
     return 1

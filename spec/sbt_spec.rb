@@ -33,4 +33,13 @@ describe "Sbt" do
       expect(app.output).to match("Running: sbt compile stage")
     end
   end
+
+  it "should work with sbt 1.0" do
+    Hatchet::Runner.new("sbt-one-example").deploy do |app|
+      expect(app.output).to include("Running: sbt compile stage")
+      expect(app.output).to include("https://repo.scala-sbt.org/scalasbt/maven-releases/org/scala-sbt/sbt-launch/1.0.0")
+      expect(app.output).not_to include("Main Scala API documentation to")
+      expect(app.output).to include("[info] Done packaging.")
+    end
+  end
 end
