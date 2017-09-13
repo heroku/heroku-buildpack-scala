@@ -6,7 +6,7 @@ testDetect_SbtFileFoundInRoot()
 {
   touch ${BUILD_DIR}/something.sbt
 
-  detect  
+  detect
 
   assertAppDetected "Scala"
 }
@@ -79,7 +79,7 @@ testDetect_ApplicationConfFileDetectsAsPlay20Scala()
   touch ${BUILD_DIR}/app/something.scala
   mkdir ${BUILD_DIR}/app/views
   touch ${BUILD_DIR}/app/something.scala.html
-  
+
   detect
 
   assertAppDetected "Play 2.x - Scala"
@@ -95,7 +95,7 @@ testDetect_ApplicationConfFileDetectsAsPlay20Java()
   touch ${BUILD_DIR}/app/something.java
   mkdir ${BUILD_DIR}/app/views
   touch ${BUILD_DIR}/app/something.scala.html
-  
+
   detect
 
   assertAppDetected "Play 2.x - Java"
@@ -104,7 +104,7 @@ testDetect_ApplicationConfFileDetectsAsPlay20Java()
 
 testDetect_NotFound()
 {
-  detect  
-  
-  assertNoAppDetected
+  detect
+
+  assertEquals "1" "${RETURN}"
 }

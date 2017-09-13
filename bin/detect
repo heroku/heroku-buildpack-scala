@@ -21,5 +21,6 @@ if detect_sbt $BUILD_DIR ; then
   fi
   exit 0
 else
-  echo "no" && exit 1
+  (>&2 echo "Could not find a 'build.sbt' file! Please ensure it exists and is checked into Git.")
+  exit 1
 fi
