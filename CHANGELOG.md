@@ -1,3 +1,7 @@
+## v79
+
+* Fixed a bug related to sbt 1.0 and the HerokuBuildpackPlugin
+
 ## v69
 
 * Fixed a bug in system.properties detection
