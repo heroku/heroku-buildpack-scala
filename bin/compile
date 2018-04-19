@@ -169,6 +169,10 @@ if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
       status "Dropping ivy cache from the slug"
       rm -rf $SBT_USER_HOME/.ivy2
     fi
+    if [ "$KEEP_COURSIER_CACHE" != "true" ] && [ -d $SBT_USER_HOME/.coursier ]; then
+      status "Dropping coursier cache from the slug"
+      rm -rf $SBT_USER_HOME/.coursier
+    fi
     if [ -d $SBT_USER_HOME/boot ] ; then
       status "Dropping sbt boot dir from the slug"
       rm -rf $SBT_USER_HOME/boot
