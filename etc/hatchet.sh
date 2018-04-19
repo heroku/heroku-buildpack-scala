@@ -2,17 +2,21 @@
 
 BUILDPACK_NAME="heroku-buildpack-scala"
 
-if [ "$CIRCLECI" == "true" ] && [ -n "$CI_PULL_REQUEST" ]; then
-  if [ "$CIRCLE_PR_USERNAME" != "heroku" ]; then
-    echo "Skipping integration tests on forked PR."
-    exit 0
+if [ "$CIRCLECI" == "true" ]; then
+  if [ -n "$CI_PULL_REQUEST" ]; then
+    if [ "$CIRCLE_PR_USERNAME" != "heroku" ]; then
+      echo "Skipping integration tests on forked PR."
+      exit 0
+    fi
   fi
 fi
 
-if [ "$TRAVIS" == "true" ] && [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
-  if [ "$TRAVIS_PULL_REQUEST_SLUG" != "heroku/$BUILDPACK_NAME" ]; then
-    echo "Skipping integration tests on forked PR."
-    exit 0
+if [ "$TRAVIS" == "true" ];then
+  if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
+    if [ "$TRAVIS_PULL_REQUEST_SLUG" != "heroku/$BUILDPACK_NAME" ]; then
+      echo "Skipping integration tests on forked PR."
+      exit 0
+    fi
   fi
 fi
 
