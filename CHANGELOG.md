@@ -1,3 +1,7 @@
+## v80
+
+* Clean up coursier cache directory after sbt build
+
 ## v79
 
 * Fixed a bug related to sbt 1.0 and the HerokuBuildpackPlugin
