@@ -1,3 +1,7 @@
+## v82
+
+* Changed location of JVM common buildpack
+
 ## v80
 
 * Clean up coursier cache directory after sbt build
