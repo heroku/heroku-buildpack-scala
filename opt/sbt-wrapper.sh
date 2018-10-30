@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 case $(ulimit -u) in
 16384) # PM Dyno
   maxSbtHeap="2000"
