@@ -1,3 +1,7 @@
+## v83
+
+* Ensure bash when running sbt-wrapper
+
 ## v82
 
 * Changed location of JVM common buildpack
