@@ -12,7 +12,7 @@ describe "Sbt" do
       `git commit -am "redeploy" --allow-empty`
       app.push!
       expect(app.output).to include("Running: sbt compile stage")
-      expect(app.output).to include("[info] Done packaging.")
+      expect(app.output).to include("[success]")
     end
   end
 
