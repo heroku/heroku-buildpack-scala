@@ -290,3 +290,13 @@ testComplile_BuildPropertiesFileWithMServerVersion()
 
   assertContains "SBT should have been installed" "Downloading sbt launcher for" "$(cat ${STD_ERR})"
 }
+
+testComplile_CreatesExportScript()
+{
+  createSbtProject
+
+  compile
+
+  assertEquals 0 "${RETURN}"
+  assertTrue "Export script should be created" "[ -f export ]"
+}
