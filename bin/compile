@@ -54,7 +54,7 @@ SBT_PRE_TASKS=$(get_property "$SYSPROPFILE" "sbt.pre-tasks" "$SBT_PRE_TASKS")
 SBT_CLEAN=$(get_property "$SYSPROPFILE" "sbt.clean" "${SBT_CLEAN:-false}")
 
 # Install the JDK
-install_jdk $BUILD_DIR
+install_jdk "$BUILD_DIR" "$CACHE_DIR"
 
 #create the cache dir if it doesn't exist
 mkdir -p $CACHE_DIR

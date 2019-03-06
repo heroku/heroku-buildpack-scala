@@ -140,6 +140,7 @@ testCompile()
   # run
   assertCaptured "SBT tasks to run should be output" "Running: sbt compile stage"
   assertCaptured "SBT should run stage task" "${SBT_STAGING_STRING}"
+  assertTrue "system.properties was not cached" "[ -f $CACHE_DIR/system.properties ]"
 
   # clean up
   assertEquals "Ivy2 cache should have been repacked for a non-play project" "" "$(diff -r ${BUILD_DIR}/.sbt_home/.ivy2 ${CACHE_DIR}/.sbt_home/.ivy2)"
