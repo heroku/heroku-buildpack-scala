@@ -1,5 +1,9 @@
 ## master
 
+* Clean sbt cache dir from slug
+
+## v85
+
 * Pass cache to JVM install to cache system.properties file
 
 ## v84

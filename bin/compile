@@ -178,6 +178,10 @@ if is_sbt_native_packager $BUILD_DIR || is_play $BUILD_DIR; then
       status "Dropping sbt boot dir from the slug"
       rm -rf $SBT_USER_HOME/boot
     fi
+    if [ -d $SBT_USER_HOME/.cache ] ; then
+      status "Dropping sbt cache dir from the slug"
+      rm -rf $SBT_USER_HOME/.cache
+    fi
     if [ -d $BUILD_DIR/project/boot ] ; then
       status "Dropping project boot dir from the slug"
       rm -rf $BUILD_DIR/project/boot
