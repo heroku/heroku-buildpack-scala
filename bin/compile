@@ -210,7 +210,7 @@ export PATH="\$SBT_HOME/bin:\$PATH"
 EOF
 
 # Move compiled app back to where Heroku expects it
-if is_app_dir "$APP_BUILD_DIR"; then
+if [ -z "${CNB_STACK_ID:-}" ] && is_app_dir "$APP_BUILD_DIR"; then
   mv $BUILD_DIR $APP_BUILD_DIR
 fi
 
