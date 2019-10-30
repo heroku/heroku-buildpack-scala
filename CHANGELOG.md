@@ -1,5 +1,9 @@
 ## master
 
+* Added ability to run as a CNB with a shim
+
+## v86
+
 * Clean sbt cache dir from slug
 
 ## v85
