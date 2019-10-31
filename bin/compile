@@ -22,24 +22,28 @@ ENV_DIR=$3
 
 source <(curl --retry 3 -fsSL $BUILDPACK_STDLIB_URL)
 
-# Move app to a static build dir to keep paths the same between builds
-# This is necessary for incremental compile, because sbt invalidates the
-# cache if the path is different.
-if is_app_dir "$APP_BUILD_DIR"; then
-  BUILD_DIR="/tmp/scala_buildpack_build_dir"
-  mv $APP_BUILD_DIR $BUILD_DIR
+if [ -z "${CNB_STACK_ID:-}" ]; then
+  # Move app to a static build dir to keep paths the same between builds
+  # This is necessary for incremental compile, because sbt invalidates the
+  # cache if the path is different.
+  if is_app_dir "$APP_BUILD_DIR"; then
+    BUILD_DIR="/tmp/scala_buildpack_build_dir"
+    mv $APP_BUILD_DIR $BUILD_DIR
+  else
+    BUILD_DIR="$APP_BUILD_DIR"
+  fi
+
+  # Now that we've moved into a new tmp dir, we need to fix the PATH
+  # This is only necessary when using heroku-buildpack-multi because earlier
+  # buildpacks may have put extra commands (like `grunt`) on the path.
+  sedReplace="sed -e s/[\/&]/\\\&/g"
+  escAppBuildDir="$(echo "$APP_BUILD_DIR" | $sedReplace)"
+  escBuildDir="$(echo "$BUILD_DIR" | $sedReplace)"
+  export PATH=$(echo "$PATH" | sed -e s/$escAppBuildDir/$escBuildDir/g)
+  export GEM_PATH=$(echo "$GEM_PATH" | sed -e s/$escAppBuildDir/$escBuildDir/g)
 else
   BUILD_DIR="$APP_BUILD_DIR"
 fi
-
-# Now that we've moved into a new tmp dir, we need to fix the PATH
-# This is only necessary when using heroku-buildpack-multi because earlier
-# buildpacks may have put extra commands (like `grunt`) on the path.
-sedReplace="sed -e s/[\/&]/\\\&/g"
-escAppBuildDir="$(echo "$APP_BUILD_DIR" | $sedReplace)"
-escBuildDir="$(echo "$BUILD_DIR" | $sedReplace)"
-export PATH=$(echo "$PATH" | sed -e s/$escAppBuildDir/$escBuildDir/g)
-export GEM_PATH=$(echo "$GEM_PATH" | sed -e s/$escAppBuildDir/$escBuildDir/g)
 
 export_env $ENV_DIR "." "JAVA_OPTS"
 
@@ -206,7 +210,7 @@ export PATH="\$SBT_HOME/bin:\$PATH"
 EOF
 
 # Move compiled app back to where Heroku expects it
-if is_app_dir "$APP_BUILD_DIR"; then
+if [ -z "${CNB_STACK_ID:-}" ] && is_app_dir "$APP_BUILD_DIR"; then
   mv $BUILD_DIR $APP_BUILD_DIR
 fi
 
