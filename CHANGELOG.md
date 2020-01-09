@@ -1,4 +1,7 @@
-## master
+## Master
+* Update sbt-extras
+
+## v87
 
 * Added ability to run as a CNB with a shim
 
