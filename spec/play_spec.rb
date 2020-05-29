@@ -4,15 +4,8 @@ describe "Play" do
 
   REPOS={
     "scala-getting-started" => "2.4",
-    #"play-2.4.x-scala" => "2.3",
     "play-2.3.x-scala-sample" => "2.3",
-    "play-2.2.x-scala-sample" => "2.2",
-    "play-2.1.x-scala-sample" => "2.1",
-    "play-2.0.x-scala-sample" => "2.0",
-    "play-2.3.x-java-sample" => "2.3",
-    # "play-2.2.x-java-sample" => "2.2",
-    #"play-2.1.x-java-sample" => "2.1",
-    #"play-2.0.x-java-sample" => "2.0"
+    "play-2.3.x-java-sample" => "2.3"
   }
 
   REPOS.keys.each do |repo|
