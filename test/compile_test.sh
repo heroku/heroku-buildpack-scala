@@ -2,7 +2,7 @@
 
 . ${BUILDPACK_TEST_RUNNER_HOME}/lib/test_utils.sh
 
-DEFAULT_SBT_VERSION="0.13.17"
+DEFAULT_SBT_VERSION="0.13.18"
 DEFAULT_PLAY_VERSION="2.3.4"
 DEFAULT_SCALA_VERSION="2.12.7"
 SBT_TEST_CACHE="/tmp/sbt-test-cache"
@@ -187,7 +187,7 @@ testRemovePlayForkRun()
 }
 
 testCompile_PrimeIvyCacheForPlay() {
-  createPlayProject "2.3.7" "0.13.5" "2.11.1"
+  createPlayProject "2.3.7" "0.13.18" "2.11.1"
 
   compile
 
@@ -219,12 +219,12 @@ testCompile_WithMultilineBuildProperties() {
   cat > ${BUILD_DIR}/project/build.properties <<EOF
 foo=bar
 
-sbt.version   =  0.13.5
+sbt.version   =  0.13.18
 
 abc=xyz
 EOF
   compile
-  assertContains "Multiline properties file should detect sbt version" "Downloading sbt launcher for 0.13.5" "$(cat ${STD_ERR})"
+  assertContains "Multiline properties file should detect sbt version" "Downloading sbt launcher for 0.13.18" "$(cat ${STD_ERR})"
 }
 
 testCompile_BuildFailure()
@@ -276,16 +276,7 @@ testComplile_BuildPropertiesFileWithUnsupportedOldVersion()
 
 testComplile_BuildPropertiesFileWithRCVersion()
 {
-  createSbtProject "0.13.5-RC1"
-
-  compile
-
-  assertContains "SBT should have been installed" "Downloading sbt launcher for" "$(cat ${STD_ERR})"
-}
-
-testComplile_BuildPropertiesFileWithMServerVersion()
-{
-  createSbtProject "0.13.6-MSERVER-1"
+  createSbtProject "0.13.17-RC1"
 
   compile
 
