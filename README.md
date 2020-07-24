@@ -93,6 +93,28 @@ heroku buildpacks:set <your-github-url>
 heroku buildpacks:set <your-github-url>#your-branch
 ```
 
+
+TESTS
+-----
+
+Running bash tests locally:
+
+Run:
+
+```
+$ .bash etc/ci-setup.sh
+```
+
+This will install test runner in `tmp/` directory. It will warn you that you're not running on CI, that's okay.
+
+Next setup tests and run them:
+
+
+```
+$ export SHUNIT_HOME="$PWD/tmp/shunit2-2.1.6"
+$ tmp/testrunner/bin/run -c .
+```
+
 License
 -------
 
