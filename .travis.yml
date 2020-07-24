@@ -3,7 +3,9 @@ dist: trusty
 branches:
   only:
   - master
-before_install: bash etc/ci-setup.sh
+before_install:
+  - bash etc/ci-setup.sh
+  - sudo apt-get -y install curl
 install: true
 script: ./tmp/testrunner/bin/run -c . && sh etc/hatchet.sh
 after_script: if [ -n "$HEROKU_API_KEY" ]; then heroku keys:remove $USER@`hostname`; fi
