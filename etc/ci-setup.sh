@@ -26,5 +26,6 @@ EOF
 curl --fail --retry 3 --retry-delay 1 --connect-timeout 3 --max-time 30 https://toolbelt.heroku.com/install-ubuntu.sh | sh
 
 if [ -n "$HEROKU_API_KEY" ]; then
+  echo "Adding keys"
   yes | heroku keys:add
 fi
