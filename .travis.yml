@@ -2,7 +2,7 @@ language: scala
 dist: trusty
 branches:
   only:
-  - master
+  - main
 before_install: bash etc/ci-setup.sh
 install: true
 script: /tmp/testrunner/bin/run -c . && sh etc/hatchet.sh
