@@ -1,4 +1,4 @@
-## Master
+## Main
 * Update sbt-extras
 
 ## v87
