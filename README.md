@@ -1,4 +1,4 @@
-Heroku Buildpack for Scala [![Build Status](https://travis-ci.org/heroku/heroku-buildpack-scala.svg?branch=master)](https://travis-ci.org/heroku/heroku-buildpack-scala)
+Heroku Buildpack for Scala [![CircleCI](https://circleci.com/gh/heroku/heroku-buildpack-scala.svg?style=shield)](https://circleci.com/gh/heroku/heroku-buildpack-scala)
 =========================
 
 ![](https://cloud.githubusercontent.com/assets/51578/11041625/f2eed216-86e0-11e5-8470-5c01a775fa51.jpg)

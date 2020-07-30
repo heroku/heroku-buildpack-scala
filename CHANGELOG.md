@@ -1,4 +1,4 @@
-## Master
+## Main
 * Update sbt-extras
 * Correct coursier cache directory to `.cache/coursier` rather than `.coursier`
 

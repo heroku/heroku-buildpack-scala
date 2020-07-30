@@ -1,0 +1,62 @@
+version: 2.1
+
+orbs:
+  heroku: circleci/heroku@1.1.1
+
+jobs:
+  hatchet:
+    parameters:
+      heroku-stack:
+        type: enum
+        enum: ["cedar-14", "heroku-16", "heroku-18", "heroku-20"]
+    docker:
+      - image: circleci/ruby:2.7
+    environment:
+      HEROKU_TEST_STACK: << parameters.heroku-stack >>
+      HATCHET_BUILDPACK_BASE: https://github.com/heroku/heroku-buildpack-scala
+    steps:
+      - checkout
+      - heroku/install
+      - run:
+          name: Install Ruby dependencies
+          command: |
+            gem install bundler
+            bundle install
+      - run:
+          name: Hatchet CI setup
+          command: bundle exec hatchet ci:setup
+      - run:
+          name: Execute rspec w/ parallel_split_test
+          command: bundle exec parallel_split_test spec/
+
+  buildpack-testrunner:
+    docker:
+      - image: circleci/openjdk:8
+    environment:
+      SHUNIT_HOME: /tmp/shunit2-2.1.6
+    steps:
+      - checkout
+      - run:
+          name: Install required apt packages
+          command: |
+            sudo apt-get update
+            sudo apt-get install file
+      - run:
+          name: Download and unpack shunit 2.1.6
+          command: curl -sSf https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/shunit2/shunit2-2.1.6.tgz | tar xz -C /tmp/
+      - run:
+          name: Clone heroku-buildpack-testrunner
+          command: git clone https://github.com/heroku/heroku-buildpack-testrunner.git /tmp/testrunner
+      - run:
+          name: Execute buildpack-testrunner
+          command: /tmp/testrunner/bin/run .
+
+workflows:
+  version: 2.1
+  default-ci-workflow:
+    jobs:
+      - buildpack-testrunner
+      - hatchet:
+          matrix:
+            parameters:
+              heroku-stack: ["cedar-14", "heroku-16", "heroku-18"]
