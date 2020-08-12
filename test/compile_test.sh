@@ -175,7 +175,7 @@ testCleanCompile()
 
 testRemovePlayForkRun()
 {
-  createPlayProject
+  createPlayProject "2.3.10" "0.13.17" "2.10.7"
   mkdir -p ${BUILD_DIR}/project
   touch ${BUILD_DIR}/project/play-fork-run.sbt
 
