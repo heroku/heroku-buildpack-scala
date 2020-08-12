@@ -3,7 +3,6 @@ require 'hatchet'
 require 'fileutils'
 require 'hatchet'
 require 'rspec/retry'
-require 'active_support'
 require 'date'
 
 ENV['RACK_ENV'] = 'test'
