@@ -18,7 +18,7 @@ GEM
     moneta (1.0.0)
     multi_json (1.15.0)
     parallel (1.19.2)
-    parallel_split_test (0.7.0)
+    parallel_split_test (0.8.0)
       parallel (>= 0.5.13)
       rspec (>= 3.1.0)
     platform-api (3.0.0)
