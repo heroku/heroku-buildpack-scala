@@ -1,5 +1,9 @@
 ## Main
+
+## v88
+
 * Update sbt-extras
+* Update tests
 
 ## v87
 
