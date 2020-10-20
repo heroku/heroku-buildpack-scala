@@ -2,7 +2,7 @@ name: Check Changelog
 
 on:
   pull_request:
-    types: [opened, reopened, edited, synchronize]
+    types: [opened, reopened, edited, synchronize, labeled]
 
 jobs:
   check:
@@ -10,7 +10,8 @@ jobs:
     if: |
       !contains(github.event.pull_request.body, '[skip changelog]') &&
       !contains(github.event.pull_request.body, '[changelog skip]') &&
-      !contains(github.event.pull_request.body, '[skip ci]')
+      !contains(github.event.pull_request.body, '[skip ci]') &&
+      !contains(github.event.pull_request.labels.*.name, 'skip changelog')
     steps:
       - uses: actions/checkout@v1
       - name: Check that CHANGELOG is touched
