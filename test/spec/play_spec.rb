@@ -10,7 +10,7 @@ describe "Play" do
   REPOS.keys.each do |repo|
     context repo do
       it "should not download pre-cached dependencies" do
-        new_default_hatchet_runner("sbt-minimal-scala-sample").tap do |app|
+        new_default_hatchet_runner(repo).tap do |app|
           app.before_deploy do
             set_java_version(DEFAULT_OPENJDK_VERSION)
           end
