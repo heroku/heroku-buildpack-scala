@@ -1,6 +1,6 @@
 {
   "hatchet": {
-    "directory": "spec/fixtures"
+    "directory": "test/spec/fixtures"
   },
   "play": [
     "heroku/scala-getting-started",
