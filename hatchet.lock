@@ -1,27 +1,15 @@
 ---
-- - spec/fixtures/repos/play/play-2.0.x-java-sample
-  - 62c4665228180cf605efbc68d197b6e45f537fd3
-- - spec/fixtures/repos/play/play-2.0.x-scala-sample
-  - af956ed5e9eabbe7982e64585d7d93c9ffd0cad0
-- - spec/fixtures/repos/play/play-2.1.x-java-sample
-  - aaaa3c7ebdb891276e0c377ef24d4d4d5c2ecf3a
-- - spec/fixtures/repos/play/play-2.1.x-scala-sample
-  - 7cec5c72e4fbf004a4ac9cfdc1e1c13dd4ada2ec
-- - spec/fixtures/repos/play/play-2.2.x-java-sample
-  - 3126c5823c396fe6b1c69171f42a8b2a576898ad
-- - spec/fixtures/repos/play/play-2.2.x-scala-sample
+- - test/spec/fixtures/repos/play/play-2.2.x-scala-sample
   - c78f3ad89aacb87b97ad7d41bdcdafffe35e6089
-- - spec/fixtures/repos/play/play-2.3.x-java-sample
-  - 3d0984c793f28295a56ae5496703cbf4109f5eed
-- - spec/fixtures/repos/play/play-2.3.x-scala-sample
+- - test/spec/fixtures/repos/play/play-2.3.x-scala-sample
   - b6e861a555c880f3acf3995b6c12170634c365b2
-- - spec/fixtures/repos/play/play-2.4.x-scala
+- - test/spec/fixtures/repos/play/play-2.4.x-scala
   - 032f37504617baea4a06c523f596f2defae50ff0
-- - spec/fixtures/repos/play/scala-getting-started
-  - d8702af1f6da7b67b4a315afa75273ca86a7a38b
-- - spec/fixtures/repos/sbt/sbt-minimal-scala-sample
+- - test/spec/fixtures/repos/play/scala-getting-started
+  - 9ccbc79d6e7c2f0abf152d5daf696daae87b3790
+- - test/spec/fixtures/repos/sbt/sbt-minimal-scala-sample
   - 92b704164a806e7a70a2237f07c5519664c7def3
-- - spec/fixtures/repos/sbt/sbt-one-example
+- - test/spec/fixtures/repos/sbt/sbt-one-example
   - 32291b4dc3219e72af320f0387706f223de864db
-- - spec/fixtures/repos/sbt/sbt-start-script-sample
+- - test/spec/fixtures/repos/sbt/sbt-start-script-sample
   - 0e5668e7b096c62af1d54ddadc2aecaf30592840

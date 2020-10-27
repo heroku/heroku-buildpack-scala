@@ -15,6 +15,7 @@ GEM
       rrrretry (~> 1)
       thor (~> 1)
       threaded (~> 0)
+    java-properties (0.2.1)
     moneta (1.0.0)
     multi_json (1.15.0)
     parallel (1.19.2)
@@ -50,6 +51,7 @@ PLATFORMS
 
 DEPENDENCIES
   heroku_hatchet
+  java-properties
   parallel_split_test
   rspec-expectations
   rspec-retry

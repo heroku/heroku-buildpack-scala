@@ -12,8 +12,17 @@ jobs:
     docker:
       - image: circleci/ruby:2.7
     environment:
-      HEROKU_TEST_STACK: << parameters.heroku-stack >>
+      PARALLEL_SPLIT_TEST_PROCESSES: 6
+      # Hatchet Configuration (https://github.com/heroku/hatchet#env-vars)
       HATCHET_BUILDPACK_BASE: https://github.com/heroku/heroku-buildpack-scala
+      HATCHET_BUILDPACK_BRANCH: << pipeline.git.branch >>
+      HATCHET_APP_LIMIT: 100
+      HATCHET_EXPENSIVE_MODE: 1
+      HATCHET_RUN_MULTI: 1
+      # Default stack for all Heroku apps created by Hatchet
+      DEFAULT_APP_STACK: << parameters.heroku-stack >>
+      # Default config variables for all Heroku apps created by Hatchet, prefixed with 'DEFAULT_APP_CONFIG_'
+      # DEFAULT_APP_CONFIG_FOO: "bar"
     steps:
       - checkout
       - heroku/install
@@ -27,7 +36,7 @@ jobs:
           command: bundle exec hatchet ci:setup
       - run:
           name: Execute rspec w/ parallel_split_test
-          command: bundle exec parallel_split_test spec/
+          command: bundle exec parallel_split_test test/spec/
 
   buildpack-testrunner:
     docker:
