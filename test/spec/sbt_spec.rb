@@ -36,15 +36,6 @@ describe "Sbt" do
     end
   end
 
-  it "not prime cache for sbt-start-script projects" do
-    new_default_hatchet_runner("sbt-start-script-sample").tap do |app|
-      app.deploy do
-        expect(app.output).not_to match(/Priming Ivy cache/)
-        expect(app.output).to match("Running: sbt compile stage")
-      end
-    end
-  end
-
   it "should work with sbt 1.0" do
     new_default_hatchet_runner("sbt-one-example").tap do |app|
       app.deploy do
