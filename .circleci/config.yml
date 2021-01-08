@@ -8,7 +8,7 @@ jobs:
     parameters:
       heroku-stack:
         type: enum
-        enum: ["cedar-14", "heroku-16", "heroku-18", "heroku-20"]
+        enum: ["heroku-16", "heroku-18", "heroku-20"]
     docker:
       - image: circleci/ruby:2.7
     environment:
@@ -68,4 +68,4 @@ workflows:
       - hatchet:
           matrix:
             parameters:
-              heroku-stack: ["cedar-14", "heroku-16", "heroku-18", "heroku-20"]
+              heroku-stack: ["heroku-16", "heroku-18", "heroku-20"]
