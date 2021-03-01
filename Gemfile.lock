@@ -16,7 +16,7 @@ GEM
       rrrretry (~> 1)
       thor (~> 1)
       threaded (~> 0)
-    java-properties (0.2.1)
+    java-properties (0.3.0)
     moneta (1.0.0)
     multi_json (1.15.0)
     parallel (1.20.1)
