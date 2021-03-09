@@ -40,7 +40,7 @@ describe "Sbt" do
     new_default_hatchet_runner("sbt-one-example").tap do |app|
       app.deploy do
         expect(app.output).to include("Running: sbt compile stage")
-        expect(app.output).to include("https://repo.scala-sbt.org/scalasbt/maven-releases/org/scala-sbt/sbt-launch/1.0.0")
+        expect(app.output).to include("https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.0.0")
         expect(app.output).not_to include("Main Scala API documentation to")
         expect(app.output).to include("[info] Done packaging.")
       end
