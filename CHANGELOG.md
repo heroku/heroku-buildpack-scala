@@ -1,5 +1,7 @@
 ## Main
 
+* Remove heroku-16 support
+
 ## v90
 
 * Update sbt-extras, support for sbt >= 1.4.8
