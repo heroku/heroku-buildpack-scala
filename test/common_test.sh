@@ -44,7 +44,7 @@ _createPlay_23_Project()
   mkdir -p ${BUILD_DIR}/conf ${BUILD_DIR}/project
   touch ${BUILD_DIR}/conf/application.conf
   cat > ${BUILD_DIR}/project/plugins.sbt <<EOF
-resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
+resolvers += "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/"
 
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "${playVersion}")
 EOF
