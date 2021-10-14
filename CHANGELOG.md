@@ -1,5 +1,6 @@
 ## Main
 
+* Download the JVM Common buildpack from the buildpack registry, rather than the legacy `codon-buildpacks` S3 bucket.
 * Remove heroku-16 support
 
 ## v90
