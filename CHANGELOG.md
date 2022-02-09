@@ -1,5 +1,8 @@
 ## Main
 
+## v92
+
+* Update sbt-extras, support for sbt >= 1.6.2
 
 ## v91
 
