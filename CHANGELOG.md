@@ -1,5 +1,7 @@
 ## Main
 
+* Add heroku-22 support
+
 ## v92
 
 * Update sbt-extras, support for sbt >= 1.6.2
