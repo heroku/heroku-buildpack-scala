@@ -1,5 +1,7 @@
 ## Main
 
+* Vendor buildpack-stdlib rather than downloading it at build time
+
 ## v93
 
 * Add heroku-22 support

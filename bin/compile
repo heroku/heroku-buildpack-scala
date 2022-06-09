@@ -20,7 +20,7 @@ APP_BUILD_DIR=$(cd $1; pwd)
 CACHE_DIR=$2
 ENV_DIR=$3
 
-source <(curl --retry 3 -fsSL $BUILDPACK_STDLIB_URL)
+source $LIB_DIR/buildpack-stdlib-v7.sh
 
 if [ -z "${CNB_STACK_ID:-}" ]; then
   # Move app to a static build dir to keep paths the same between builds
