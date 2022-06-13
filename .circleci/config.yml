@@ -52,7 +52,7 @@ jobs:
             sudo apt-get install file
       - run:
           name: Download and unpack shunit 2.1.6
-          command: curl -sSf https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/shunit2/shunit2-2.1.6.tgz | tar xz -C /tmp/
+          command: curl -sSf --fail --retry 3 --retry-connrefused --connect-timeout 5 https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/shunit2/shunit2-2.1.6.tgz | tar xz -C /tmp/
       - run:
           name: Clone heroku-buildpack-testrunner
           command: git clone https://github.com/heroku/heroku-buildpack-testrunner.git /tmp/testrunner
