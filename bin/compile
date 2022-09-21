@@ -161,6 +161,8 @@ fi
 # build app
 run_sbt "$javaVersion" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "$SBT_TASKS"
 
+write_sbt_dependency_classpath_log "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "show dependencyClasspath"
+
 # repack cache
 mkdir -p $CACHE_DIR
 for DIR in $CACHED_DIRS; do

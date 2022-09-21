@@ -306,6 +306,14 @@ run_sbt() {
   fi
 }
 
+write_sbt_dependency_classpath_log() {
+  local home=$1
+  local launcher=$2
+
+  status "Collecting dependency information"
+  SBT_HOME="$home" sbt "show dependencyClasspath" | grep -o "Attributed\(.*\)" > .heroku/sbt-dependency-classpath.log
+}
+
 cache_copy() {
   rel_dir=$1
   from_dir=$2
