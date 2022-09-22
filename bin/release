@@ -13,11 +13,13 @@ EOF
 
 dependencies_file_path="${BUILD_DIR}/.heroku/sbt-dependency-classpath.log";
 
-if grep -q "com/impossibl/pgjdbc-ng" "${dependencies_file_path}" ||
-  grep -q "org/postgresql" "${dependencies_file_path}" ||
-  grep -q "skunk-core" "${dependencies_file_path}" ||
-  grep -q "postgresql-async" "${dependencies_file_path}" ||
-  grep -q "quill-ndbc-postgres" "${dependencies_file_path}"; then
+if [[ -f "${dependencies_file_path}" ]] && (
+    grep -q "com/impossibl/pgjdbc-ng" "${dependencies_file_path}" ||
+    grep -q "org/postgresql" "${dependencies_file_path}" ||
+    grep -q "skunk-core" "${dependencies_file_path}" ||
+    grep -q "postgresql-async" "${dependencies_file_path}" ||
+    grep -q "quill-ndbc-postgres" "${dependencies_file_path}"
+  ); then
 
 cat <<EOF
 addons:
