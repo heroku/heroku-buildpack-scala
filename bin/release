@@ -8,10 +8,27 @@ BUILD_DIR=$1
 
 cat <<EOF
 ---
+
+EOF
+
+dependencies_file_path="${BUILD_DIR}/.heroku/sbt-dependency-classpath.log";
+
+if [[ -f "${dependencies_file_path}" ]] && (
+    grep -q "com/impossibl/pgjdbc-ng" "${dependencies_file_path}" ||
+    grep -q "org/postgresql" "${dependencies_file_path}" ||
+    grep -q "skunk-core" "${dependencies_file_path}" ||
+    grep -q "postgresql-async" "${dependencies_file_path}" ||
+    grep -q "quill-ndbc-postgres" "${dependencies_file_path}"
+  ); then
+
+cat <<EOF
 addons:
   - heroku-postgresql
 
 EOF
+
+fi
+
 if [ ! -f $BUILD_DIR/Procfile ]; then
   if uses_universal_packaging $BUILD_DIR; then
     echo "default_process_types:"
