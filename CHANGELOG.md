@@ -1,5 +1,12 @@
 ## Main
 
+* Only provision Heroku Postgres if the app declares a dependency to one of the following postgres drivers:
+    - [Official Postgres JDBC Driver](https://jdbc.postgresql.org/)
+    - [PGJDBC-NG](https://impossibl.github.io/pgjdbc-ng/)
+    - [Skunk](https://tpolecat.github.io/skunk/)
+    - [postgresql-async](https://github.com/postgresql-async/postgresql-async)
+    - [quill-ndbc-postgres](https://getquill.io/#docs)
+
 ## v94
 
 * Adjust curl retry and connection timeout handling
