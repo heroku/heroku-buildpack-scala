@@ -1,5 +1,10 @@
 ## Main
 
+
+## v96
+
+* Add support for the `DISABLE_DEPENDENCY_CLASSPATH_LOG` environment variable to disable the dependency classpath log. 
+
 ## v95
 
 * Only provision Heroku Postgres if the app declares a dependency on one of the following postgres drivers:
