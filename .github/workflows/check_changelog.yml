@@ -13,6 +13,6 @@ jobs:
       !contains(github.event.pull_request.body, '[skip ci]') &&
       !contains(github.event.pull_request.labels.*.name, 'skip changelog')
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: Check that CHANGELOG is touched
         run: git diff remotes/origin/${{ github.base_ref }} --name-only | grep CHANGELOG.md
