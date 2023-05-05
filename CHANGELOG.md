@@ -1,5 +1,6 @@
 ## Main
 
+* Remove heroku-18 support ([#226](https://github.com/heroku/heroku-buildpack-scala/pull/226))
 
 ## v96
 
