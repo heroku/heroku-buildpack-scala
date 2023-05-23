@@ -9,9 +9,8 @@ name = "Scala"
     "vendor/",
     ".gitignore",
     ".github/",
-    ".travis.yml",
-    "circle.yml",
     "hatchet.json",
+    "hatchet.lock",
     "Gemfile",
     "Gemfile.lock",
 ]
