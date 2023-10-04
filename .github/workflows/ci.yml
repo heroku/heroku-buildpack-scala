@@ -32,7 +32,7 @@ jobs:
       # Default stack for all Heroku apps created by Hatchet
       DEFAULT_APP_STACK: ${{ matrix.stack }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Install Ruby and dependencies
         uses: ruby/setup-ruby@v1
         with:
@@ -51,7 +51,7 @@ jobs:
       # source. I ported this as-is from the Travis config. Given we're trying to get rid of testrunner entirely,
       # it will stay like this. If we, for some reason, decide to keep testrunner, we should look into a fixed STACK env var.
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/setup-java@v3
         with:
           distribution: zulu
