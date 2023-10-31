@@ -1,10 +1,12 @@
 import sbt._
-import Keys._
+import sbt.Keys._
 
 object HerokuBuildpackPlugin extends AutoPlugin {
+  override def trigger = allRequirements
+
   override lazy val projectSettings = Seq(
-    sources in doc in Compile := List(),
-    publishArtifact in packageDoc := false,
-    publishArtifact in packageSrc := false
+    Compile / doc / sources := List(),
+    packageDoc / publishArtifact := false,
+    packageSrc / publishArtifact := false
   )
 }

@@ -174,13 +174,13 @@ testGetSupportedSbt1Version()
 {
   mkdir -p ${BUILD_DIR}/project
   cat > ${BUILD_DIR}/project/build.properties <<EOF
-sbt.version=1.0.0-RC3
+sbt.version=1.1.0-RC3
 EOF
 
   capture get_supported_sbt_version ${BUILD_DIR} ${SBT_1_VERSION_PATTERN}
 
   assertCapturedSuccess
-  assertCapturedEquals "1.0.0-RC3"
+  assertCapturedEquals "1.1.0-RC3"
 }
 
 testGetUnsupportedSbtVersion()

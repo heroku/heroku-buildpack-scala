@@ -256,7 +256,7 @@ testComplile_BuildPropertiesFileWithUnsupportedOldVersion()
   compile
 
   assertCapturedError "You have defined an unsupported sbt.version in project/build.properties"
-  assertCapturedError "You must use a version of sbt between 0.11.0 and 1.x"
+  assertCapturedError "For sbt 0.x you must use a version >= 0.11, for sbt 1.x you must use a version >= 1.1"
 }
 
 testComplile_BuildPropertiesFileWithRCVersion()
