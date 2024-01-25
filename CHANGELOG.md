@@ -1,12 +1,14 @@
-## Main
+# Changelog
+
+## [Unreleased]
 
 * Remove heroku-18 support ([#226](https://github.com/heroku/heroku-buildpack-scala/pull/226))
 
-## v96
+## [v96] - 2022-09-30
 
 * Add support for the `DISABLE_DEPENDENCY_CLASSPATH_LOG` environment variable to disable the dependency classpath log. 
 
-## v95
+## [v95] - 2022-09-26
 
 * Only provision Heroku Postgres if the app declares a dependency on one of the following postgres drivers:
     - [Official Postgres JDBC Driver](https://jdbc.postgresql.org/)
@@ -15,26 +17,26 @@
     - [postgresql-async](https://github.com/postgresql-async/postgresql-async)
     - [quill-ndbc-postgres](https://getquill.io/#docs)
 
-## v94
+## [v94] - 2022-06-14
 
 * Adjust curl retry and connection timeout handling
 * Vendor buildpack-stdlib rather than downloading it at build time
 * Switch to the recommended regional S3 domain instead of the global one
 
-## v93
+## [v93] - 2022-06-07
 
 * Add heroku-22 support
 
-## v92
+## [v92] - 2022-02-09
 
 * Update sbt-extras, support for sbt >= 1.6.2
 
-## v91
+## [v91] - 2021-10-14
 
 * Download the JVM Common buildpack from the buildpack registry, rather than the legacy `codon-buildpacks` S3 bucket.
 * Remove heroku-16 support
 
-## v90
+## [v90] - 2021-03-09
 
 * Update sbt-extras, support for sbt >= 1.4.8
 
@@ -133,3 +135,12 @@
 
 *  Upgrade to sbt 0.13.7 launcher
 *  Allow for customized jvm-common package
+
+[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v96...HEAD
+[v96]: https://github.com/heroku/heroku-buildpack-scala/compare/v95...v96
+[v95]: https://github.com/heroku/heroku-buildpack-scala/compare/v94...v95
+[v94]: https://github.com/heroku/heroku-buildpack-scala/compare/v93...v94
+[v93]: https://github.com/heroku/heroku-buildpack-scala/compare/v92...v93
+[v92]: https://github.com/heroku/heroku-buildpack-scala/compare/v91...v92
+[v91]: https://github.com/heroku/heroku-buildpack-scala/compare/v90...v91
+[v90]: https://github.com/heroku/heroku-buildpack-scala/compare/v89...v90
