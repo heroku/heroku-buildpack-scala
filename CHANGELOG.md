@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+
+## [v97] - 2024-02-01
+
 * Remove heroku-18 support ([#226](https://github.com/heroku/heroku-buildpack-scala/pull/226))
 
 ## [v96] - 2022-09-30
@@ -136,7 +139,8 @@
 *  Upgrade to sbt 0.13.7 launcher
 *  Allow for customized jvm-common package
 
-[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v96...HEAD
+[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v97...main
+[v97]: https://github.com/heroku/heroku-buildpack-scala/compare/v96...v97
 [v96]: https://github.com/heroku/heroku-buildpack-scala/compare/v95...v96
 [v95]: https://github.com/heroku/heroku-buildpack-scala/compare/v94...v95
 [v94]: https://github.com/heroku/heroku-buildpack-scala/compare/v93...v94
