@@ -2,7 +2,9 @@
 
 ## [Unreleased]
 
-* Remove heroku-18 support ([#226](https://github.com/heroku/heroku-buildpack-scala/pull/226))
+* Remove heroku-18 support. ([#226](https://github.com/heroku/heroku-buildpack-scala/pull/226))
+* Fix deprecation warnings when using sbt `>= 1.5`. ([#232](https://github.com/heroku/heroku-buildpack-scala/pull/232))
+* Support for sbt `1.0.x` has been removed. ([#232](https://github.com/heroku/heroku-buildpack-scala/pull/232))
 
 ## [v96] - 2022-09-30
 

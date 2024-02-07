@@ -4,6 +4,7 @@
 
 testRelease()
 {
+  mkdir -p "${BUILD_DIR}/.heroku"
   touch "${BUILD_DIR}/.heroku/sbt-dependency-classpath.log"
 
   expected_release_output=`cat <<EOF
