@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+
+## [v98] - 2024-02-14
+
 * Fix Play Framework detection for Play >= `3.0.0`. ([#240](https://github.com/heroku/heroku-buildpack-scala/pull/240))
 
 ## [v97] - 2024-02-07
@@ -142,7 +145,8 @@
 *  Upgrade to sbt 0.13.7 launcher
 *  Allow for customized jvm-common package
 
-[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v97...main
+[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v98...main
+[v98]: https://github.com/heroku/heroku-buildpack-scala/compare/v97...v98
 [v97]: https://github.com/heroku/heroku-buildpack-scala/compare/v96...v97
 [v96]: https://github.com/heroku/heroku-buildpack-scala/compare/v95...v96
 [v95]: https://github.com/heroku/heroku-buildpack-scala/compare/v94...v95
