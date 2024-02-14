@@ -17,7 +17,20 @@ detect_sbt() {
 }
 
 is_play() {
-  _has_playConfig $1
+  local app_dir=$1
+
+  case "${IS_PLAY_APP}" in
+  "true")
+    return 0
+    ;;
+  "false")
+    return 1
+    ;;
+  *)
+    [[ -f "${app_dir}/${PLAY_CONF_FILE:-conf/application.conf}" ]] ||
+      grep -E --quiet --no-messages '^\s*addSbtPlugin\(\s*("org\.playframework"|"com\.typesafe\.play")\s*%\s*"sbt-plugin"' "${app_dir}/project/plugins.sbt"
+    ;;
+  esac
 }
 
 is_sbt_native_packager() {
@@ -48,22 +61,6 @@ _has_hiddenSbtDir() {
 _has_buildPropertiesFile() {
   local ctxDir=$1
   test -e $ctxDir/project/build.properties
-}
-
-_has_playConfig() {
-  local ctxDir=$1
-  test -e $ctxDir/conf/application.conf ||
-      test "$IS_PLAY_APP" = "true" ||
-      (test -n "$PLAY_CONF_FILE" &&
-          test -e "$PLAY_CONF_FILE" &&
-          test "$IS_PLAY_APP" != "false") ||
-      (# test for default Play 2.3 and 2.4 setup.
-          test -d $ctxDir/project &&
-          test -r $ctxDir/project/plugins.sbt &&
-          test -n "$(grep "addSbtPlugin(\"com.typesafe.play\" % \"sbt-plugin\"" $ctxDir/project/plugins.sbt | grep -v ".*//.*addSbtPlugin")" &&
-          test -r $ctxDir/build.sbt &&
-          test -n "$(grep "enablePlugins(Play" $ctxDir/build.sbt | grep -v ".*//.*enablePlugins(Play")" &&
-          test "$IS_PLAY_APP" != "false")
 }
 
 _has_playPluginsFile() {

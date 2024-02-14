@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Fix Play Framework detection for Play >= `3.0.0`. ([#240](https://github.com/heroku/heroku-buildpack-scala/pull/240))
 
 ## [v97] - 2024-02-07
 
