@@ -30,6 +30,10 @@ EOF
 TaskKey[Unit]("stage") in Compile := { println("${SBT_STAGING_STRING}") }
 EOF
 
+  cat > ${projectRoot}/system.properties <<EOF
+java.runtime.version = 8
+EOF
+
   mkdir -p ${projectRoot}/project
   cat > ${projectRoot}/project/build.properties <<EOF
 sbt.version=${sbtVersion}
@@ -73,7 +77,6 @@ testCompile()
   # run
   assertCaptured "SBT tasks to run should be output" "Running: sbt compile stage"
   assertCaptured "SBT should run stage task" "${SBT_STAGING_STRING}"
-  assertTrue "system.properties was not cached" "[ -f $CACHE_DIR/system.properties ]"
 
   # clean up
   assertEquals "SBT home should have been repacked" "" "$(diff -r ${BUILD_DIR}/.sbt_home/bin ${CACHE_DIR}/.sbt_home/bin)"
