@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Remove heroku-20 support ([#252](https://github.com/heroku/heroku-buildpack-scala/pull/252))
 
 ## [v98] - 2024-02-14
 
