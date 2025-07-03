@@ -7,3 +7,4 @@
 # by Dependabot or release automation, to reduce team review request noise.
 CHANGELOG.md @Malax
 Gemfile.lock @Malax
+/.github/workflows/ @Malax
