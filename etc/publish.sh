@@ -1,34 +1,77 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -e
+# NOTE: This script requires bash >= 4.4 and GNU coreutils!
+# If you run this on macOS, you might need to install the appropiate packages.
 
-BP_NAME=${1:-"heroku/scala"}
+set -euo pipefail
+shopt -s inherit_errexit
 
-curVersion=$(heroku buildpacks:versions $BP_NAME | awk 'FNR == 3 { print $1 }')
-newVersion="v$((curVersion + 1))"
+buildpack_registry_name="heroku/scala"
 
-read -p "Deploy as version: $newVersion [y/n]? " choice
-case "$choice" in
-  y|Y ) echo "";;
-  n|N ) exit 0;;
-  * ) exit 1;;
+function abort() {
+	echo
+	echo "Error: ${1}" >&2
+	exit 1
+}
+
+echo "Checking environment..."
+
+if ! command -v gh >/dev/null; then
+	abort "Install the GitHub CLI first: https://cli.github.com"
+fi
+
+if ! heroku buildpacks:publish --help >/dev/null; then
+	abort "Install the Buildpack Registry plugin first: https://github.com/heroku/plugin-buildpack-registry"
+fi
+
+# Explicitly check the CLI is logged in, since the Buildpack Registry plugin doesn't handle re-authing
+# expired logins properly, which can otherwise lead to the release aborting partway through.
+if ! heroku whoami >/dev/null; then
+	abort "Log into the Heroku CLI first: heroku login"
+fi
+
+echo "Checking buildpack versions in sync..."
+current_github_release_version=$(gh release view --json tagName --jq '.tagName' | tr --delete 'v')
+current_registry_version="$(heroku buildpacks:versions "${buildpack_registry_name}" | awk 'FNR == 3 { print $1 }')"
+
+if [[ "${current_github_release_version}" != "${current_registry_version}" ]]; then
+	abort "The current GitHub release version (v${current_github_release_version}) does not match the registry version (v${current_registry_version}), likely due to a registry rollback. Fix this first!"
+fi
+
+new_version="$((current_github_release_version + 1))"
+new_git_tag="v${new_version}"
+
+echo "Extracting changelog entry for this release..."
+git fetch origin
+# Using `git show` to avoid having to disrupt the current branch/working directory.
+changelog_entry="$(git show origin/main:CHANGELOG.md | awk "/^## \[v${new_version}\]/{flag=1; next} /^## /{flag=0} flag")"
+
+if [[ -n "${changelog_entry}" ]]; then
+	echo -e "${changelog_entry}\n"
+else
+	abort "Unable to find changelog entry for v${new_version}. Has the prepare release PR been triggered/merged?"
+fi
+
+read -r -p "Deploy as ${new_git_tag} [y/n]? " choice
+case "${choice}" in
+y | Y) ;;
+n | N) exit 0 ;;
+*) exit 1 ;;
 esac
 
-originMain=$(git rev-parse origin/main)
-echo "Tagging commit $originMain with $newVersion... "
-git tag $newVersion ${originMain:?}
-git push origin refs/tags/$newVersion
+echo -e "\nCreating GitHub release..."
+gh release create "${new_git_tag}" --title "${new_git_tag}" --notes "${changelog_entry}"
+git fetch --tags
 
-heroku buildpacks:publish $BP_NAME $newVersion
+echo -e "\nUpdating previous-version tag..."
+git tag -f previous-version latest-version
+git push -f origin :refs/tags/previous-version
 
-echo "Updating previous-version tag"
-git tag -d previous-version
-git push origin :previous-version
-git tag previous-version latest-version
-echo "Updating latest-version tag"
-git tag -d latest-version
-git push origin :latest-version
-git tag latest-version ${originMain:?}
-git push --tags
+echo -e "\nUpdating latest-version tag..."
+git tag -f latest-version "${new_git_tag}"
+git push -f origin :refs/tags/latest-version
 
-echo "Done."
+echo -e "\nPublishing to the Heroku Buildpack Registry..."
+heroku buildpacks:publish "${buildpack_registry_name}" "${new_git_tag}"
+echo
+heroku buildpacks:versions "${buildpack_registry_name}" | head -n 3
