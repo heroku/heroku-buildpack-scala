@@ -14,6 +14,7 @@ LIB_DIR=$BP_DIR/lib
 . $LIB_DIR/common.sh
 . $LIB_DIR/properties.sh
 . $LIB_DIR/failures.sh
+. $LIB_DIR/metrics.sh
 
 # parse args
 APP_BUILD_DIR=$(cd $1; pwd)
@@ -21,6 +22,9 @@ CACHE_DIR=$2
 ENV_DIR=$3
 
 source $LIB_DIR/buildpack-stdlib-v7.sh
+
+metrics::init "${CACHE_DIR}" "scala"
+metrics::setup
 
 if [ -z "${CNB_STACK_ID:-}" ]; then
   # Move app to a static build dir to keep paths the same between builds
@@ -56,6 +60,15 @@ KEEP_PLAY_FORK_RUN=$(get_property "$SYSPROPFILE" "sbt.keep-play-fork-run" "${KEE
 SBT_PROJECT=$(get_property "$SYSPROPFILE" "sbt.project")
 SBT_PRE_TASKS=$(get_property "$SYSPROPFILE" "sbt.pre-tasks" "$SBT_PRE_TASKS")
 SBT_CLEAN=$(get_property "$SYSPROPFILE" "sbt.clean" "${SBT_CLEAN:-false}")
+
+[ -n "$SBT_PRE_TASKS" ] && metrics::set_string "sbt_pre_tasks" "$SBT_PRE_TASKS"
+[ -n "$SBT_PROJECT" ] && metrics::set_string "sbt_project" "$SBT_PROJECT"
+[ -n "${SBT_TASKS:-}" ] && metrics::set_string "sbt_tasks" "$SBT_TASKS"
+[ -n "$KEEP_PLAY_FORK_RUN" ] && metrics::set_string "keep_play_fork_run" "$KEEP_PLAY_FORK_RUN"
+[ -n "$KEEP_SBT_CACHE" ] && metrics::set_string "keep_sbt_cache" "$KEEP_SBT_CACHE"
+[ -n "$KEEP_COURSIER_CACHE" ] && metrics::set_string "keep_coursier_cache" "$KEEP_COURSIER_CACHE"
+[ -n "$SBT_CLEAN" ] && metrics::set_string "sbt_clean" "$SBT_CLEAN"
+[ -n "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ] && metrics::set_string "disable_dependency_classpath_log" "${DISABLE_DEPENDENCY_CLASSPATH_LOG}"
 
 # Install the JDK
 install_jdk "$BUILD_DIR" "$CACHE_DIR"
@@ -147,6 +160,21 @@ rm -f $SBT_USER_HOME/plugins/HerokuPlugin.scala # remove the old ambiguously nam
 rm -f $SBT_USER_HOME/plugins/HerokuBuildpackPlugin_sbt1.scala # remove the old poorly named plugin
 rm -f $SBT_USER_HOME/plugins/HerokuBuildpackPlugin.scala # remove the old plugin
 cp -p $OPT_DIR/$HEROKU_PLUGIN $SBT_USER_HOME/plugins/HerokuBuildpackPlugin.scala
+
+# Collect metrics
+metrics::set_string "sbt_version" "${SBT_VERSION:-unknown}"
+
+if is_sbt_native_packager $BUILD_DIR; then
+  metrics::set_raw "uses_sbt_native_packager" "true"
+else
+  metrics::set_raw "uses_sbt_native_packager" "false"
+fi
+
+if is_play $BUILD_DIR; then
+  metrics::set_raw "is_play_app" "true"
+else
+  metrics::set_raw "is_play_app" "false"
+fi
 
 # Manually pre-clean because sbt-native-packager doesn't clobber this dir
 rm -rf $BUILD_DIR/target/universal/stage
