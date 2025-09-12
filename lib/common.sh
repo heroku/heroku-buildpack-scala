@@ -323,7 +323,7 @@ cache_copy() {
 	local rel_dir="${1}"
 	local from_dir="${2}"
 	local to_dir="${3}"
-	rm -rf "${to_dir}/${rel_dir}"
+	rm -rf "${to_dir:?cache_copy: to_dir parameter is required}/${rel_dir:?cache_copy: rel_dir parameter is required}"
 	if [[ -d "${from_dir}/${rel_dir}" ]]; then
 		mkdir -p "${to_dir}/${rel_dir}"
 		cp -pr "${from_dir}/${rel_dir}/." "${to_dir}/${rel_dir}"
@@ -331,8 +331,8 @@ cache_copy() {
 }
 
 install_jdk() {
-	local install_dir=${1:?}
-	local cache_dir=${2:?}
+	local install_dir=${1:?install_jdk: install_dir parameter is required}
+	local cache_dir=${2:?install_jdk: cache_dir parameter is required}
 
 	let start=$(nowms)
 	JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz}
