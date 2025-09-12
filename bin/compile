@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # bin/compile <build-dir> <cache-dir> <env-dir>
 
+echo "DEBUG: Starting compile script with args: $1 $2 $3"
+
 # fail fast
 set -e
 
@@ -20,7 +22,9 @@ APP_BUILD_DIR=$(cd "${1}" && pwd)
 CACHE_DIR="${2}"
 ENV_DIR="${3}"
 
+echo "DEBUG: Basic setup completed, sourcing buildpack-stdlib-v7.sh"
 source "${LIB_DIR}/buildpack-stdlib-v7.sh"
+echo "DEBUG: buildpack-stdlib-v7.sh sourced successfully"
 
 metrics::init "${CACHE_DIR}" "scala"
 metrics::setup
