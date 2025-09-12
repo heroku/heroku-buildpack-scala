@@ -79,7 +79,9 @@ get_scala_version() {
 			# if we don't grep for the version, and instead use `sbt scala-version`,
 			# then sbt will try to download the internet
 			scala_version_line="$(grep "scalaVersion" "${ctx_dir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g')"
+			set +e
 			scala_version=$(expr "${scala_version_line}" : ".\+\(2\.1[0-1]\)\.[0-9]")
+			set -e
 
 			if [[ -n "${scala_version}" ]]; then
 				echo "${scala_version}"
@@ -107,7 +109,9 @@ get_supported_play_version() {
 
 	if _has_playPluginsFile "${ctx_dir}"; then
 		plugin_version_line="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctx_dir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
+		set +e
 		plugin_version=$(expr "${plugin_version_line}" : ".\+\(2\.[0-4]\)\.[0-9]")
+		set -e
 		if [[ "${plugin_version}" != "0" ]]; then
 			echo -n "${plugin_version}"
 		fi
