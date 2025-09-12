@@ -79,7 +79,9 @@ get_scala_version() {
       # if we don't grep for the version, and instead use `sbt scala-version`,
       # then sbt will try to download the internet
       scalaVersionLine="$(grep "scalaVersion" "${ctxDir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g')"
+      set +e
       scalaVersion=$(expr "$scalaVersionLine" : ".\+\(2\.1[0-1]\)\.[0-9]")
+      set -e
 
       if [ -n "${scalaVersion}" ]; then
         echo "$scalaVersion"
@@ -107,7 +109,9 @@ get_supported_play_version() {
 
   if _has_playPluginsFile $ctxDir; then
     pluginVersionLine="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
+    set +e
     pluginVersion=$(expr "$pluginVersionLine" : ".\+\(2\.[0-4]\)\.[0-9]")
+    set -e
     if [ "$pluginVersion" != 0 ]; then
       echo -n "$pluginVersion"
     fi
@@ -120,7 +124,9 @@ get_supported_sbt_version() {
   local sbtVersionPattern=${2:-$SBT_0_VERSION_PATTERN}
   if _has_buildPropertiesFile $ctxDir; then
     sbtVersionLine="$(grep -P '[ \t]*sbt\.version[ \t]*=' "${ctxDir}"/project/build.properties | sed -E -e 's/[ \t\r\n]//g')"
+    set +e
     sbtVersion=$(expr "$sbtVersionLine" : "$sbtVersionPattern")
+    set -e
     if [ "$sbtVersion" != 0 ] ; then
       echo "$sbtVersion"
     else
