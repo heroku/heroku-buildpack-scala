@@ -72,7 +72,9 @@ SBT_CLEAN=$(get_property "${SYSPROPFILE}" "sbt.clean" "${SBT_CLEAN:-false}")
 [[ -n "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]] && metrics::set_string "disable_dependency_classpath_log" "${DISABLE_DEPENDENCY_CLASSPATH_LOG}"
 
 # Install the JDK
+echo "DEBUG: About to install JDK, BUILD_DIR=${BUILD_DIR}, CACHE_DIR=${CACHE_DIR}"
 install_jdk "${BUILD_DIR}" "${CACHE_DIR}"
+echo "DEBUG: JDK installation completed"
 
 #create the cache dir if it doesn't exist
 mkdir -p "${CACHE_DIR}"
@@ -90,10 +92,14 @@ SBT_BINDIR="${SBT_USER_HOME}/bin"
 cd "${BUILD_DIR}"
 
 # unpack cache
+echo "DEBUG: About to unpack cache, CACHED_DIRS: ${SBT_USER_HOME} target project/target project/boot .coursier"
 CACHED_DIRS="${SBT_USER_HOME} target project/target project/boot .coursier"
 for DIR in ${CACHED_DIRS}; do
+	echo "DEBUG: Processing cache dir: ${DIR}"
 	cache_copy "${DIR}" "${CACHE_DIR}" "${BUILD_DIR}"
+	echo "DEBUG: Completed cache copy for: ${DIR}"
 done
+echo "DEBUG: Cache unpacking completed"
 
 # these are preliminary checks. actual version check happens below when attempting to download sbt boot.properties
 if [[ ! -f project/build.properties ]]; then
