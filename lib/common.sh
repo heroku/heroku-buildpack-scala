@@ -5,337 +5,337 @@ SBT_1_VERSION_PATTERN='sbt\.version=\(1\.[1-9][0-9]*\.[0-9]\+\(-[a-zA-Z0-9_]\+\)
 
 ## SBT 0.10 allows either *.sbt in the root dir, or project/*.scala or .sbt/*.scala
 detect_sbt() {
-  local ctxDir=$1
-  if _has_sbtFile $ctxDir || \
-     _has_projectScalaFile $ctxDir || \
-     _has_hiddenSbtDir $ctxDir || \
-     _has_buildPropertiesFile $ctxDir ; then
-    return 0
-  else
-    return 1
-  fi
+	local ctx_dir="${1}"
+	if _has_sbtFile "${ctx_dir}" \
+		|| _has_projectScalaFile "${ctx_dir}" \
+		|| _has_hiddenSbtDir "${ctx_dir}" \
+		|| _has_buildPropertiesFile "${ctx_dir}"; then
+		return 0
+	else
+		return 1
+	fi
 }
 
 is_play() {
-  local app_dir=$1
+	local app_dir="${1}"
 
-  case "${IS_PLAY_APP}" in
-  "true")
-    return 0
-    ;;
-  "false")
-    return 1
-    ;;
-  *)
-    [[ -f "${app_dir}/${PLAY_CONF_FILE:-conf/application.conf}" ]] ||
-      grep -E --quiet --no-messages '^\s*addSbtPlugin\(\s*("org\.playframework"|"com\.typesafe\.play")\s*%\s*"sbt-plugin"' "${app_dir}/project/plugins.sbt"
-    ;;
-  esac
+	case "${IS_PLAY_APP}" in
+		"true")
+			return 0
+			;;
+		"false")
+			return 1
+			;;
+		*)
+			[[ -f "${app_dir}/${PLAY_CONF_FILE:-conf/application.conf}" ]] \
+				|| grep -E --quiet --no-messages '^\s*addSbtPlugin\(\s*("org\.playframework"|"com\.typesafe\.play")\s*%\s*"sbt-plugin"' "${app_dir}/project/plugins.sbt"
+			;;
+	esac
 }
 
 is_sbt_native_packager() {
-  local ctxDir=$1
-  if [ -e "${ctxDir}"/project/plugins.sbt ]; then
-    pluginVersionLine="$(grep "addSbtPlugin(.\+sbt-native-packager" "${ctxDir}"/project/plugins.sbt)"
-    test -n "$pluginVersionLine"
-  else
-    return 1
-  fi
+	local ctx_dir="${1}"
+	if [[ -e "${ctx_dir}/project/plugins.sbt" ]]; then
+		plugin_version_line="$(grep "addSbtPlugin(.\+sbt-native-packager" "${ctx_dir}/project/plugins.sbt")"
+		test -n "${plugin_version_line}"
+	else
+		return 1
+	fi
 }
 
 _has_sbtFile() {
-  local ctxDir=$1
-  test -n "$(find $ctxDir -maxdepth 1 -name '*.sbt' -print -quit)"
+	local ctx_dir="${1}"
+	test -n "$(find "${ctx_dir}" -maxdepth 1 -name '*.sbt' -print -quit)"
 }
 
 _has_projectScalaFile() {
-  local ctxDir=$1
-  test -d $ctxDir/project && test -n "$(find $ctxDir/project -maxdepth 1 -name '*.scala' -print -quit)"
+	local ctx_dir="${1}"
+	test -d "${ctx_dir}/project" && test -n "$(find "${ctx_dir}/project" -maxdepth 1 -name '*.scala' -print -quit)"
 }
 
 _has_hiddenSbtDir() {
-  local ctxDir=$1
-  test -d $ctxDir/.sbt && test -n "$(find $ctxDir/.sbt -maxdepth 1 -name '*.scala' -print -quit)"
+	local ctx_dir="${1}"
+	test -d "${ctx_dir}/.sbt" && test -n "$(find "${ctx_dir}/.sbt" -maxdepth 1 -name '*.scala' -print -quit)"
 }
 
 _has_buildPropertiesFile() {
-  local ctxDir=$1
-  test -e $ctxDir/project/build.properties
+	local ctx_dir="${1}"
+	test -e "${ctx_dir}/project/build.properties"
 }
 
 _has_playPluginsFile() {
-  local ctxDir=$1
-  test -e $ctxDir/project/plugins.sbt
+	local ctx_dir="${1}"
+	test -e "${ctx_dir}/project/plugins.sbt"
 }
 
 get_scala_version() {
-  local ctxDir=$1
-  local sbtUserHome=$2
-  local launcher=$3
-  local playVersion=$4
+	local ctx_dir="${1}"
+	local sbt_user_home="${2}"
+	local launcher="${3}"
+	local play_version="${4}"
 
-  if [ -n "${playVersion}" ]; then
-    if [ "${playVersion}" = "2.3" ] || [ "${playVersion}" = "2.4" ]; then
-      # if we don't grep for the version, and instead use `sbt scala-version`,
-      # then sbt will try to download the internet
-      scalaVersionLine="$(grep "scalaVersion" "${ctxDir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g')"
-      scalaVersion=$(expr "$scalaVersionLine" : ".\+\(2\.1[0-1]\)\.[0-9]")
+	if [[ -n "${play_version}" ]]; then
+		if [[ "${play_version}" == "2.3" ]] || [[ "${play_version}" == "2.4" ]]; then
+			# if we don't grep for the version, and instead use `sbt scala-version`,
+			# then sbt will try to download the internet
+			scala_version_line="$(grep "scalaVersion" "${ctx_dir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g')"
+			scala_version=$(expr "${scala_version_line}" : ".\+\(2\.1[0-1]\)\.[0-9]")
 
-      if [ -n "${scalaVersion}" ]; then
-        echo "$scalaVersion"
-      else
-        echo "2.10"
-      fi
-    elif [ "${playVersion}" = "2.2" ]; then
-      echo '2.10'
-    elif [ "${playVersion}" = "2.1" ]; then
-      echo '2.10'
-    elif [ "${playVersion}" = "2.0" ]; then
-      echo '2.9'
-    else
-      echo ''
-    fi
-  else
-    echo ''
-  fi
+			if [[ -n "${scala_version}" ]]; then
+				echo "${scala_version}"
+			else
+				echo "2.10"
+			fi
+		elif [[ "${play_version}" == "2.2" ]]; then
+			echo '2.10'
+		elif [[ "${play_version}" == "2.1" ]]; then
+			echo '2.10'
+		elif [[ "${play_version}" == "2.0" ]]; then
+			echo '2.9'
+		else
+			echo ''
+		fi
+	else
+		echo ''
+	fi
 }
 
 get_supported_play_version() {
-  local ctxDir=$1
-  local sbtUserHome=$2
-  local launcher=$3
+	local ctx_dir="${1}"
+	local sbt_user_home="${2}"
+	local launcher="${3}"
 
-  if _has_playPluginsFile $ctxDir; then
-    pluginVersionLine="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
-    pluginVersion=$(expr "$pluginVersionLine" : ".\+\(2\.[0-4]\)\.[0-9]")
-    if [ "$pluginVersion" != 0 ]; then
-      echo -n "$pluginVersion"
-    fi
-  fi
-  echo ""
+	if _has_playPluginsFile "${ctx_dir}"; then
+		plugin_version_line="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctx_dir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
+		plugin_version=$(expr "${plugin_version_line}" : ".\+\(2\.[0-4]\)\.[0-9]")
+		if [[ "${plugin_version}" != "0" ]]; then
+			echo -n "${plugin_version}"
+		fi
+	fi
+	echo ""
 }
 
 get_supported_sbt_version() {
-  local ctxDir=$1
-  local sbtVersionPattern=${2:-$SBT_0_VERSION_PATTERN}
-  if _has_buildPropertiesFile $ctxDir; then
-    sbtVersionLine="$(grep -P '[ \t]*sbt\.version[ \t]*=' "${ctxDir}"/project/build.properties | sed -E -e 's/[ \t\r\n]//g')"
-    sbtVersion=$(expr "$sbtVersionLine" : "$sbtVersionPattern")
-    if [ "$sbtVersion" != 0 ] ; then
-      echo "$sbtVersion"
-    else
-      echo ""
-    fi
-  else
-    echo ""
-  fi
+	local ctx_dir="${1}"
+	local sbt_version_pattern="${2:-${SBT_0_VERSION_PATTERN}}"
+	if _has_buildPropertiesFile "${ctx_dir}"; then
+		sbt_version_line="$(grep -P '[ \t]*sbt\.version[ \t]*=' "${ctx_dir}"/project/build.properties | sed -E -e 's/[ \t\r\n]//g')"
+		sbt_version=$(expr "${sbt_version_line}" : "${sbt_version_pattern}")
+		if [[ "${sbt_version}" != "0" ]]; then
+			echo "${sbt_version}"
+		else
+			echo ""
+		fi
+	else
+		echo ""
+	fi
 }
 
 prime_ivy_cache() {
-  local ctxDir=$1
-  local sbtUserHome=$2
-  local launcher=$3
+	local ctx_dir="${1}"
+	local sbt_user_home="${2}"
+	local launcher="${3}"
 
-  if is_play $ctxDir ; then
-    playVersion=`get_supported_play_version ${BUILD_DIR} ${sbtUserHome} ${launcher}`
-  fi
-  scalaVersion=$(get_scala_version "$ctxDir" "$sbtUserHome" "$launcher" "$playVersion")
+	if is_play "${ctx_dir}"; then
+		play_version=$(get_supported_play_version "${BUILD_DIR}" "${sbt_user_home}" "${launcher}")
+	fi
+	scala_version=$(get_scala_version "${ctx_dir}" "${sbt_user_home}" "${launcher}" "${play_version}")
 
-  if [ -n "$scalaVersion" ]; then
-    cachePkg=" (Scala-${scalaVersion}"
-    if [ -n "$playVersion" ]; then
-      cachePkg="${cachePkg}, Play-${playVersion}"
-    fi
-    cachePkg="${cachePkg})"
-  fi
-  status_pending "Priming Ivy cache${cachePkg}"
-  if _download_and_unpack_ivy_cache "$sbtUserHome" "$scalaVersion" "$playVersion"; then
-    status_done
-  else
-    echo " no cache found"
-  fi
+	if [[ -n "${scala_version}" ]]; then
+		cache_pkg=" (Scala-${scala_version}"
+		if [[ -n "${play_version}" ]]; then
+			cache_pkg="${cache_pkg}, Play-${play_version}"
+		fi
+		cache_pkg="${cache_pkg})"
+	fi
+	status_pending "Priming Ivy cache${cache_pkg}"
+	if _download_and_unpack_ivy_cache "${sbt_user_home}" "${scala_version}" "${play_version}"; then
+		status_done
+	else
+		echo " no cache found"
+	fi
 }
 
 _download_and_unpack_ivy_cache() {
-  local sbtUserHome=$1
-  local scalaVersion=$2
-  local playVersion=$3
+	local sbtUserHome="${1}"
+	local scala_version="${2}"
+	local play_version="${3}"
 
-  baseUrl="https://lang-jvm.s3.us-east-1.amazonaws.com/sbt/v8/sbt-cache"
-  if [ -n "$playVersion" ]; then
-    ivyCacheUrl="$baseUrl-play-${playVersion}_${scalaVersion}.tar.gz"
-  else
-    ivyCacheUrl="$baseUrl-base.tar.gz"
-  fi
+	base_url="https://lang-jvm.s3.us-east-1.amazonaws.com/sbt/v8/sbt-cache"
+	if [[ -n "${play_version}" ]]; then
+		ivy_cache_url="${base_url}-play-${play_version}_${scala_version}.tar.gz"
+	else
+		ivy_cache_url="${base_url}-base.tar.gz"
+	fi
 
-  curl --fail --retry 3 --retry-connrefused --connect-timeout 5 --silent --max-time 60 --location $ivyCacheUrl | tar xzm -C $sbtUserHome
-  if [ $? -eq 0 ]; then
-    mv $sbtUserHome/.sbt/* $sbtUserHome
-    rm -rf $sbtUserHome/.sbt
-    return 0
-  else
-    return 1
-  fi
+	curl --fail --retry 3 --retry-connrefused --connect-timeout 5 --silent --max-time 60 --location "${ivy_cache_url}" | tar xzm -C "${sbt_user_home}"
+	if [[ $? -eq 0 ]]; then
+		mv "${sbt_user_home}"/.sbt/* "${sbt_user_home}"
+		rm -rf "${sbt_user_home}/.sbt"
+		return 0
+	else
+		return 1
+	fi
 }
 
 has_supported_sbt_version() {
-  local ctxDir=$1
-  local supportedVersion="$(get_supported_sbt_version ${ctxDir} ${SBT_0_VERSION_PATTERN})"
-  if [ -n "$supportedVersion" ] ; then
-    return 0
-  else
-    return 1
-  fi
+	local ctx_dir="${1}"
+	local supported_version="$(get_supported_sbt_version "${ctx_dir}" "${SBT_0_VERSION_PATTERN}")"
+	if [[ -n "${supported_version}" ]]; then
+		return 0
+	else
+		return 1
+	fi
 }
 
 has_supported_sbt_1_version() {
-  local ctxDir=$1
-  local supportedVersion="$(get_supported_sbt_version ${ctxDir} ${SBT_1_VERSION_PATTERN})"
-  if [ -n "$supportedVersion" ] ; then
-    return 0
-  else
-    return 1
-  fi
+	local ctx_dir="${1}"
+	local supported_version="$(get_supported_sbt_version "${ctx_dir}" "${SBT_1_VERSION_PATTERN}")"
+	if [[ -n "${supported_version}" ]]; then
+		return 0
+	else
+		return 1
+	fi
 }
 
 has_old_preset_sbt_opts() {
-  if [ "$SBT_OPTS" = "-Xmx384m -Xss512k -XX:+UseCompressedOops" ]; then
-    return 0
-  else
-    return 1
-  fi
+	if [[ "${SBT_OPTS}" == "-Xmx384m -Xss512k -XX:+UseCompressedOops" ]]; then
+		return 0
+	else
+		return 1
+	fi
 }
 
 count_files() {
-  local location=$1
-  local pattern=$2
+	local location="${1}"
+	local pattern="${2}"
 
-  if [ -d ${location} ]; then
-    find ${location} -name ${pattern} | wc -l | sed 's/ //g'
-  else
-    echo "0"
-  fi
+	if [[ -d "${location}" ]]; then
+		find "${location}" -name "${pattern}" | wc -l | sed 's/ //g'
+	else
+		echo "0"
+	fi
 }
 
 detect_play_lang() {
-  local appDir=$1/app
+	local app_dir="${1}/app"
 
-  local num_scala_files=$(count_files ${appDir} '*.scala')
-  local num_java_files=$(count_files ${appDir} '*.java')
+	local num_scala_files=$(count_files "${app_dir}" '*.scala')
+	local num_java_files=$(count_files "${app_dir}" '*.java')
 
-  if   [ ${num_scala_files} -gt ${num_java_files} ] ; then
-    echo "Scala"
-  elif [ ${num_scala_files} -lt ${num_java_files} ] ; then
-    echo "Java"
-  else
-    echo ""
-  fi
+	if [[ ${num_scala_files} -gt ${num_java_files} ]]; then
+		echo "Scala"
+	elif [[ ${num_scala_files} -lt ${num_java_files} ]]; then
+		echo "Java"
+	else
+		echo ""
+	fi
 }
 
 is_app_dir() {
-  test "$1" != "/app"
+	test "${1}" != "/app"
 }
 
 uses_universal_packaging() {
-  local ctxDir=$1
-  test -d $ctxDir/target/universal/stage/bin
+	local ctx_dir="${1}"
+	test -d "${ctx_dir}/target/universal/stage/bin"
 }
 
 _universal_packaging_procs() {
-  local ctxDir=$1
-  (cd $ctxDir; find target/universal/stage/bin -type f -executable)
+	local ctx_dir="${1}"
+	(cd "${ctx_dir}" && find target/universal/stage/bin -type f -executable)
 }
 
 _universal_packaging_proc_count() {
-  local ctxDir=$1
-  _universal_packaging_procs $ctxDir | wc -l
+	local ctx_dir="${1}"
+	_universal_packaging_procs "${ctx_dir}" | wc -l
 }
 
 universal_packaging_default_web_proc() {
-  local ctxDir=$1
-  if [ $(_universal_packaging_proc_count $ctxDir) -eq 1 ]; then
-    echo "web: $(_universal_packaging_procs $ctxDir) -Dhttp.port=\$PORT"
-  fi
+	local ctx_dir="${1}"
+	if [[ $(_universal_packaging_proc_count "${ctx_dir}") -eq 1 ]]; then
+		echo "web: $(_universal_packaging_procs "${ctx_dir}") -Dhttp.port=\$PORT"
+	fi
 }
 
 # sed -l basically makes sed replace and buffer through stdin to stdout
 # so you get updates while the command runs and dont wait for the end
 # e.g. sbt stage | indent
 output() {
-  local logfile="$1"
-  local c='s/^/       /'
+	local logfile="${1}"
+	local c='s/^/       /'
 
-  case $(uname) in
-      Darwin) tee -a "$logfile" | sed -l "$c";; # mac/bsd sed: -l buffers on line boundaries
-      *)      tee -a "$logfile" | sed -u "$c";; # unix/gnu sed: -u unbuffered (arbitrary) chunks of data
-  esac
+	case $(uname) in
+		Darwin) tee -a "${logfile}" | sed -l "${c}" ;; # mac/bsd sed: -l buffers on line boundaries
+		*) tee -a "${logfile}" | sed -u "${c}" ;;      # unix/gnu sed: -u unbuffered (arbitrary) chunks of data
+	esac
 }
 
 install_sbt_extras() {
-  local optDir=${1}
-  local sbtBinDir=${2}
+	local opt_dir="${1}"
+	local sbt_bin_dir="${2}"
 
-  rm -f ${sbtBinDir}/sbt-launch*.jar #legacy launcher
-  mkdir -p ${sbtBinDir}
-  cp -p ${optDir}/sbt-extras.sh ${sbtBinDir}/sbt-extras
-  cp -p ${optDir}/sbt-wrapper.sh ${sbtBinDir}/sbt
+	rm -f "${sbt_bin_dir}/sbt-launch"*.jar #legacy launcher
+	mkdir -p "${sbt_bin_dir}"
+	cp -p "${opt_dir}/sbt-extras.sh" "${sbt_bin_dir}/sbt-extras"
+	cp -p "${opt_dir}/sbt-wrapper.sh" "${sbt_bin_dir}/sbt"
 
-  chmod 0755 ${sbtBinDir}/sbt-extras
-  chmod 0755 ${sbtBinDir}/sbt
+	chmod 0755 "${sbt_bin_dir}/sbt-extras"
+	chmod 0755 "${sbt_bin_dir}/sbt"
 
-  export PATH="${sbtBinDir}:$PATH"
+	export PATH="${sbt_bin_dir}:${PATH}"
 }
 
 run_sbt() {
-  local javaVersion=$1
-  local home=$2
-  local launcher=$3
-  local tasks=$4
-  local buildLogFile=".heroku/sbt-build.log"
+	local java_version="${1}"
+	local home="${2}"
+	local launcher="${3}"
+	local tasks="${4}"
+	local build_log_file=".heroku/sbt-build.log"
 
-  echo "" > $buildLogFile
+	echo "" >"${build_log_file}"
 
-  status "Running: sbt $tasks"
-  SBT_HOME="$home" sbt ${tasks} | output $buildLogFile
+	status "Running: sbt ${tasks}"
+	SBT_HOME="${home}" sbt ${tasks} | output "${build_log_file}"
 
-  if [ "${PIPESTATUS[*]}" != "0 0" ]; then
-    handle_sbt_errors $buildLogFile
-  fi
+	if [[ "${PIPESTATUS[*]}" != "0 0" ]]; then
+		handle_sbt_errors "${build_log_file}"
+	fi
 }
 
 write_sbt_dependency_classpath_log() {
-  local home=$1
-  local launcher=$2
+	local home="${1}"
+	local launcher="${2}"
 
-  status "Collecting dependency information"
-  SBT_HOME="$home" sbt "show dependencyClasspath" | grep -o "Attributed\(.*\)" > .heroku/sbt-dependency-classpath.log
+	status "Collecting dependency information"
+	SBT_HOME="${home}" sbt "show dependencyClasspath" | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log
 }
 
 cache_copy() {
-  rel_dir=$1
-  from_dir=$2
-  to_dir=$3
-  rm -rf $to_dir/$rel_dir
-  if [ -d $from_dir/$rel_dir ]; then
-    mkdir -p $to_dir/$rel_dir
-    cp -pr $from_dir/$rel_dir/. $to_dir/$rel_dir
-  fi
+	local rel_dir="${1}"
+	local from_dir="${2}"
+	local to_dir="${3}"
+	rm -rf "${to_dir}/${rel_dir}"
+	if [[ -d "${from_dir}/${rel_dir}" ]]; then
+		mkdir -p "${to_dir}/${rel_dir}"
+		cp -pr "${from_dir}/${rel_dir}/." "${to_dir}/${rel_dir}"
+	fi
 }
 
 install_jdk() {
-  local install_dir=${1:?}
-  local cache_dir=${2:?}
+	local install_dir=${1:?}
+	local cache_dir=${2:?}
 
-  let start=$(nowms)
-  JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz}
-  mkdir -p /tmp/jvm-common
-  curl --fail --retry 3 --retry-connrefused --connect-timeout 5 --silent --location $JVM_COMMON_BUILDPACK | tar xzm -C /tmp/jvm-common --strip-components=1
-  source /tmp/jvm-common/bin/util
-  source /tmp/jvm-common/bin/java
-  source /tmp/jvm-common/opt/jdbc.sh
-  mtime "jvm-common.install.time" "${start}"
+	let start=$(nowms)
+	JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz}
+	mkdir -p /tmp/jvm-common
+	curl --fail --retry 3 --retry-connrefused --connect-timeout 5 --silent --location "${JVM_COMMON_BUILDPACK}" | tar xzm -C /tmp/jvm-common --strip-components=1
+	source /tmp/jvm-common/bin/util
+	source /tmp/jvm-common/bin/java
+	source /tmp/jvm-common/opt/jdbc.sh
+	mtime "jvm-common.install.time" "${start}"
 
-  let start=$(nowms)
-  install_java_with_overlay "${install_dir}" "${cache_dir}"
-  mtime "jvm.install.time" "${start}"
+	let start=$(nowms)
+	install_java_with_overlay "${install_dir}" "${cache_dir}"
+	mtime "jvm.install.time" "${start}"
 }
