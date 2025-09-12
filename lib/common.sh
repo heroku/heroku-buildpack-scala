@@ -119,7 +119,9 @@ get_supported_sbt_version() {
 	local ctx_dir="${1}"
 	local sbt_version_pattern="${2:-${SBT_0_VERSION_PATTERN}}"
 	if _has_buildPropertiesFile "${ctx_dir}"; then
+		local sbt_version_line
 		sbt_version_line="$(grep -P '[ \t]*sbt\.version[ \t]*=' "${ctx_dir}"/project/build.properties | sed -E -e 's/[ \t\r\n]//g')"
+		local sbt_version
 		sbt_version=$(expr "${sbt_version_line}" : "${sbt_version_pattern}")
 		if [[ "${sbt_version}" != "0" ]]; then
 			echo "${sbt_version}"
@@ -315,7 +317,7 @@ cache_copy() {
 	local rel_dir="${1}"
 	local from_dir="${2}"
 	local to_dir="${3}"
-	rm -rf "${to_dir}/${rel_dir}"
+	rm -rf "${to_dir:?}/${rel_dir:?}"
 	if [[ -d "${from_dir}/${rel_dir}" ]]; then
 		mkdir -p "${to_dir}/${rel_dir}"
 		cp -pr "${from_dir}/${rel_dir}/." "${to_dir}/${rel_dir}"
