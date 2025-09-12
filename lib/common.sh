@@ -323,7 +323,7 @@ cache_copy() {
 	local rel_dir="${1}"
 	local from_dir="${2}"
 	local to_dir="${3}"
-	rm -rf "${to_dir:?}/${rel_dir:?}"
+	rm -rf "${to_dir}/${rel_dir}"
 	if [[ -d "${from_dir}/${rel_dir}" ]]; then
 		mkdir -p "${to_dir}/${rel_dir}"
 		cp -pr "${from_dir}/${rel_dir}/." "${to_dir}/${rel_dir}"
