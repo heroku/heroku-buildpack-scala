@@ -122,7 +122,9 @@ get_supported_sbt_version() {
 		local sbt_version_line
 		sbt_version_line="$(grep -P '[ \t]*sbt\.version[ \t]*=' "${ctx_dir}"/project/build.properties | sed -E -e 's/[ \t\r\n]//g')"
 		local sbt_version
-		sbt_version=$(expr "${sbt_version_line}" : "${sbt_version_pattern}" || echo "0")
+		set +e
+		sbt_version=$(expr "${sbt_version_line}" : "${sbt_version_pattern}")
+		set -e
 		if [[ "${sbt_version}" != "0" ]]; then
 			echo "${sbt_version}"
 		else
