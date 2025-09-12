@@ -90,8 +90,8 @@ SBT_BINDIR="${SBT_USER_HOME}/bin"
 cd "${BUILD_DIR}"
 
 # unpack cache
-CACHED_DIRS=("${SBT_USER_HOME}" "target" "project/target" "project/boot" ".coursier")
-for DIR in "${CACHED_DIRS[@]}"; do
+CACHED_DIRS="${SBT_USER_HOME} target project/target project/boot .coursier"
+for DIR in ${CACHED_DIRS}; do
 	cache_copy "${DIR}" "${CACHE_DIR}" "${BUILD_DIR}"
 done
 
@@ -197,7 +197,7 @@ fi
 
 # repack cache
 mkdir -p "${CACHE_DIR}"
-for DIR in "${CACHED_DIRS[@]}"; do
+for DIR in ${CACHED_DIRS}; do
 	cache_copy "${DIR}" "${BUILD_DIR}" "${CACHE_DIR}"
 done
 
