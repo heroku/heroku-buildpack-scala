@@ -330,6 +330,7 @@ install_jdk() {
   local install_dir=${1:?}
   local cache_dir=${2:?}
 
+  local start
   start=$(nowms)
   JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz}
   mkdir -p /tmp/jvm-common
