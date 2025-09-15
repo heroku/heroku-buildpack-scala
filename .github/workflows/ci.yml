@@ -10,9 +10,17 @@ permissions:
   contents: read
 
 jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - run: make lint-scripts
+
   hatchet:
     name: "Hatchet (${{ matrix.stack }})"
     runs-on: ubuntu-22.04
+    needs: lint
     strategy:
       fail-fast: false
       matrix:
@@ -45,6 +53,7 @@ jobs:
 
   buildpack-testrunner:
     runs-on: ubuntu-22.04
+    needs: lint
     env:
       SHUNIT_HOME: /tmp/shunit2-2.1.6
       # Note the missing STACK environment variable here. This works since there is a default value in the buildpack
