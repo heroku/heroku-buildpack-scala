@@ -5,8 +5,9 @@ get_property() {
   local propName=$2
   local propDefault=${3:-""}
 
-  if [ -f ${propFile} ]; then
-    local propValue=$(sed '/^\#/d' ${propFile} | grep "${propName}"  | tail -n 1 | cut -d "=" -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+  if [ -f "${propFile}" ]; then
+    local propValue
+    propValue=$(sed '/^\#/d' "${propFile}" | grep "${propName}"  | tail -n 1 | cut -d "=" -f2- | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
     echo "${propValue:-$propDefault}"
   else
     echo "${propDefault}"
