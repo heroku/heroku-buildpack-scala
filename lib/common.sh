@@ -300,7 +300,8 @@ run_sbt() {
   echo "" > "$buildLogFile"
 
   status "Running: sbt $tasks"
-  SBT_HOME="$home" sbt "${tasks}" | output "$buildLogFile"
+  # shellcheck disable=SC2086  # We want word splitting for tasks
+  SBT_HOME="$home" sbt ${tasks} | output "$buildLogFile"
 
   if [ "${PIPESTATUS[*]}" != "0 0" ]; then
     handle_sbt_errors "$buildLogFile"
