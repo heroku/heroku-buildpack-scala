@@ -7,18 +7,15 @@ BPLOG_PREFIX="buildpack.scala"
 
 BASE_DIR="$(pwd)"
 BUILDPACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
-# shellcheck disable=SC2034  # Used in sourced scripts
-BIN_DIR=${BUILDPACK_DIR}/bin
-OPT_DIR=${BUILDPACK_DIR}/opt
-LIB_DIR=${BUILDPACK_DIR}/lib
+
 # shellcheck source=lib/common.sh
-source "${LIB_DIR}/common.sh"
+source "${BUILDPACK_DIR}/lib/common.sh"
 # shellcheck source=lib/properties.sh
-source "${LIB_DIR}/properties.sh"
+source "${BUILDPACK_DIR}/lib/properties.sh"
 # shellcheck source=lib/failures.sh
-source "${LIB_DIR}/failures.sh"
+source "${BUILDPACK_DIR}/lib/failures.sh"
 # shellcheck source=lib/metrics.sh
-source "${LIB_DIR}/metrics.sh"
+source "${BUILDPACK_DIR}/lib/metrics.sh"
 
 # parse args
 APP_BUILD_DIR=$(cd "$1"; pwd)
@@ -26,7 +23,7 @@ CACHE_DIR=${2}
 ENV_DIR=${3}
 
 # shellcheck disable=SC1091  # buildpack-stdlib-v7.sh is excluded from shellcheck
-source "${LIB_DIR}/buildpack-stdlib-v7.sh"
+source "${BUILDPACK_DIR}/lib/buildpack-stdlib-v7.sh"
 
 metrics::init "${CACHE_DIR}" "scala"
 metrics::setup
@@ -154,7 +151,7 @@ fi
 [ "${SBT_CLEAN}" = "true" ] && SBT_TASKS="clean ${SBT_TASKS}"
 
 # Install the custom sbt script
-install_sbt_extras "${OPT_DIR}" "${SBT_BINDIR}"
+install_sbt_extras "${BUILDPACK_DIR}/opt" "${SBT_BINDIR}"
 
 # copy in heroku sbt plugin
 if has_supported_sbt_1_version "${BUILD_DIR}"; then
@@ -166,7 +163,7 @@ mkdir -p "${SBT_USER_HOME}/plugins"
 rm -f "${SBT_USER_HOME}/plugins/HerokuPlugin.scala" # remove the old ambiguously named plugin
 rm -f "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin_sbt1.scala" # remove the old poorly named plugin
 rm -f "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala" # remove the old plugin
-cp -p "${OPT_DIR}/${HEROKU_PLUGIN}" "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"
+cp -p "${BUILDPACK_DIR}/opt/${HEROKU_PLUGIN}" "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"
 
 # Collect metrics
 metrics::set_string "sbt_version" "${SBT_VERSION:-unknown}"
