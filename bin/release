@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# bin/release <build-dir>
 
 BP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
 source "${BP_DIR}/lib/common.sh"

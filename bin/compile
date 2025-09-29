@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
-# bin/compile <build-dir> <cache-dir> <env-dir>
 
-# fail fast
 set -e
 
 # shellcheck disable=SC2034  # Used by buildpack-stdlib-v7.sh logging functions, will be removed soon
