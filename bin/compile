@@ -6,11 +6,11 @@ set -e
 BPLOG_PREFIX="buildpack.scala"
 
 BASE_DIR="$(pwd)"
-BP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)" # absolute path
+BUILDPACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
 # shellcheck disable=SC2034  # Used in sourced scripts
-BIN_DIR=${BP_DIR}/bin
-OPT_DIR=${BP_DIR}/opt
-LIB_DIR=${BP_DIR}/lib
+BIN_DIR=${BUILDPACK_DIR}/bin
+OPT_DIR=${BUILDPACK_DIR}/opt
+LIB_DIR=${BUILDPACK_DIR}/lib
 # shellcheck source=lib/common.sh
 source "${LIB_DIR}/common.sh"
 # shellcheck source=lib/properties.sh

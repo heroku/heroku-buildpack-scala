@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-BP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
-source "${BP_DIR}/lib/common.sh"
+BUILDPACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
+source "${BUILDPACK_DIR}/lib/common.sh"
 
 BUILD_DIR=${1}
 
