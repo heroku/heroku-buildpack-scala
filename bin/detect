@@ -2,7 +2,7 @@
 # bin/use <build-dir>
 
 BP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
-. "${BP_DIR}/lib/common.sh"
+source "${BP_DIR}/lib/common.sh"
 
 BUILD_DIR=${1}
 
