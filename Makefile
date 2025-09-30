@@ -10,16 +10,16 @@ STACK_IMAGE_TAG := heroku/$(subst -,:,$(STACK))-build
 lint: lint-scripts check-format lint-ruby
 
 lint-scripts:
-	@git ls-files -z --cached --others --exclude-standard 'bin/*' 'etc/*' 'lib/*' | grep -zv buildpack-stdlib-v7.sh | xargs -0 shellcheck --check-sourced --color=always
+	@git ls-files -z --cached --others --exclude-standard 'bin/*' 'etc/*' 'lib/*' | xargs -0 shellcheck --check-sourced --color=always
 
 lint-ruby:
 	@bundle exec rubocop
 
 check-format:
-	@shfmt -f . | grep -v "vendor/" | grep -v "lib/buildpack-stdlib-v7.sh" | grep -v "opt/" | grep -v "test/spec/fixtures/" | xargs shfmt --diff
+	@shfmt -f . | grep -v "vendor/" | grep -v "opt/" | grep -v "test/spec/fixtures/" | xargs shfmt --diff
 
 format:
-	@shfmt -f . | grep -v "vendor/" | grep -v "lib/buildpack-stdlib-v7.sh" | grep -v "opt/" | grep -v "test/spec/fixtures/" | xargs shfmt --write --list
+	@shfmt -f . | grep -v "vendor/" | grep -v "opt/" | grep -v "test/spec/fixtures/" | xargs shfmt --write --list
 
 run:
 	@echo "Running buildpack using: STACK=$(STACK) FIXTURE=$(FIXTURE)"

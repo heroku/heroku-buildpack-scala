@@ -334,8 +334,6 @@ install_jdk() {
 	local install_dir=${1:?}
 	local cache_dir=${2:?}
 
-	local start
-	start=$(nowms)
 	JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz}
 	mkdir -p /tmp/jvm-common
 	curl --fail --retry 3 --retry-connrefused --connect-timeout 5 --silent --location "$JVM_COMMON_BUILDPACK" | tar xzm -C /tmp/jvm-common --strip-components=1
@@ -345,9 +343,6 @@ install_jdk() {
 	source /tmp/jvm-common/bin/java
 	# shellcheck disable=SC1091  # External files from jvm-common buildpack
 	source /tmp/jvm-common/opt/jdbc.sh
-	mtime "jvm-common.install.time" "${start}"
 
-	start=$(nowms)
 	install_java_with_overlay "${install_dir}" "${cache_dir}"
-	mtime "jvm.install.time" "${start}"
 }

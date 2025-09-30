@@ -4,9 +4,6 @@
 # fail fast
 set -e
 
-# shellcheck disable=SC2034  # Used by buildpack-stdlib-v7.sh logging functions, will be removed soon
-BPLOG_PREFIX="buildpack.scala"
-
 BASE_DIR="$(pwd)"
 BP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)" # absolute path
 # shellcheck disable=SC2034  # Used in sourced scripts
@@ -21,6 +18,8 @@ LIB_DIR=$BP_DIR/lib
 . "$LIB_DIR/failures.sh"
 # shellcheck source=lib/metrics.sh
 . "$LIB_DIR/metrics.sh"
+# shellcheck source=lib/util.sh
+. "$LIB_DIR/util.sh"
 
 # parse args
 APP_BUILD_DIR=$(
@@ -29,9 +28,6 @@ APP_BUILD_DIR=$(
 )
 CACHE_DIR=$2
 ENV_DIR=$3
-
-# shellcheck disable=SC1091  # buildpack-stdlib-v7.sh is excluded from shellcheck
-source "$LIB_DIR/buildpack-stdlib-v7.sh"
 
 metrics::init "${CACHE_DIR}" "scala"
 metrics::setup
@@ -61,7 +57,7 @@ else
 	BUILD_DIR="$APP_BUILD_DIR"
 fi
 
-export_env "$ENV_DIR" "." "JAVA_OPTS"
+util::export_env_dir "$ENV_DIR" "." "JAVA_OPTS"
 
 # Set system properties as env vars
 SYSPROPFILE="$BUILD_DIR/system.properties"
