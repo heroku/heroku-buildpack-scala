@@ -3,6 +3,9 @@
 ## [Unreleased]
 
 
+## [v100] - 2025-09-30
+
+
 ## [v99] - 2025-09-10
 
 * Add metrics infrastructure and collection ([#259](https://github.com/heroku/heroku-buildpack-scala/pull/259))
@@ -150,7 +153,8 @@
 *  Upgrade to sbt 0.13.7 launcher
 *  Allow for customized jvm-common package
 
-[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v99...main
+[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v100...main
+[v100]: https://github.com/heroku/heroku-buildpack-scala/compare/v99...v100
 [v99]: https://github.com/heroku/heroku-buildpack-scala/compare/v98...v99
 [v98]: https://github.com/heroku/heroku-buildpack-scala/compare/v97...v98
 [v97]: https://github.com/heroku/heroku-buildpack-scala/compare/v96...v97
