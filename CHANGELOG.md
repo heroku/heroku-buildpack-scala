@@ -5,6 +5,7 @@
 
 ## [v100] - 2025-09-30
 
+* Code improvements, no changes for users. ([#262](https://github.com/heroku/heroku-buildpack-scala/pull/262))
 
 ## [v99] - 2025-09-10
 
