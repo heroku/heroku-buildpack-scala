@@ -1,5 +1,5 @@
 # These targets are not files
-.PHONY: lint lint-scripts check-format format run publish
+.PHONY: lint lint-scripts lint-ruby check-format format run publish
 
 STACK ?= heroku-24
 FIXTURE ?= test/spec/fixtures/repos/play-2.4.x-scala
