@@ -1,0 +1,34 @@
+plugins:
+  - rubocop-rspec
+
+AllCops:
+  NewCops: enable
+
+Layout/TrailingWhitespace:
+  # Required since we use heredocs to assert against Hatchet output, and sometimes that output
+  # contains trailing newlines which we must match against. The alternative is to end the lines
+  # with the unsightly `#{' '}` workaround.
+  AllowInHeredoc: true
+
+Metrics/BlockLength:
+  Enabled: false
+
+RSpec/DescribeClass:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/Focus:
+  # Disable auto-correct otherwise format-on-save will remove the annotation
+  # whilst developing locally.
+  AutoCorrect: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma
