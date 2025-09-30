@@ -14,8 +14,17 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+      - name: Install Ruby and dependencies
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          ruby-version: "3.4"
+      - name: Install shfmt
+        run: sudo apt-get install shfmt
       - run: make lint-scripts
+      - run: make check-format
+      - run: make lint-ruby
 
   hatchet:
     name: "Hatchet (${{ matrix.stack }})"
@@ -50,4 +59,3 @@ jobs:
         run: bundle exec hatchet ci:setup
       - name: Run Hatchet integration tests
         run: bundle exec parallel_split_test test/spec/
-
