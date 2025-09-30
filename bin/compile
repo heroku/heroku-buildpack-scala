@@ -23,7 +23,10 @@ LIB_DIR=$BP_DIR/lib
 . "$LIB_DIR/metrics.sh"
 
 # parse args
-APP_BUILD_DIR=$(cd "$1"; pwd)
+APP_BUILD_DIR=$(
+	cd "$1"
+	pwd
+)
 CACHE_DIR=$2
 ENV_DIR=$3
 
@@ -34,28 +37,28 @@ metrics::init "${CACHE_DIR}" "scala"
 metrics::setup
 
 if [ -z "${CNB_STACK_ID:-}" ]; then
-  # Move app to a static build dir to keep paths the same between builds
-  # This is necessary for incremental compile, because sbt invalidates the
-  # cache if the path is different.
-  if is_app_dir "$APP_BUILD_DIR"; then
-    BUILD_DIR="/tmp/scala_buildpack_build_dir"
-    mv "$APP_BUILD_DIR" "$BUILD_DIR"
-  else
-    BUILD_DIR="$APP_BUILD_DIR"
-  fi
+	# Move app to a static build dir to keep paths the same between builds
+	# This is necessary for incremental compile, because sbt invalidates the
+	# cache if the path is different.
+	if is_app_dir "$APP_BUILD_DIR"; then
+		BUILD_DIR="/tmp/scala_buildpack_build_dir"
+		mv "$APP_BUILD_DIR" "$BUILD_DIR"
+	else
+		BUILD_DIR="$APP_BUILD_DIR"
+	fi
 
-  # Now that we've moved into a new tmp dir, we need to fix the PATH
-  # This is only necessary when using heroku-buildpack-multi because earlier
-  # buildpacks may have put extra commands (like `grunt`) on the path.
-  sedReplace="sed -e s/[\/&]/\\\&/g"
-  escAppBuildDir="$(echo "$APP_BUILD_DIR" | $sedReplace)"
-  escBuildDir="$(echo "$BUILD_DIR" | $sedReplace)"
-  PATH=${PATH//"$escAppBuildDir"/"$escBuildDir"}
-  export PATH
-  GEM_PATH=${GEM_PATH//"$escAppBuildDir"/"$escBuildDir"}
-  export GEM_PATH
+	# Now that we've moved into a new tmp dir, we need to fix the PATH
+	# This is only necessary when using heroku-buildpack-multi because earlier
+	# buildpacks may have put extra commands (like `grunt`) on the path.
+	sedReplace="sed -e s/[\/&]/\\\&/g"
+	escAppBuildDir="$(echo "$APP_BUILD_DIR" | $sedReplace)"
+	escBuildDir="$(echo "$BUILD_DIR" | $sedReplace)"
+	PATH=${PATH//"$escAppBuildDir"/"$escBuildDir"}
+	export PATH
+	GEM_PATH=${GEM_PATH//"$escAppBuildDir"/"$escBuildDir"}
+	export GEM_PATH
 else
-  BUILD_DIR="$APP_BUILD_DIR"
+	BUILD_DIR="$APP_BUILD_DIR"
 fi
 
 export_env "$ENV_DIR" "." "JAVA_OPTS"
@@ -100,21 +103,21 @@ cd "$BUILD_DIR"
 # unpack cache
 CACHED_DIRS="$SBT_USER_HOME target project/target project/boot .coursier"
 for DIR in $CACHED_DIRS; do
-  cache_copy "$DIR" "$CACHE_DIR" "$BUILD_DIR"
+	cache_copy "$DIR" "$CACHE_DIR" "$BUILD_DIR"
 done
 
 # these are preliminary checks. actual version check happens below when attempting to download sbt boot.properties
 if ! test -e project/build.properties; then
-  error "Your scala project must include project/build.properties and define sbt.version"
+	error "Your scala project must include project/build.properties and define sbt.version"
 fi
 
 if ! (has_supported_sbt_version "${BUILD_DIR}" || has_supported_sbt_1_version "${BUILD_DIR}"); then
-  error "You have defined an unsupported sbt.version in project/build.properties
+	error "You have defined an unsupported sbt.version in project/build.properties
 For sbt 0.x you must use a version >= 0.11, for sbt 1.x you must use a version >= 1.1"
 fi
 
 if has_old_preset_sbt_opts; then
-  warning "Your SBT_OPTS config var looks like its not in the right form.
+	warning "Your SBT_OPTS config var looks like its not in the right form.
 It was probably set this way in an earlier version of the buildpack. The
 only ill effect should be a warning like \"The \`-\` command is deprecated\".
 To avoid any unexpected behavior, please unset it by running this command:
@@ -127,22 +130,22 @@ https://github.com/paulp/sbt-extras#sample-usage"
 fi
 
 if [ "$KEEP_PLAY_FORK_RUN" != "true" ] && [ -f project/play-fork-run.sbt ]; then
-  warning "Removing project/play-fork-run.sbt. This file was probably added
+	warning "Removing project/play-fork-run.sbt. This file was probably added
 by Activator, and it breaks sbt. For more information see:
 https://github.com/typesafehub/activator/issues/979
 
 If you need to keep this file you can either rename it or set the following
 configuration variable:
 $ heroku config:set KEEP_PLAY_FORK_RUN=true"
-  rm project/play-fork-run.sbt
+	rm project/play-fork-run.sbt
 fi
 
 SBT_VERSION="$(get_supported_sbt_version "${BUILD_DIR}")"
 
 if [ -n "$SBT_PROJECT" ]; then
-  SBT_TASKS="$SBT_PROJECT/compile $SBT_PROJECT/stage"
+	SBT_TASKS="$SBT_PROJECT/compile $SBT_PROJECT/stage"
 else
-  SBT_TASKS="${SBT_TASKS:-"compile stage"}"
+	SBT_TASKS="${SBT_TASKS:-"compile stage"}"
 fi
 
 # To run any tasks before the actual build, configure the environment
@@ -160,29 +163,29 @@ install_sbt_extras "$OPT_DIR" "$SBT_BINDIR"
 
 # copy in heroku sbt plugin
 if has_supported_sbt_1_version "${BUILD_DIR}"; then
-  HEROKU_PLUGIN="HerokuBuildpackPlugin_sbt1.scala"
+	HEROKU_PLUGIN="HerokuBuildpackPlugin_sbt1.scala"
 else
-  HEROKU_PLUGIN="HerokuBuildpackPlugin.scala"
+	HEROKU_PLUGIN="HerokuBuildpackPlugin.scala"
 fi
 mkdir -p "$SBT_USER_HOME/plugins"
-rm -f "$SBT_USER_HOME/plugins/HerokuPlugin.scala" # remove the old ambiguously named plugin
+rm -f "$SBT_USER_HOME/plugins/HerokuPlugin.scala"               # remove the old ambiguously named plugin
 rm -f "$SBT_USER_HOME/plugins/HerokuBuildpackPlugin_sbt1.scala" # remove the old poorly named plugin
-rm -f "$SBT_USER_HOME/plugins/HerokuBuildpackPlugin.scala" # remove the old plugin
+rm -f "$SBT_USER_HOME/plugins/HerokuBuildpackPlugin.scala"      # remove the old plugin
 cp -p "$OPT_DIR/$HEROKU_PLUGIN" "$SBT_USER_HOME/plugins/HerokuBuildpackPlugin.scala"
 
 # Collect metrics
 metrics::set_string "sbt_version" "${SBT_VERSION:-unknown}"
 
 if is_sbt_native_packager "$BUILD_DIR"; then
-  metrics::set_raw "uses_sbt_native_packager" "true"
+	metrics::set_raw "uses_sbt_native_packager" "true"
 else
-  metrics::set_raw "uses_sbt_native_packager" "false"
+	metrics::set_raw "uses_sbt_native_packager" "false"
 fi
 
 if is_play "$BUILD_DIR"; then
-  metrics::set_raw "is_play_app" "true"
+	metrics::set_raw "is_play_app" "true"
 else
-  metrics::set_raw "is_play_app" "false"
+	metrics::set_raw "is_play_app" "false"
 fi
 
 # Manually pre-clean because sbt-native-packager doesn't clobber this dir
@@ -190,9 +193,9 @@ rm -rf "$BUILD_DIR/target/universal/stage"
 
 # download and cache the dependencies if this is the first build
 if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
-  if is_sbt_native_packager "$BUILD_DIR" || is_play "$BUILD_DIR"; then
-    prime_ivy_cache "$BUILD_DIR" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR"
-  fi
+	if is_sbt_native_packager "$BUILD_DIR" || is_play "$BUILD_DIR"; then
+		prime_ivy_cache "$BUILD_DIR" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR"
+	fi
 fi
 
 # build app
@@ -200,64 +203,64 @@ javaVersion="${JAVA_VERSION:-8}"
 run_sbt "$javaVersion" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "$SBT_TASKS"
 
 if [ -z "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]; then
-  write_sbt_dependency_classpath_log "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "show dependencyClasspath"
+	write_sbt_dependency_classpath_log "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "show dependencyClasspath"
 fi
 
 # repack cache
 mkdir -p "$CACHE_DIR"
 for DIR in $CACHED_DIRS; do
-  cache_copy "$DIR" "$BUILD_DIR" "$CACHE_DIR"
+	cache_copy "$DIR" "$BUILD_DIR" "$CACHE_DIR"
 done
 
 # drop useless directories from slug for play and sbt-native-launcher only
 if is_sbt_native_packager "$BUILD_DIR" || is_play "$BUILD_DIR"; then
-  if [ "$KEEP_SBT_CACHE" != "true" ]; then
-    if [ "$KEEP_IVY_CACHE" != "true" ] && [ -d "$SBT_USER_HOME/.ivy2" ]; then
-      status "Dropping ivy cache from the slug"
-      rm -rf "${SBT_USER_HOME:?}/.ivy2"
-    fi
-    if [ "$KEEP_COURSIER_CACHE" != "true" ] && [ -d "$SBT_USER_HOME/.coursier" ]; then
-      status "Dropping coursier cache from the slug"
-      rm -rf "${SBT_USER_HOME:?}/.coursier"
-    fi
-    if [ -d "$SBT_USER_HOME/boot" ] ; then
-      status "Dropping sbt boot dir from the slug"
-      rm -rf "${SBT_USER_HOME:?}/boot"
-    fi
-    if [ -d "$SBT_USER_HOME/.cache" ] ; then
-      status "Dropping sbt cache dir from the slug"
-      rm -rf "${SBT_USER_HOME:?}/.cache"
-    fi
-    if [ -d "$BUILD_DIR/project/boot" ] ; then
-      status "Dropping project boot dir from the slug"
-      rm -rf "$BUILD_DIR/project/boot"
-    fi
-    if [ -d "$BUILD_DIR/target" ] ; then
-      status "Dropping compilation artifacts from the slug"
-      rm -rf "$BUILD_DIR/target/scala-"*
-      rm -rf "$BUILD_DIR/target/streams"
-      if [ -d "$BUILD_DIR/target/resolution-cache" ] ; then
-        find "$BUILD_DIR/target/resolution-cache"/* ! -name "reports" ! -name "*-compile.xml" -print0 | xargs -0 rm -rf --
-      fi
-    fi
-  fi
+	if [ "$KEEP_SBT_CACHE" != "true" ]; then
+		if [ "$KEEP_IVY_CACHE" != "true" ] && [ -d "$SBT_USER_HOME/.ivy2" ]; then
+			status "Dropping ivy cache from the slug"
+			rm -rf "${SBT_USER_HOME:?}/.ivy2"
+		fi
+		if [ "$KEEP_COURSIER_CACHE" != "true" ] && [ -d "$SBT_USER_HOME/.coursier" ]; then
+			status "Dropping coursier cache from the slug"
+			rm -rf "${SBT_USER_HOME:?}/.coursier"
+		fi
+		if [ -d "$SBT_USER_HOME/boot" ]; then
+			status "Dropping sbt boot dir from the slug"
+			rm -rf "${SBT_USER_HOME:?}/boot"
+		fi
+		if [ -d "$SBT_USER_HOME/.cache" ]; then
+			status "Dropping sbt cache dir from the slug"
+			rm -rf "${SBT_USER_HOME:?}/.cache"
+		fi
+		if [ -d "$BUILD_DIR/project/boot" ]; then
+			status "Dropping project boot dir from the slug"
+			rm -rf "$BUILD_DIR/project/boot"
+		fi
+		if [ -d "$BUILD_DIR/target" ]; then
+			status "Dropping compilation artifacts from the slug"
+			rm -rf "$BUILD_DIR/target/scala-"*
+			rm -rf "$BUILD_DIR/target/streams"
+			if [ -d "$BUILD_DIR/target/resolution-cache" ]; then
+				find "$BUILD_DIR/target/resolution-cache"/* ! -name "reports" ! -name "*-compile.xml" -print0 | xargs -0 rm -rf --
+			fi
+		fi
+	fi
 fi
 
 # write profile.d script
 profileScript="${BUILD_DIR}/.profile.d/scala.sh"
 mkdir -p "$(dirname "$profileScript")"
-cat << EOF > "$profileScript"
+cat <<EOF >"$profileScript"
 export SBT_HOME="\$HOME/$SBT_USER_HOME"
 export PATH="\$SBT_HOME/bin:\$PATH"
 EOF
 
 # Move compiled app back to where Heroku expects it
 if [ -z "${CNB_STACK_ID:-}" ] && is_app_dir "$APP_BUILD_DIR"; then
-  mv "$BUILD_DIR" "$APP_BUILD_DIR"
+	mv "$BUILD_DIR" "$APP_BUILD_DIR"
 fi
 
 # write export script
-cat << EOF > "${BASE_DIR}/export"
+cat <<EOF >"${BASE_DIR}/export"
 export SBT_HOME="$APP_BUILD_DIR/$SBT_USER_HOME"
 export PATH="\$SBT_HOME/bin:\$PATH"
 EOF
