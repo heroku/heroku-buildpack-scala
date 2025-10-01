@@ -71,7 +71,6 @@ _has_playPluginsFile() {
 get_scala_version() {
 	local ctxDir=$1
 	local sbtUserHome=$2
-	local launcher=$3
 	local playVersion=$4
 
 	if [ -n "${playVersion}" ]; then
@@ -103,7 +102,6 @@ get_scala_version() {
 get_supported_play_version() {
 	local ctxDir=$1
 	local sbtUserHome=$2
-	local launcher=$3
 
 	if _has_playPluginsFile "$ctxDir"; then
 		pluginVersionLine="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctxDir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
@@ -128,31 +126,6 @@ get_supported_sbt_version() {
 		fi
 	else
 		echo ""
-	fi
-}
-
-prime_ivy_cache() {
-	local ctxDir=$1
-	local sbtUserHome=$2
-	local launcher=$3
-
-	if is_play "$ctxDir"; then
-		playVersion=$(get_supported_play_version "${BUILD_DIR}" "${sbtUserHome}" "${launcher}")
-	fi
-	scalaVersion=$(get_scala_version "$ctxDir" "$sbtUserHome" "$launcher" "$playVersion")
-
-	if [ -n "$scalaVersion" ]; then
-		cachePkg=" (Scala-${scalaVersion}"
-		if [ -n "$playVersion" ]; then
-			cachePkg="${cachePkg}, Play-${playVersion}"
-		fi
-		cachePkg="${cachePkg})"
-	fi
-	status_pending "Priming Ivy cache${cachePkg}"
-	if _download_and_unpack_ivy_cache "$sbtUserHome" "$scalaVersion" "$playVersion"; then
-		status_done
-	else
-		echo " no cache found"
 	fi
 }
 
@@ -296,13 +269,12 @@ run_sbt() {
 	# shellcheck disable=SC2034  # Used in future versions
 	local javaVersion=$1
 	local home=$2
-	local launcher=$3
 	local tasks=$4
 	local buildLogFile=".heroku/sbt-build.log"
 
 	echo "" >"$buildLogFile"
 
-	status "Running: sbt $tasks"
+	output::step "Running: sbt $tasks"
 	# shellcheck disable=SC2086  # We want word splitting for tasks
 	SBT_HOME="$home" sbt ${tasks} | output "$buildLogFile"
 
@@ -313,9 +285,8 @@ run_sbt() {
 
 write_sbt_dependency_classpath_log() {
 	local home=$1
-	local launcher=$2
 
-	status "Collecting dependency information"
+	output::step "Collecting dependency information"
 	SBT_HOME="$home" sbt "show dependencyClasspath" | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log
 }
 
