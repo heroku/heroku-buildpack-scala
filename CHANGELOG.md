@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-* Fix PATH and GEM_PATH rewriting logic when build directory is moved. ([#000](https://github.com/heroku/heroku-buildpack-scala/pull/000))
+* Fix PATH and GEM_PATH rewriting logic when build directory is moved. ([#269](https://github.com/heroku/heroku-buildpack-scala/pull/269))
 
 ## [v100] - 2025-09-30
 
