@@ -43,18 +43,16 @@ if [ -z "${CNB_STACK_ID:-}" ]; then
 		BUILD_DIR="$APP_BUILD_DIR"
 	fi
 
-	# Now that we've moved into a new tmp dir, we need to fix the PATH
-	# This is only necessary when using heroku-buildpack-multi because earlier
-	# buildpacks may have put extra commands (like `grunt`) on the path.
-	sedReplace="sed -e s/[\/&]/\\\&/g"
-	escAppBuildDir="$(echo "$APP_BUILD_DIR" | $sedReplace)"
-	escBuildDir="$(echo "$BUILD_DIR" | $sedReplace)"
-	PATH=${PATH//"$escAppBuildDir"/"$escBuildDir"}
+	# When multiple buildpacks are used, earlier buildpacks may add executables to PATH
+	# and GEM_PATH that reference APP_BUILD_DIR. Since we've moved the build directory to
+	# a temp location, we must rewrite these environment variables to replace APP_BUILD_DIR
+	# with the new BUILD_DIR so that executables added by earlier buildpacks remain accessible.
+	PATH=${PATH//"${APP_BUILD_DIR}"/"${BUILD_DIR}"}
 	export PATH
-	GEM_PATH=${GEM_PATH//"$escAppBuildDir"/"$escBuildDir"}
+	GEM_PATH=${GEM_PATH//"${APP_BUILD_DIR}"/"${BUILD_DIR}"}
 	export GEM_PATH
 else
-	BUILD_DIR="$APP_BUILD_DIR"
+	BUILD_DIR="${APP_BUILD_DIR}"
 fi
 
 util::export_env_dir "$ENV_DIR" "." "JAVA_OPTS"
