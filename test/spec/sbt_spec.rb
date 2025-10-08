@@ -53,6 +53,7 @@ describe 'Sbt' do
     # this buildpack which should successfully find and use that java executable.
     new_default_hatchet_runner('sbt-minimal-scala-sample', buildpacks: ['heroku/jvm', :default]).tap do |app|
       app.deploy do
+        expect(app.output).to include('Using provided JDK')
         expect(app.output).to include('Running: sbt compile stage')
         expect(app.output).to include('[info] Done packaging.')
       end
