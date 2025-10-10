@@ -5,19 +5,19 @@
 set -e
 
 BASE_DIR="$(pwd)"
-BP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)" # absolute path
+BUILDPACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
 # shellcheck source=lib/output.sh
-source "${BP_DIR}/lib/output.sh"
+source "${BUILDPACK_DIR}/lib/output.sh"
 # shellcheck source=lib/common.sh
-source "${BP_DIR}/lib/common.sh"
+source "${BUILDPACK_DIR}/lib/common.sh"
 # shellcheck source=lib/properties.sh
-source "${BP_DIR}/lib/properties.sh"
+source "${BUILDPACK_DIR}/lib/properties.sh"
 # shellcheck source=lib/failures.sh
-source "${BP_DIR}/lib/failures.sh"
+source "${BUILDPACK_DIR}/lib/failures.sh"
 # shellcheck source=lib/metrics.sh
-source "${BP_DIR}/lib/metrics.sh"
+source "${BUILDPACK_DIR}/lib/metrics.sh"
 # shellcheck source=lib/util.sh
-source "${BP_DIR}/lib/util.sh"
+source "${BUILDPACK_DIR}/lib/util.sh"
 
 # parse args
 APP_BUILD_DIR=$(
@@ -160,7 +160,7 @@ fi
 [[ "${SBT_CLEAN}" = "true" ]] && SBT_TASKS="clean ${SBT_TASKS}"
 
 # Install the custom sbt script
-install_sbt_extras "${BP_DIR}/opt" "${SBT_BINDIR}"
+install_sbt_extras "${BUILDPACK_DIR}/opt" "${SBT_BINDIR}"
 
 # copy in heroku sbt plugin
 if has_supported_sbt_1_version "${BUILD_DIR}"; then
@@ -172,7 +172,7 @@ mkdir -p "${SBT_USER_HOME}/plugins"
 rm -f "${SBT_USER_HOME}/plugins/HerokuPlugin.scala"               # remove the old ambiguously named plugin
 rm -f "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin_sbt1.scala" # remove the old poorly named plugin
 rm -f "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"      # remove the old plugin
-cp -p "${BP_DIR}/opt/${HEROKU_PLUGIN}" "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"
+cp -p "${BUILDPACK_DIR}/opt/${HEROKU_PLUGIN}" "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"
 
 # Collect metrics
 metrics::set_string "sbt_version" "${SBT_VERSION:-unknown}"
