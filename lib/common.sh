@@ -148,11 +148,9 @@ prime_ivy_cache() {
 		fi
 		cachePkg="${cachePkg})"
 	fi
-	status_pending "Priming Ivy cache${cachePkg}"
-	if _download_and_unpack_ivy_cache "$sbtUserHome" "$scalaVersion" "$playVersion"; then
-		status_done
-	else
-		echo " no cache found"
+	output::step "Priming Ivy cache${cachePkg}"
+	if ! _download_and_unpack_ivy_cache "$sbtUserHome" "$scalaVersion" "$playVersion"; then
+		output::step "No Ivy cache found, skipping priming"
 	fi
 }
 
@@ -302,7 +300,7 @@ run_sbt() {
 
 	echo "" >"$buildLogFile"
 
-	status "Running: sbt $tasks"
+	output::step "Running: sbt $tasks"
 	# shellcheck disable=SC2086  # We want word splitting for tasks
 	SBT_HOME="$home" sbt ${tasks} | output "$buildLogFile"
 
@@ -315,7 +313,7 @@ write_sbt_dependency_classpath_log() {
 	local home=$1
 	local launcher=$2
 
-	status "Collecting dependency information"
+	output::step "Collecting dependency information"
 	SBT_HOME="$home" sbt "show dependencyClasspath" | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log
 }
 

@@ -10,6 +10,8 @@ BP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)" # absolute path
 BIN_DIR=$BP_DIR/bin
 OPT_DIR=$BP_DIR/opt
 LIB_DIR=$BP_DIR/lib
+# shellcheck source=lib/output.sh
+. "$LIB_DIR/output.sh"
 # shellcheck source=lib/common.sh
 . "$LIB_DIR/common.sh"
 # shellcheck source=lib/properties.sh
@@ -102,35 +104,44 @@ done
 
 # these are preliminary checks. actual version check happens below when attempting to download sbt boot.properties
 if ! test -e project/build.properties; then
-	error "Your scala project must include project/build.properties and define sbt.version"
+	output::error <<-EOF
+		Your scala project must include project/build.properties and define sbt.version
+	EOF
 fi
 
 if ! (has_supported_sbt_version "${BUILD_DIR}" || has_supported_sbt_1_version "${BUILD_DIR}"); then
-	error "You have defined an unsupported sbt.version in project/build.properties
-For sbt 0.x you must use a version >= 0.11, for sbt 1.x you must use a version >= 1.1"
+	output::error <<-EOF
+		You have defined an unsupported sbt.version in project/build.properties
+		For sbt 0.x you must use a version >= 0.11, for sbt 1.x you must use a version >= 1.1
+	EOF
 fi
 
 if has_old_preset_sbt_opts; then
-	warning "Your SBT_OPTS config var looks like its not in the right form.
-It was probably set this way in an earlier version of the buildpack. The
-only ill effect should be a warning like \"The \`-\` command is deprecated\".
-To avoid any unexpected behavior, please unset it by running this command:
+	output::warning <<-EOF
+		Your SBT_OPTS config var looks like its not in the right form.
+		It was probably set this way in an earlier version of the buildpack. The
+		only ill effect should be a warning like \"The \`-\` command is deprecated\".
+		To avoid any unexpected behavior, please unset it by running this command:
 
-  $ heroku config:unset SBT_OPTS
+			$ heroku config:unset SBT_OPTS
 
-The buildpack will pick good defaults for you, but you can still customize
-sbt's execution as described in this article:
-https://github.com/paulp/sbt-extras#sample-usage"
+		The buildpack will pick good defaults for you, but you can still customize
+		sbt's execution as described in this article:
+		https://github.com/paulp/sbt-extras#sample-usage
+	EOF
 fi
 
 if [ "$KEEP_PLAY_FORK_RUN" != "true" ] && [ -f project/play-fork-run.sbt ]; then
-	warning "Removing project/play-fork-run.sbt. This file was probably added
-by Activator, and it breaks sbt. For more information see:
-https://github.com/typesafehub/activator/issues/979
+	output::warning <<-EOF
+		Removing project/play-fork-run.sbt. This file was probably added
+		by Activator, and it breaks sbt. For more information see:
+		https://github.com/typesafehub/activator/issues/979
 
-If you need to keep this file you can either rename it or set the following
-configuration variable:
-$ heroku config:set KEEP_PLAY_FORK_RUN=true"
+		If you need to keep this file you can either rename it or set the following
+		configuration variable:
+		$ heroku config:set KEEP_PLAY_FORK_RUN=true
+	EOF
+
 	rm project/play-fork-run.sbt
 fi
 
@@ -210,27 +221,27 @@ done
 if is_sbt_native_packager "$BUILD_DIR" || is_play "$BUILD_DIR"; then
 	if [ "$KEEP_SBT_CACHE" != "true" ]; then
 		if [ "$KEEP_IVY_CACHE" != "true" ] && [ -d "$SBT_USER_HOME/.ivy2" ]; then
-			status "Dropping ivy cache from the slug"
+			output::step "Dropping ivy cache from the slug"
 			rm -rf "${SBT_USER_HOME:?}/.ivy2"
 		fi
 		if [ "$KEEP_COURSIER_CACHE" != "true" ] && [ -d "$SBT_USER_HOME/.coursier" ]; then
-			status "Dropping coursier cache from the slug"
+			output::step "Dropping coursier cache from the slug"
 			rm -rf "${SBT_USER_HOME:?}/.coursier"
 		fi
 		if [ -d "$SBT_USER_HOME/boot" ]; then
-			status "Dropping sbt boot dir from the slug"
+			output::step "Dropping sbt boot dir from the slug"
 			rm -rf "${SBT_USER_HOME:?}/boot"
 		fi
 		if [ -d "$SBT_USER_HOME/.cache" ]; then
-			status "Dropping sbt cache dir from the slug"
+			output::step "Dropping sbt cache dir from the slug"
 			rm -rf "${SBT_USER_HOME:?}/.cache"
 		fi
 		if [ -d "$BUILD_DIR/project/boot" ]; then
-			status "Dropping project boot dir from the slug"
+			output::step "Dropping project boot dir from the slug"
 			rm -rf "$BUILD_DIR/project/boot"
 		fi
 		if [ -d "$BUILD_DIR/target" ]; then
-			status "Dropping compilation artifacts from the slug"
+			output::step "Dropping compilation artifacts from the slug"
 			rm -rf "$BUILD_DIR/target/scala-"*
 			rm -rf "$BUILD_DIR/target/streams"
 			if [ -d "$BUILD_DIR/target/resolution-cache" ]; then
