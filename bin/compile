@@ -1,48 +1,42 @@
 #!/usr/bin/env bash
-# bin/compile <build-dir> <cache-dir> <env-dir>
 
-# fail fast
+BUILDPACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
+
 set -e
 
-BASE_DIR="$(pwd)"
-BP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)" # absolute path
-# shellcheck disable=SC2034  # Used in sourced scripts
-BIN_DIR=$BP_DIR/bin
-OPT_DIR=$BP_DIR/opt
-LIB_DIR=$BP_DIR/lib
-# shellcheck source=lib/output.sh
-. "$LIB_DIR/output.sh"
-# shellcheck source=lib/common.sh
-. "$LIB_DIR/common.sh"
-# shellcheck source=lib/properties.sh
-. "$LIB_DIR/properties.sh"
-# shellcheck source=lib/failures.sh
-. "$LIB_DIR/failures.sh"
-# shellcheck source=lib/metrics.sh
-. "$LIB_DIR/metrics.sh"
-# shellcheck source=lib/util.sh
-. "$LIB_DIR/util.sh"
+BUILD_DIR="${1}"
+CACHE_DIR="${2}"
+ENV_DIR="${3}"
 
-# parse args
-APP_BUILD_DIR=$(
-	cd "$1"
-	pwd
-)
-CACHE_DIR=$2
-ENV_DIR=$3
+BASE_DIR="$(pwd)"
+
+# shellcheck source=lib/output.sh
+source "${BUILDPACK_DIR}/lib/output.sh"
+# shellcheck source=lib/common.sh
+source "${BUILDPACK_DIR}/lib/common.sh"
+# shellcheck source=lib/properties.sh
+source "${BUILDPACK_DIR}/lib/properties.sh"
+# shellcheck source=lib/failures.sh
+source "${BUILDPACK_DIR}/lib/failures.sh"
+# shellcheck source=lib/metrics.sh
+source "${BUILDPACK_DIR}/lib/metrics.sh"
+# shellcheck source=lib/util.sh
+source "${BUILDPACK_DIR}/lib/util.sh"
+
+APP_BUILD_DIR=$(cd "${BUILD_DIR}" && pwd)
 
 metrics::init "${CACHE_DIR}" "scala"
 metrics::setup
 
-if [ -z "${CNB_STACK_ID:-}" ]; then
+if [[ -z "${CNB_STACK_ID:-}" ]]; then
 	# Move app to a static build dir to keep paths the same between builds
 	# This is necessary for incremental compile, because sbt invalidates the
 	# cache if the path is different.
-	if is_app_dir "$APP_BUILD_DIR"; then
+	if is_app_dir "${APP_BUILD_DIR}"; then
 		BUILD_DIR="/tmp/scala_buildpack_build_dir"
-		mv "$APP_BUILD_DIR" "$BUILD_DIR"
+		mv "${APP_BUILD_DIR}" "${BUILD_DIR}"
 	else
-		BUILD_DIR="$APP_BUILD_DIR"
+		BUILD_DIR="${APP_BUILD_DIR}"
 	fi
 
 	# When multiple buildpacks are used, earlier buildpacks may add executables to PATH
@@ -57,49 +51,49 @@ else
 	BUILD_DIR="${APP_BUILD_DIR}"
 fi
 
-util::export_env_dir "$ENV_DIR" "." "JAVA_OPTS"
+util::export_env_dir "${ENV_DIR}" "." "JAVA_OPTS"
 
 # Set system properties as env vars
-SYSPROPFILE="$BUILD_DIR/system.properties"
+SYSPROPFILE="${BUILD_DIR}/system.properties"
 
-JVM_COMMON_BUILDPACK=${JVM_COMMON_BUILDPACK:-"https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz"}
-JVM_COMMON_BUILDPACK=$(get_property "$SYSPROPFILE" "heroku.jvm.buildpack" "$JVM_COMMON_BUILDPACK")
-KEEP_PLAY_FORK_RUN=$(get_property "$SYSPROPFILE" "sbt.keep-play-fork-run" "${KEEP_PLAY_FORK_RUN:-false}")
-SBT_PROJECT=$(get_property "$SYSPROPFILE" "sbt.project")
-SBT_PRE_TASKS=$(get_property "$SYSPROPFILE" "sbt.pre-tasks" "$SBT_PRE_TASKS")
-SBT_CLEAN=$(get_property "$SYSPROPFILE" "sbt.clean" "${SBT_CLEAN:-false}")
+JVM_COMMON_BUILDPACK="${JVM_COMMON_BUILDPACK:-https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz}"
+JVM_COMMON_BUILDPACK="$(get_property "${SYSPROPFILE}" "heroku.jvm.buildpack" "${JVM_COMMON_BUILDPACK}")"
+KEEP_PLAY_FORK_RUN="$(get_property "${SYSPROPFILE}" "sbt.keep-play-fork-run" "${KEEP_PLAY_FORK_RUN:-false}")"
+SBT_PROJECT="$(get_property "${SYSPROPFILE}" "sbt.project")"
+SBT_PRE_TASKS="$(get_property "${SYSPROPFILE}" "sbt.pre-tasks" "${SBT_PRE_TASKS}")"
+SBT_CLEAN="$(get_property "${SYSPROPFILE}" "sbt.clean" "${SBT_CLEAN:-false}")"
 
-[ -n "$SBT_PRE_TASKS" ] && metrics::set_string "sbt_pre_tasks" "$SBT_PRE_TASKS"
-[ -n "$SBT_PROJECT" ] && metrics::set_string "sbt_project" "$SBT_PROJECT"
-[ -n "${SBT_TASKS:-}" ] && metrics::set_string "sbt_tasks" "$SBT_TASKS"
-[ -n "$KEEP_PLAY_FORK_RUN" ] && metrics::set_string "keep_play_fork_run" "$KEEP_PLAY_FORK_RUN"
-[ -n "$KEEP_SBT_CACHE" ] && metrics::set_string "keep_sbt_cache" "$KEEP_SBT_CACHE"
-[ -n "$KEEP_COURSIER_CACHE" ] && metrics::set_string "keep_coursier_cache" "$KEEP_COURSIER_CACHE"
-[ -n "$SBT_CLEAN" ] && metrics::set_string "sbt_clean" "$SBT_CLEAN"
-[ -n "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ] && metrics::set_string "disable_dependency_classpath_log" "${DISABLE_DEPENDENCY_CLASSPATH_LOG}"
+[[ -n "${SBT_PRE_TASKS}" ]] && metrics::set_string "sbt_pre_tasks" "${SBT_PRE_TASKS}"
+[[ -n "${SBT_PROJECT}" ]] && metrics::set_string "sbt_project" "${SBT_PROJECT}"
+[[ -n "${SBT_TASKS:-}" ]] && metrics::set_string "sbt_tasks" "${SBT_TASKS}"
+[[ -n "${KEEP_PLAY_FORK_RUN}" ]] && metrics::set_string "keep_play_fork_run" "${KEEP_PLAY_FORK_RUN}"
+[[ -n "${KEEP_SBT_CACHE}" ]] && metrics::set_string "keep_sbt_cache" "${KEEP_SBT_CACHE}"
+[[ -n "${KEEP_COURSIER_CACHE}" ]] && metrics::set_string "keep_coursier_cache" "${KEEP_COURSIER_CACHE}"
+[[ -n "${SBT_CLEAN}" ]] && metrics::set_string "sbt_clean" "${SBT_CLEAN}"
+[[ -n "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]] && metrics::set_string "disable_dependency_classpath_log" "${DISABLE_DEPENDENCY_CLASSPATH_LOG}"
 
 # Install the JDK
-install_jdk "$BUILD_DIR" "$CACHE_DIR"
+install_jdk "${BUILD_DIR}" "${CACHE_DIR}"
 
 #create the cache dir if it doesn't exist
-mkdir -p "$CACHE_DIR"
+mkdir -p "${CACHE_DIR}"
 
 # home directory from perspective of SBT; we rename
 # it because otherwise the project root and $HOME
 # are the same, and by default .sbt has a (different)
 # meaning in those two places
 SBT_USER_HOME=".sbt_home"
-SBT_USER_HOME_ABSOLUTE="$BUILD_DIR/$SBT_USER_HOME"
+SBT_USER_HOME_ABSOLUTE="${BUILD_DIR}/${SBT_USER_HOME}"
 # where we put the SBT binaries
-SBT_BINDIR="$SBT_USER_HOME"/bin
+SBT_BINDIR="${SBT_USER_HOME}/bin"
 
 # chdir as sbt expects
-cd "$BUILD_DIR"
+cd "${BUILD_DIR}"
 
 # unpack cache
-CACHED_DIRS="$SBT_USER_HOME target project/target project/boot .coursier"
-for DIR in $CACHED_DIRS; do
-	cache_copy "$DIR" "$CACHE_DIR" "$BUILD_DIR"
+CACHED_DIRS="${SBT_USER_HOME} target project/target project/boot .coursier"
+for DIR in ${CACHED_DIRS}; do
+	cache_copy "${DIR}" "${CACHE_DIR}" "${BUILD_DIR}"
 done
 
 # these are preliminary checks. actual version check happens below when attempting to download sbt boot.properties
@@ -131,7 +125,7 @@ if has_old_preset_sbt_opts; then
 	EOF
 fi
 
-if [ "$KEEP_PLAY_FORK_RUN" != "true" ] && [ -f project/play-fork-run.sbt ]; then
+if [[ "${KEEP_PLAY_FORK_RUN}" != "true" ]] && [[ -f project/play-fork-run.sbt ]]; then
 	output::warning <<-EOF
 		Removing project/play-fork-run.sbt. This file was probably added
 		by Activator, and it breaks sbt. For more information see:
@@ -147,24 +141,24 @@ fi
 
 SBT_VERSION="$(get_supported_sbt_version "${BUILD_DIR}")"
 
-if [ -n "$SBT_PROJECT" ]; then
-	SBT_TASKS="$SBT_PROJECT/compile $SBT_PROJECT/stage"
+if [[ -n "${SBT_PROJECT}" ]]; then
+	SBT_TASKS="${SBT_PROJECT}/compile ${SBT_PROJECT}/stage"
 else
-	SBT_TASKS="${SBT_TASKS:-"compile stage"}"
+	SBT_TASKS="${SBT_TASKS:-compile stage}"
 fi
 
 # To run any tasks before the actual build, configure the environment
 # $ heroku config:set SBT_PRE_TASKS=flyway:info
-[ "$SBT_PRE_TASKS" ] && SBT_TASKS="$SBT_PRE_TASKS $SBT_TASKS"
+[[ "${SBT_PRE_TASKS}" ]] && SBT_TASKS="${SBT_PRE_TASKS} ${SBT_TASKS}"
 
 # To enable clean compiles, configure the environment to clean:
 # $ heroku config:set SBT_CLEAN=true
 # $ git push heroku main
 # See: https://devcenter.heroku.com/articles/scala-support#clean-builds
-[ "$SBT_CLEAN" = "true" ] && SBT_TASKS="clean $SBT_TASKS"
+[[ "${SBT_CLEAN}" = "true" ]] && SBT_TASKS="clean ${SBT_TASKS}"
 
 # Install the custom sbt script
-install_sbt_extras "$OPT_DIR" "$SBT_BINDIR"
+install_sbt_extras "${BUILDPACK_DIR}/opt" "${SBT_BINDIR}"
 
 # copy in heroku sbt plugin
 if has_supported_sbt_1_version "${BUILD_DIR}"; then
@@ -172,100 +166,100 @@ if has_supported_sbt_1_version "${BUILD_DIR}"; then
 else
 	HEROKU_PLUGIN="HerokuBuildpackPlugin.scala"
 fi
-mkdir -p "$SBT_USER_HOME/plugins"
-rm -f "$SBT_USER_HOME/plugins/HerokuPlugin.scala"               # remove the old ambiguously named plugin
-rm -f "$SBT_USER_HOME/plugins/HerokuBuildpackPlugin_sbt1.scala" # remove the old poorly named plugin
-rm -f "$SBT_USER_HOME/plugins/HerokuBuildpackPlugin.scala"      # remove the old plugin
-cp -p "$OPT_DIR/$HEROKU_PLUGIN" "$SBT_USER_HOME/plugins/HerokuBuildpackPlugin.scala"
+mkdir -p "${SBT_USER_HOME}/plugins"
+rm -f "${SBT_USER_HOME}/plugins/HerokuPlugin.scala"               # remove the old ambiguously named plugin
+rm -f "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin_sbt1.scala" # remove the old poorly named plugin
+rm -f "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"      # remove the old plugin
+cp -p "${BUILDPACK_DIR}/opt/${HEROKU_PLUGIN}" "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"
 
 # Collect metrics
 metrics::set_string "sbt_version" "${SBT_VERSION:-unknown}"
 
-if is_sbt_native_packager "$BUILD_DIR"; then
+if is_sbt_native_packager "${BUILD_DIR}"; then
 	metrics::set_raw "uses_sbt_native_packager" "true"
 else
 	metrics::set_raw "uses_sbt_native_packager" "false"
 fi
 
-if is_play "$BUILD_DIR"; then
+if is_play "${BUILD_DIR}"; then
 	metrics::set_raw "is_play_app" "true"
 else
 	metrics::set_raw "is_play_app" "false"
 fi
 
 # Manually pre-clean because sbt-native-packager doesn't clobber this dir
-rm -rf "$BUILD_DIR/target/universal/stage"
+rm -rf "${BUILD_DIR}/target/universal/stage"
 
 # download and cache the dependencies if this is the first build
-if [ ! -d "$SBT_USER_HOME/.ivy2" ]; then
-	if is_sbt_native_packager "$BUILD_DIR" || is_play "$BUILD_DIR"; then
-		prime_ivy_cache "$BUILD_DIR" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR"
+if [[ ! -d "${SBT_USER_HOME}/.ivy2" ]]; then
+	if is_sbt_native_packager "${BUILD_DIR}" || is_play "${BUILD_DIR}"; then
+		prime_ivy_cache "${BUILD_DIR}" "${SBT_USER_HOME_ABSOLUTE}" "${SBT_BINDIR}/${SBT_JAR}"
 	fi
 fi
 
 # build app
-javaVersion="${JAVA_VERSION:-8}"
-run_sbt "$javaVersion" "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "$SBT_TASKS"
+java_version="${JAVA_VERSION:-8}"
+run_sbt "${java_version}" "${SBT_USER_HOME_ABSOLUTE}" "${SBT_BINDIR}/${SBT_JAR}" "${SBT_TASKS}"
 
-if [ -z "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]; then
-	write_sbt_dependency_classpath_log "$SBT_USER_HOME_ABSOLUTE" "$SBT_BINDIR/$SBT_JAR" "show dependencyClasspath"
+if [[ -z "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]]; then
+	write_sbt_dependency_classpath_log "${SBT_USER_HOME_ABSOLUTE}" "${SBT_BINDIR}/${SBT_JAR}" "show dependencyClasspath"
 fi
 
 # repack cache
-mkdir -p "$CACHE_DIR"
-for DIR in $CACHED_DIRS; do
-	cache_copy "$DIR" "$BUILD_DIR" "$CACHE_DIR"
+mkdir -p "${CACHE_DIR}"
+for DIR in ${CACHED_DIRS}; do
+	cache_copy "${DIR}" "${BUILD_DIR}" "${CACHE_DIR}"
 done
 
 # drop useless directories from slug for play and sbt-native-launcher only
-if is_sbt_native_packager "$BUILD_DIR" || is_play "$BUILD_DIR"; then
-	if [ "$KEEP_SBT_CACHE" != "true" ]; then
-		if [ "$KEEP_IVY_CACHE" != "true" ] && [ -d "$SBT_USER_HOME/.ivy2" ]; then
+if is_sbt_native_packager "${BUILD_DIR}" || is_play "${BUILD_DIR}"; then
+	if [[ "${KEEP_SBT_CACHE}" != "true" ]]; then
+		if [[ "${KEEP_IVY_CACHE}" != "true" ]] && [[ -d "${SBT_USER_HOME}/.ivy2" ]]; then
 			output::step "Dropping ivy cache from the slug"
 			rm -rf "${SBT_USER_HOME:?}/.ivy2"
 		fi
-		if [ "$KEEP_COURSIER_CACHE" != "true" ] && [ -d "$SBT_USER_HOME/.coursier" ]; then
+		if [[ "${KEEP_COURSIER_CACHE}" != "true" ]] && [[ -d "${SBT_USER_HOME}/.coursier" ]]; then
 			output::step "Dropping coursier cache from the slug"
 			rm -rf "${SBT_USER_HOME:?}/.coursier"
 		fi
-		if [ -d "$SBT_USER_HOME/boot" ]; then
+		if [[ -d "${SBT_USER_HOME}/boot" ]]; then
 			output::step "Dropping sbt boot dir from the slug"
 			rm -rf "${SBT_USER_HOME:?}/boot"
 		fi
-		if [ -d "$SBT_USER_HOME/.cache" ]; then
+		if [[ -d "${SBT_USER_HOME}/.cache" ]]; then
 			output::step "Dropping sbt cache dir from the slug"
 			rm -rf "${SBT_USER_HOME:?}/.cache"
 		fi
-		if [ -d "$BUILD_DIR/project/boot" ]; then
+		if [[ -d "${BUILD_DIR}/project/boot" ]]; then
 			output::step "Dropping project boot dir from the slug"
-			rm -rf "$BUILD_DIR/project/boot"
+			rm -rf "${BUILD_DIR}/project/boot"
 		fi
-		if [ -d "$BUILD_DIR/target" ]; then
+		if [[ -d "${BUILD_DIR}/target" ]]; then
 			output::step "Dropping compilation artifacts from the slug"
-			rm -rf "$BUILD_DIR/target/scala-"*
-			rm -rf "$BUILD_DIR/target/streams"
-			if [ -d "$BUILD_DIR/target/resolution-cache" ]; then
-				find "$BUILD_DIR/target/resolution-cache"/* ! -name "reports" ! -name "*-compile.xml" -print0 | xargs -0 rm -rf --
+			rm -rf "${BUILD_DIR}/target/scala-"*
+			rm -rf "${BUILD_DIR}/target/streams"
+			if [[ -d "${BUILD_DIR}/target/resolution-cache" ]]; then
+				find "${BUILD_DIR}/target/resolution-cache"/* ! -name "reports" ! -name "*-compile.xml" -print0 | xargs -0 rm -rf --
 			fi
 		fi
 	fi
 fi
 
 # write profile.d script
-profileScript="${BUILD_DIR}/.profile.d/scala.sh"
-mkdir -p "$(dirname "$profileScript")"
-cat <<EOF >"$profileScript"
-export SBT_HOME="\$HOME/$SBT_USER_HOME"
-export PATH="\$SBT_HOME/bin:\$PATH"
+profile_script="${BUILD_DIR}/.profile.d/scala.sh"
+mkdir -p "$(dirname "${profile_script}")"
+cat <<-EOF >"${profile_script}"
+	export SBT_HOME="\$HOME/${SBT_USER_HOME}"
+	export PATH="\$SBT_HOME/bin:\$PATH"
 EOF
 
 # Move compiled app back to where Heroku expects it
-if [ -z "${CNB_STACK_ID:-}" ] && is_app_dir "$APP_BUILD_DIR"; then
-	mv "$BUILD_DIR" "$APP_BUILD_DIR"
+if [[ -z "${CNB_STACK_ID:-}" ]] && is_app_dir "${APP_BUILD_DIR}"; then
+	mv "${BUILD_DIR}" "${APP_BUILD_DIR}"
 fi
 
 # write export script
-cat <<EOF >"${BASE_DIR}/export"
-export SBT_HOME="$APP_BUILD_DIR/$SBT_USER_HOME"
-export PATH="\$SBT_HOME/bin:\$PATH"
+cat <<-EOF >"${BASE_DIR}/export"
+	export SBT_HOME="${APP_BUILD_DIR}/${SBT_USER_HOME}"
+	export PATH="\$SBT_HOME/bin:\$PATH"
 EOF

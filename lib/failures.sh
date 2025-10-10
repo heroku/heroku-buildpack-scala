@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
 
 handle_sbt_errors() {
-	local log_file="$1"
+	local log_file="${1}"
 
 	local header="Failed to run sbt!"
 
-	local previousVersion="You can also try reverting to the previous version of the buildpack by running:
+	local previous_version="You can also try reverting to the previous version of the buildpack by running:
 $ heroku buildpacks:set https://github.com/heroku/heroku-buildpack-scala#previous-version"
 
 	local footer="Thanks,
 Heroku"
 
-	if grep -qi 'Not a valid key: stage' "$log_file"; then
+	if grep -qi 'Not a valid key: stage' "${log_file}"; then
 		output::error <<-EOF
 			${header}
 			It looks like your build.sbt does not have a valid 'stage' task.
@@ -22,7 +22,7 @@ Heroku"
 
 			${footer}
 		EOF
-	elif grep -qi 'is already defined as object' "$log_file"; then
+	elif grep -qi 'is already defined as object' "${log_file}"; then
 		output::error <<-EOF
 			${header}
 			We're sorry this build is failing. It looks like you may need to run a
@@ -38,7 +38,7 @@ Heroku"
 
 			If this does not resolve the problem, please submit a ticket so we
 			can help: https://help.heroku.com
-			${previousVersion}
+			${previous_version}
 
 			${footer}
 		EOF
@@ -47,7 +47,7 @@ Heroku"
 			${header}
 			We're sorry this build is failing. If you can't find the issue in application
 			code, please submit a ticket so we can help: https://help.heroku.com
-			${previousVersion}
+			${previous_version}
 
 			${footer}
 		EOF
