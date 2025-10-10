@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# bin/release <build-dir>
 
 BUILDPACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
 source "${BUILDPACK_DIR}/lib/common.sh"

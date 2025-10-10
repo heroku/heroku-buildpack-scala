@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# bin/use <build-dir>
-
-BUILDPACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
-source "${BUILDPACK_DIR}/lib/common.sh"
 
 BUILD_DIR="${1}"
+
+BUILDPACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
+
+source "${BUILDPACK_DIR}/lib/common.sh"
 
 ## SBT 0.10 allows either *.sbt in the root dir, or project/*.scala or .sbt/*.scala
 if detect_sbt "${BUILD_DIR}"; then
