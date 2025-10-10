@@ -248,9 +248,9 @@ fi
 # write profile.d script
 profile_script="${BUILD_DIR}/.profile.d/scala.sh"
 mkdir -p "$(dirname "${profile_script}")"
-cat <<EOF >"${profile_script}"
-export SBT_HOME="\$HOME/${SBT_USER_HOME}"
-export PATH="\$SBT_HOME/bin:\$PATH"
+cat <<-EOF >"${profile_script}"
+	export SBT_HOME="\$HOME/${SBT_USER_HOME}"
+	export PATH="\$SBT_HOME/bin:\$PATH"
 EOF
 
 # Move compiled app back to where Heroku expects it
@@ -259,7 +259,7 @@ if [[ -z "${CNB_STACK_ID:-}" ]] && is_app_dir "${APP_BUILD_DIR}"; then
 fi
 
 # write export script
-cat <<EOF >"${BASE_DIR}/export"
-export SBT_HOME="${APP_BUILD_DIR}/${SBT_USER_HOME}"
-export PATH="\$SBT_HOME/bin:\$PATH"
+cat <<-EOF >"${BASE_DIR}/export"
+	export SBT_HOME="${APP_BUILD_DIR}/${SBT_USER_HOME}"
+	export PATH="\$SBT_HOME/bin:\$PATH"
 EOF
