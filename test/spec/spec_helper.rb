@@ -47,3 +47,12 @@ def http_get(app, options = {})
   Excon.get("#{app.platform_api.app.info(app.name).fetch('web_url')}#{path}", idempotent: true, expects: 200,
                                                                               retry_limit: retry_limit).body
 end
+
+def clean_output(output)
+  output
+    # Remove trailing whitespace characters added by Git:
+    # https://github.com/heroku/hatchet/issues/162
+    .gsub(/ {8}(?=\R)/, '')
+    # Remove ANSI colour codes used in buildpack output (e.g. error messages).
+    .gsub(/\e\[[0-9;]+m/, '')
+end

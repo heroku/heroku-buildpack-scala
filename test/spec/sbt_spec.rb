@@ -59,4 +59,32 @@ describe 'Sbt' do
       end
     end
   end
+
+  it 'shows deprecation warning when using system.properties for buildpack configuration' do
+    new_default_hatchet_runner('sbt-minimal-scala-sample').tap do |app|
+      app.before_deploy do
+        File.open('system.properties', 'a') do |f|
+          f.puts 'sbt.clean=true'
+        end
+        app.commit!
+      end
+
+      app.deploy do
+        expect(clean_output(app.output)).to include(<<~OUTPUT)
+          remote:  !     Warning: Configuring buildpack behavior via system.properties is deprecated.
+          remote:  !
+          remote:  !     You are setting 'sbt.clean' in system.properties. This configuration
+          remote:  !     method will be removed in a future version of this buildpack.
+          remote:  !
+          remote:  !     Please migrate to using environment variables instead. You can set the
+          remote:  !     SBT_CLEAN config var to configure this setting:
+          remote:  !
+          remote:  !       $ heroku config:set SBT_CLEAN=true
+          remote:  !
+          remote:  !     After setting the config var, remove 'sbt.clean' from system.properties.
+        OUTPUT
+        expect(app.output).to match('Running: sbt clean compile stage')
+      end
+    end
+  end
 end
