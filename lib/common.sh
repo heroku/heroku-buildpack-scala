@@ -338,6 +338,7 @@ get_property_with_env_fallback() {
 	prop_value=$(java_properties::get "${properties_file}" "${property_key}")
 
 	if [[ -n "${prop_value}" ]]; then
+		metrics::set_raw "deprecated_system_properties_usage" "true"
 		output::warning <<-EOF
 			Warning: Configuring buildpack behavior via system.properties is deprecated.
 
