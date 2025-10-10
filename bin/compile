@@ -198,8 +198,8 @@ if [[ ! -d "${SBT_USER_HOME}/.ivy2" ]]; then
 fi
 
 # build app
-javaVersion="${JAVA_VERSION:-8}"
-run_sbt "${javaVersion}" "${SBT_USER_HOME_ABSOLUTE}" "${SBT_BINDIR}/${SBT_JAR}" "${SBT_TASKS}"
+java_version="${JAVA_VERSION:-8}"
+run_sbt "${java_version}" "${SBT_USER_HOME_ABSOLUTE}" "${SBT_BINDIR}/${SBT_JAR}" "${SBT_TASKS}"
 
 if [[ -z "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]]; then
 	write_sbt_dependency_classpath_log "${SBT_USER_HOME_ABSOLUTE}" "${SBT_BINDIR}/${SBT_JAR}" "show dependencyClasspath"
@@ -246,9 +246,9 @@ if is_sbt_native_packager "${BUILD_DIR}" || is_play "${BUILD_DIR}"; then
 fi
 
 # write profile.d script
-profileScript="${BUILD_DIR}/.profile.d/scala.sh"
-mkdir -p "$(dirname "${profileScript}")"
-cat <<EOF >"${profileScript}"
+profile_script="${BUILD_DIR}/.profile.d/scala.sh"
+mkdir -p "$(dirname "${profile_script}")"
+cat <<EOF >"${profile_script}"
 export SBT_HOME="\$HOME/${SBT_USER_HOME}"
 export PATH="\$SBT_HOME/bin:\$PATH"
 EOF

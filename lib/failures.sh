@@ -5,7 +5,7 @@ handle_sbt_errors() {
 
 	local header="Failed to run sbt!"
 
-	local previousVersion="You can also try reverting to the previous version of the buildpack by running:
+	local previous_version="You can also try reverting to the previous version of the buildpack by running:
 $ heroku buildpacks:set https://github.com/heroku/heroku-buildpack-scala#previous-version"
 
 	local footer="Thanks,
@@ -38,7 +38,7 @@ Heroku"
 
 			If this does not resolve the problem, please submit a ticket so we
 			can help: https://help.heroku.com
-			${previousVersion}
+			${previous_version}
 
 			${footer}
 		EOF
@@ -47,7 +47,7 @@ Heroku"
 			${header}
 			We're sorry this build is failing. If you can't find the issue in application
 			code, please submit a ticket so we can help: https://help.heroku.com
-			${previousVersion}
+			${previous_version}
 
 			${footer}
 		EOF
