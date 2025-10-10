@@ -14,8 +14,8 @@ BASE_DIR="$(pwd)"
 source "${BUILDPACK_DIR}/lib/output.sh"
 # shellcheck source=lib/common.sh
 source "${BUILDPACK_DIR}/lib/common.sh"
-# shellcheck source=lib/properties.sh
-source "${BUILDPACK_DIR}/lib/properties.sh"
+# shellcheck source=lib/java_properties.sh
+source "${BUILDPACK_DIR}/lib/java_properties.sh"
 # shellcheck source=lib/failures.sh
 source "${BUILDPACK_DIR}/lib/failures.sh"
 # shellcheck source=lib/metrics.sh
@@ -56,12 +56,11 @@ util::export_env_dir "${ENV_DIR}" "." "JAVA_OPTS"
 # Set system properties as env vars
 SYSPROPFILE="${BUILD_DIR}/system.properties"
 
-JVM_COMMON_BUILDPACK="${JVM_COMMON_BUILDPACK:-https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz}"
-JVM_COMMON_BUILDPACK="$(get_property "${SYSPROPFILE}" "heroku.jvm.buildpack" "${JVM_COMMON_BUILDPACK}")"
-KEEP_PLAY_FORK_RUN="$(get_property "${SYSPROPFILE}" "sbt.keep-play-fork-run" "${KEEP_PLAY_FORK_RUN:-false}")"
-SBT_PROJECT="$(get_property "${SYSPROPFILE}" "sbt.project")"
-SBT_PRE_TASKS="$(get_property "${SYSPROPFILE}" "sbt.pre-tasks" "${SBT_PRE_TASKS}")"
-SBT_CLEAN="$(get_property "${SYSPROPFILE}" "sbt.clean" "${SBT_CLEAN:-false}")"
+JVM_COMMON_BUILDPACK="$(get_property_with_env_fallback "${SYSPROPFILE}" "heroku.jvm.buildpack" "JVM_COMMON_BUILDPACK" "https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz")"
+KEEP_PLAY_FORK_RUN="$(get_property_with_env_fallback "${SYSPROPFILE}" "sbt.keep-play-fork-run" "KEEP_PLAY_FORK_RUN" "false")"
+SBT_PROJECT="$(java_properties::get "${SYSPROPFILE}" "sbt.project")"
+SBT_PRE_TASKS="$(get_property_with_env_fallback "${SYSPROPFILE}" "sbt.pre-tasks" "SBT_PRE_TASKS" "")"
+SBT_CLEAN="$(get_property_with_env_fallback "${SYSPROPFILE}" "sbt.clean" "SBT_CLEAN" "false")"
 
 [[ -n "${SBT_PRE_TASKS}" ]] && metrics::set_string "sbt_pre_tasks" "${SBT_PRE_TASKS}"
 [[ -n "${SBT_PROJECT}" ]] && metrics::set_string "sbt_project" "${SBT_PROJECT}"

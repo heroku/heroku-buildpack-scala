@@ -328,6 +328,22 @@ cache_copy() {
 	fi
 }
 
+get_property_with_env_fallback() {
+	local properties_file="${1}"
+	local property_key="${2}"
+	local env_var_name="${3}"
+	local default="${4:-}"
+
+	local prop_value
+	prop_value=$(java_properties::get "${properties_file}" "${property_key}")
+
+	if [[ -n "${prop_value}" ]]; then
+		echo "${prop_value}"
+	else
+		echo "${!env_var_name:-${default}}"
+	fi
+}
+
 install_jdk() {
 	local install_dir=${1:?}
 	local cache_dir=${2:?}
