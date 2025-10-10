@@ -11,7 +11,7 @@ REPOS = {
 describe 'Play' do
   REPOS.each_key do |repo|
     context repo do
-      it 'does not download pre-cached dependencies' do
+      it 'compiles the app' do
         new_default_hatchet_runner(repo).tap do |app|
           app.deploy do
             expect(app.output).to match('Running: sbt compile stage')
