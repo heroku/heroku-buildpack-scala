@@ -338,6 +338,19 @@ get_property_with_env_fallback() {
 	prop_value=$(java_properties::get "${properties_file}" "${property_key}")
 
 	if [[ -n "${prop_value}" ]]; then
+		output::warning <<-EOF
+			Warning: Configuring buildpack behavior via system.properties is deprecated.
+
+			You are setting '${property_key}' in system.properties. This configuration
+			method will be removed in a future version of this buildpack.
+
+			Please migrate to using environment variables instead. You can set the
+			${env_var_name} config var to configure this setting:
+
+			  $ heroku config:set ${env_var_name}=${prop_value}
+
+			After setting the config var, remove '${property_key}' from system.properties.
+		EOF
 		echo "${prop_value}"
 	else
 		echo "${!env_var_name:-${default}}"
