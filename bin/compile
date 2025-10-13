@@ -10,18 +10,7 @@ ENV_DIR="${3}"
 
 BASE_DIR="$(pwd)"
 
-# shellcheck source=lib/output.sh
-source "${BUILDPACK_DIR}/lib/output.sh"
-# shellcheck source=lib/common.sh
-source "${BUILDPACK_DIR}/lib/common.sh"
-# shellcheck source=lib/java_properties.sh
-source "${BUILDPACK_DIR}/lib/java_properties.sh"
-# shellcheck source=lib/failures.sh
-source "${BUILDPACK_DIR}/lib/failures.sh"
-# shellcheck source=lib/metrics.sh
-source "${BUILDPACK_DIR}/lib/metrics.sh"
-# shellcheck source=lib/util.sh
-source "${BUILDPACK_DIR}/lib/util.sh"
+source "${BUILDPACK_DIR}/lib/lib.sh"
 
 APP_BUILD_DIR=$(cd "${BUILD_DIR}" && pwd)
 

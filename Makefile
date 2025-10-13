@@ -10,7 +10,7 @@ STACK_IMAGE_TAG := heroku/$(subst -,:,$(STACK))-build
 lint: lint-scripts check-format lint-ruby
 
 lint-scripts:
-	@git ls-files -z --cached --others --exclude-standard 'bin/*' 'etc/*' 'lib/*' | xargs -0 shellcheck --check-sourced --color=always
+	@git ls-files -z --cached --others --exclude-standard 'bin/*' 'etc/*' 'lib/*' | xargs -0 shellcheck --check-sourced --color=always --exclude=SC1091
 
 lint-ruby:
 	@bundle exec rubocop

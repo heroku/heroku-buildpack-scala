@@ -30,7 +30,7 @@ if [[ -f "${EXPORT_FILE}" ]]; then
 	source "${EXPORT_FILE}"
 fi
 
-source "${BUILDPACK_DIR}/lib/metrics.sh"
+source "${BUILDPACK_DIR}/lib/lib.sh"
 
 metrics::init "${CACHE_DIR}" "scala"
 metrics::print_bin_report_yaml
