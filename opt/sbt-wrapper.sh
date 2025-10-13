@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 case $(ulimit -u) in
 16384) # PM Dyno
   maxSbtHeap="2000"
