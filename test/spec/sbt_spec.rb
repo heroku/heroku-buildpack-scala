@@ -59,4 +59,18 @@ describe 'Sbt' do
       end
     end
   end
+
+  it 'fails the build when sbt compilation fails' do
+    new_default_hatchet_runner('sbt-minimal-scala-sample', allow_failure: true).tap do |app|
+      app.before_deploy do
+        File.write('src/main/scala/com/example/Server.scala', 'this will not compile')
+      end
+
+      app.deploy do
+        expect(app).not_to be_deployed
+        expect(app.output).to include('Failed to run sbt!')
+        expect(app.output).to include('Running: sbt compile stage')
+      end
+    end
+  end
 end
