@@ -165,6 +165,9 @@ fi
 
 # Install the custom sbt script
 install_sbt_extras "${BUILDPACK_DIR}/opt" "${SBT_BINDIR}"
+# SBT_JAR was removed in 2014 when switching to sbt-extras, but is still passed as a parameter to some functions
+# Set to empty string to satisfy set -u (nounset) requirement
+SBT_JAR=""
 
 # copy in heroku sbt plugin
 if has_supported_sbt_1_version "${BUILD_DIR}"; then
