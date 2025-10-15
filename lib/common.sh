@@ -307,12 +307,7 @@ run_sbt() {
 
 	output::step "Running: sbt ${tasks}"
 	# shellcheck disable=SC2086  # We want word splitting for tasks
-	set +o pipefail
-	SBT_HOME="${home}" sbt ${tasks} | output "${build_log_file}"
-	local pipe_status=("${PIPESTATUS[@]}")
-	set -o pipefail
-
-	if [[ "${pipe_status[*]}" != "0 0" ]]; then
+	if ! SBT_HOME="${home}" sbt ${tasks} | output "${build_log_file}"; then
 		handle_sbt_errors "${build_log_file}"
 		exit 1
 	fi
