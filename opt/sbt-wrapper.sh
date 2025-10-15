@@ -27,5 +27,5 @@ sbt-extras "${SBT_EXTRAS_OPTS}" \
   -Divy.default.ivy.user.dir="$sbtHome"/.ivy2 \
   -Dfile.encoding=UTF8 \
   -Dsbt.global.base="$sbtHome" \
-  "$( { [ -n "$HEROKU_TEST_RUN_ID" ] || [[ "$DYNO" != *run.* ]]; } && echo "-Dsbt.log.noformat=true -batch")" -no-colors \
+  "$( { [ -n "${HEROKU_TEST_RUN_ID:-}" ] || [[ "${DYNO:-}" != *run.* ]]; } && echo "-Dsbt.log.noformat=true -batch")" -no-colors \
   "$@"
