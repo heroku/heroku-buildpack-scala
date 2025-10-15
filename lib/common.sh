@@ -138,6 +138,7 @@ prime_ivy_cache() {
 	local sbt_user_home="${2}"
 	local launcher="${3}"
 	local play_version=""
+	local cache_pkg=""
 
 	if is_play "${ctx_dir}"; then
 		play_version="$(get_supported_play_version "${BUILD_DIR}" "${sbt_user_home}" "${launcher}")"
@@ -305,6 +306,8 @@ run_sbt() {
 
 	echo "" >"${build_log_file}"
 
+	export SBT_EXTRAS_OPTS="${SBT_EXTRAS_OPTS:-}"
+
 	output::step "Running: sbt ${tasks}"
 	# shellcheck disable=SC2086  # We want word splitting for tasks
 	if ! SBT_HOME="${home}" sbt ${tasks} | output "${build_log_file}"; then
@@ -316,6 +319,8 @@ run_sbt() {
 write_sbt_dependency_classpath_log() {
 	local home="${1}"
 	local launcher="${2}"
+
+	export SBT_EXTRAS_OPTS="${SBT_EXTRAS_OPTS:-}"
 
 	output::step "Collecting dependency information"
 	SBT_HOME="${home}" sbt "show dependencyClasspath" | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log || true
