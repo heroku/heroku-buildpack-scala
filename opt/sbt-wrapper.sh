@@ -16,13 +16,13 @@ esac
 
 sbtHome="${SBT_HOME:-"$HOME"}"
 
-sbt-extras "${SBT_EXTRAS_OPTS}" \
+sbt-extras "${SBT_EXTRAS_OPTS:-}" \
   -J-Xmx${maxSbtHeap}M \
   -J-Xms${maxSbtHeap}M \
   -J-XX:+UseCompressedOops \
   -sbt-dir "$sbtHome" \
   -ivy "$sbtHome"/.ivy2 \
-  -sbt-launch-dir "$SBT_HOME"/launchers \
+  -sbt-launch-dir "$sbtHome"/launchers \
   -Duser.home="$sbtHome" \
   -Divy.default.ivy.user.dir="$sbtHome"/.ivy2 \
   -Dfile.encoding=UTF8 \
