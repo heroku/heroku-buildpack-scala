@@ -306,6 +306,7 @@ run_sbt() {
 
 	if [[ "${PIPESTATUS[*]}" != "0 0" ]]; then
 		handle_sbt_errors "${build_log_file}"
+		exit 1
 	fi
 }
 
