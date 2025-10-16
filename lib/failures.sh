@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 handle_sbt_errors() {
 	local log_file="${1}"
 

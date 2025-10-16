@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 SBT_0_VERSION_PATTERN='sbt\.version=\(0\.1[1-3]\.[0-9]\+\(-[a-zA-Z0-9_]\+\)*\)$'
 SBT_1_VERSION_PATTERN='sbt\.version=\(1\.[1-9][0-9]*\.[0-9]\+\(-[a-zA-Z0-9_]\+\)*\)$'
 
@@ -19,7 +21,7 @@ detect_sbt() {
 is_play() {
 	local app_dir="${1}"
 
-	case "${IS_PLAY_APP}" in
+	case "${IS_PLAY_APP:-}" in
 	"true")
 		return 0
 		;;
@@ -36,7 +38,7 @@ is_play() {
 is_sbt_native_packager() {
 	local ctx_dir="${1}"
 	if [[ -e "${ctx_dir}"/project/plugins.sbt ]]; then
-		plugin_version_line="$(grep "addSbtPlugin(.\+sbt-native-packager" "${ctx_dir}"/project/plugins.sbt)"
+		plugin_version_line="$(grep "addSbtPlugin(.\+sbt-native-packager" "${ctx_dir}"/project/plugins.sbt || true)"
 		test -n "${plugin_version_line}"
 	else
 		return 1
@@ -78,7 +80,7 @@ get_scala_version() {
 		if [[ "${play_version}" = "2.3" ]] || [[ "${play_version}" = "2.4" ]]; then
 			# if we don't grep for the version, and instead use `sbt scala-version`,
 			# then sbt will try to download the internet
-			scala_version_line="$(grep "scalaVersion" "${ctx_dir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g')"
+			scala_version_line="$(grep "scalaVersion" "${ctx_dir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g' || true)"
 			scala_version="$(expr "${scala_version_line}" : ".\+\(2\.1[0-1]\)\.[0-9]")"
 
 			if [[ -n "${scala_version}" ]]; then
@@ -106,7 +108,7 @@ get_supported_play_version() {
 	local launcher="${3}"
 
 	if _has_play_plugins_file "${ctx_dir}"; then
-		plugin_version_line="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctx_dir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g')"
+		plugin_version_line="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctx_dir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g' || true)"
 		plugin_version="$(expr "${plugin_version_line}" : ".\+\(2\.[0-4]\)\.[0-9]")"
 		if [[ "${plugin_version}" != 0 ]]; then
 			echo -n "${plugin_version}"
@@ -119,7 +121,7 @@ get_supported_sbt_version() {
 	local ctx_dir="${1}"
 	local sbt_version_pattern="${2:-${SBT_0_VERSION_PATTERN}}"
 	if _has_build_properties_file "${ctx_dir}"; then
-		sbt_version_line="$(grep -P '[ \t]*sbt\.version[ \t]*=' "${ctx_dir}"/project/build.properties | sed -E -e 's/[ \t\r\n]//g')"
+		sbt_version_line="$(grep -P '[ \t]*sbt\.version[ \t]*=' "${ctx_dir}"/project/build.properties | sed -E -e 's/[ \t\r\n]//g' || true)"
 		sbt_version="$(expr "${sbt_version_line}" : "${sbt_version_pattern}")"
 		if [[ "${sbt_version}" != 0 ]]; then
 			echo "${sbt_version}"
@@ -135,6 +137,8 @@ prime_ivy_cache() {
 	local ctx_dir="${1}"
 	local sbt_user_home="${2}"
 	local launcher="${3}"
+	local play_version=""
+	local cache_pkg=""
 
 	if is_play "${ctx_dir}"; then
 		play_version="$(get_supported_play_version "${BUILD_DIR}" "${sbt_user_home}" "${launcher}")"
@@ -167,7 +171,9 @@ _download_and_unpack_ivy_cache() {
 	fi
 
 	if curl --fail --retry 3 --retry-connrefused --connect-timeout 5 --silent --max-time 60 --location "${ivy_cache_url}" | tar xzm -C "${sbt_user_home}"; then
-		mv "${sbt_user_home}"/.sbt/* "${sbt_user_home}"
+		shopt -s nullglob
+		mv "${sbt_user_home}"/.sbt/* "${sbt_user_home}" 2>/dev/null || true
+		shopt -u nullglob
 		rm -rf "${sbt_user_home}"/.sbt
 		return 0
 	else
@@ -198,7 +204,7 @@ has_supported_sbt_1_version() {
 }
 
 has_old_preset_sbt_opts() {
-	if [[ "${SBT_OPTS}" = "-Xmx384m -Xss512k -XX:+UseCompressedOops" ]]; then
+	if [[ "${SBT_OPTS:-}" = "-Xmx384m -Xss512k -XX:+UseCompressedOops" ]]; then
 		return 0
 	else
 		return 1
@@ -300,11 +306,11 @@ run_sbt() {
 
 	echo "" >"${build_log_file}"
 
+	export SBT_EXTRAS_OPTS="${SBT_EXTRAS_OPTS:-}"
+
 	output::step "Running: sbt ${tasks}"
 	# shellcheck disable=SC2086  # We want word splitting for tasks
-	SBT_HOME="${home}" sbt ${tasks} | output "${build_log_file}"
-
-	if [[ "${PIPESTATUS[*]}" != "0 0" ]]; then
+	if ! SBT_HOME="${home}" sbt ${tasks} | output "${build_log_file}"; then
 		handle_sbt_errors "${build_log_file}"
 		exit 1
 	fi
@@ -314,8 +320,10 @@ write_sbt_dependency_classpath_log() {
 	local home="${1}"
 	local launcher="${2}"
 
+	export SBT_EXTRAS_OPTS="${SBT_EXTRAS_OPTS:-}"
+
 	output::step "Collecting dependency information"
-	SBT_HOME="${home}" sbt "show dependencyClasspath" | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log
+	SBT_HOME="${home}" sbt "show dependencyClasspath" | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log || true
 }
 
 cache_copy() {

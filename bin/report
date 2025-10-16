@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 # Produces a build report containing metadata about the build, that's consumed by the build system.
 # This script is run for both successful and failing builds, so it should not assume the build ran
 # to completion (e.g. OpenJDK may not even have been installed).

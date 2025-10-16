@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 get_property() {
 	local prop_file="${1}"
 	local prop_name="${2}"
