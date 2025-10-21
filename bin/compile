@@ -28,29 +28,22 @@ APP_BUILD_DIR=$(cd "${BUILD_DIR}" && pwd)
 metrics::init "${CACHE_DIR}" "scala"
 metrics::setup
 
-if [[ -z "${CNB_STACK_ID:-}" ]]; then
-	# Move app to a static build dir to keep paths the same between builds
-	# This is necessary for incremental compile, because sbt invalidates the
-	# cache if the path is different.
-	if is_app_dir "${APP_BUILD_DIR}"; then
-		BUILD_DIR="/tmp/scala_buildpack_build_dir"
-		mv "${APP_BUILD_DIR}" "${BUILD_DIR}"
-	else
-		BUILD_DIR="${APP_BUILD_DIR}"
-	fi
-
-	# When multiple buildpacks are used, earlier buildpacks may add executables to PATH
-	# and GEM_PATH that reference APP_BUILD_DIR. Since we've moved the build directory to
-	# a temp location, we must rewrite these environment variables to replace APP_BUILD_DIR
-	# with the new BUILD_DIR so that executables added by earlier buildpacks remain accessible.
-	PATH=${PATH//"${APP_BUILD_DIR}"/"${BUILD_DIR}"}
-	export PATH
-	if [[ -n "${GEM_PATH:-}" ]]; then
-		GEM_PATH=${GEM_PATH//"${APP_BUILD_DIR}"/"${BUILD_DIR}"}
-		export GEM_PATH
-	fi
+if is_app_dir "${APP_BUILD_DIR}"; then
+	BUILD_DIR="/tmp/scala_buildpack_build_dir"
+	mv "${APP_BUILD_DIR}" "${BUILD_DIR}"
 else
 	BUILD_DIR="${APP_BUILD_DIR}"
+fi
+
+# When multiple buildpacks are used, earlier buildpacks may add executables to PATH
+# and GEM_PATH that reference APP_BUILD_DIR. Since we've moved the build directory to
+# a temp location, we must rewrite these environment variables to replace APP_BUILD_DIR
+# with the new BUILD_DIR so that executables added by earlier buildpacks remain accessible.
+PATH=${PATH//"${APP_BUILD_DIR}"/"${BUILD_DIR}"}
+export PATH
+if [[ -n "${GEM_PATH:-}" ]]; then
+	GEM_PATH=${GEM_PATH//"${APP_BUILD_DIR}"/"${BUILD_DIR}"}
+	export GEM_PATH
 fi
 
 util::export_env_dir "${ENV_DIR}" "." "JAVA_OPTS"
@@ -252,7 +245,7 @@ cat <<-EOF >"${profile_script}"
 EOF
 
 # Move compiled app back to where Heroku expects it
-if [[ -z "${CNB_STACK_ID:-}" ]] && is_app_dir "${APP_BUILD_DIR}"; then
+if is_app_dir "${APP_BUILD_DIR}"; then
 	mv "${BUILD_DIR}" "${APP_BUILD_DIR}"
 fi
 
