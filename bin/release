@@ -2,9 +2,6 @@
 
 set -euo pipefail
 
-BUILDPACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
-source "${BUILDPACK_DIR}/lib/common.sh"
-
 BUILD_DIR="${1}"
 
 echo "---"
@@ -24,10 +21,19 @@ if [[ -f "${dependencies_file_path}" ]] && (
 fi
 
 if [[ ! -f "${BUILD_DIR}/Procfile" ]]; then
-	if uses_universal_packaging "${BUILD_DIR}"; then
+	# Use sbt-native-packager executable if exactly one is found.
+	# https://www.scala-sbt.org/sbt-native-packager/archetypes/java_app/index.html
+	mapfile -t -d '' sbt_native_packager_executables < <(find "${BUILD_DIR}/target/universal/stage/bin" -type f -executable -print0 2>/dev/null)
+	if [[ "${#sbt_native_packager_executables[@]}" -eq 1 ]]; then
+		# Include -Dhttp.port=$PORT since many sbt-native-packager apps use Play Framework.
+		# Apps that don't use the http.port system property will not be negatively affected by setting it.
 		echo "default_process_types:"
-		echo "  $(universal_packaging_default_web_proc "${BUILD_DIR}")"
-	elif is_play "${BUILD_DIR}"; then
+		echo "  web: ${sbt_native_packager_executables[0]#"${BUILD_DIR}/"} -Dhttp.port=\$PORT"
+	elif [[ -f "${BUILD_DIR}/target/start" ]]; then
+		# Legacy support for Play Framework < 2.4.0 (released April 2015).
+		# Kept due to low maintenance cost and usefulness for legacy apps without a Procfile.
+		# Play 2.4.0+ uses sbt-native-packager exclusively.
+		# Note: $JAVA_OPTS included for backwards compatibility with deployments that historically relied on it.
 		echo "default_process_types:"
 		echo "  web: target/start -Dhttp.port=\$PORT \$JAVA_OPTS"
 	fi
