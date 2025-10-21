@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* Improve `bin/detect` error messages when sbt project files are missing. ([#274](https://github.com/heroku/heroku-buildpack-scala/pull/274))
+
 
 ## [v102] - 2025-10-21
 
