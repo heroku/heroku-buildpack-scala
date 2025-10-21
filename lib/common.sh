@@ -5,19 +5,6 @@ set -euo pipefail
 SBT_0_VERSION_PATTERN='sbt\.version=\(0\.1[1-3]\.[0-9]\+\(-[a-zA-Z0-9_]\+\)*\)$'
 SBT_1_VERSION_PATTERN='sbt\.version=\(1\.[1-9][0-9]*\.[0-9]\+\(-[a-zA-Z0-9_]\+\)*\)$'
 
-## SBT 0.10 allows either *.sbt in the root dir, or project/*.scala or .sbt/*.scala
-detect_sbt() {
-	local ctx_dir="${1}"
-	if _has_sbt_file "${ctx_dir}" ||
-		_has_project_scala_file "${ctx_dir}" ||
-		_has_hidden_sbt_dir "${ctx_dir}" ||
-		_has_build_properties_file "${ctx_dir}"; then
-		return 0
-	else
-		return 1
-	fi
-}
-
 is_play() {
 	local app_dir="${1}"
 
@@ -43,21 +30,6 @@ is_sbt_native_packager() {
 	else
 		return 1
 	fi
-}
-
-_has_sbt_file() {
-	local ctx_dir="${1}"
-	test -n "$(find "${ctx_dir}" -maxdepth 1 -name '*.sbt' -print -quit)"
-}
-
-_has_project_scala_file() {
-	local ctx_dir="${1}"
-	test -d "${ctx_dir}/project" && test -n "$(find "${ctx_dir}/project" -maxdepth 1 -name '*.scala' -print -quit)"
-}
-
-_has_hidden_sbt_dir() {
-	local ctx_dir="${1}"
-	test -d "${ctx_dir}/.sbt" && test -n "$(find "${ctx_dir}/.sbt" -maxdepth 1 -name '*.scala' -print -quit)"
 }
 
 _has_build_properties_file() {
@@ -208,34 +180,6 @@ has_old_preset_sbt_opts() {
 		return 0
 	else
 		return 1
-	fi
-}
-
-count_files() {
-	local location="${1}"
-	local pattern="${2}"
-
-	if [[ -d "${location}" ]]; then
-		find "${location}" -name "${pattern}" | wc -l | sed 's/ //g'
-	else
-		echo "0"
-	fi
-}
-
-detect_play_lang() {
-	local app_dir="${1}/app"
-
-	local num_scala_files
-	local num_java_files
-	num_scala_files="$(count_files "${app_dir}" '*.scala')"
-	num_java_files="$(count_files "${app_dir}" '*.java')"
-
-	if [[ "${num_scala_files}" -gt "${num_java_files}" ]]; then
-		echo "Scala"
-	elif [[ "${num_scala_files}" -lt "${num_java_files}" ]]; then
-		echo "Java"
-	else
-		echo ""
 	fi
 }
 

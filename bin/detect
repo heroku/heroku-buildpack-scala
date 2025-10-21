@@ -4,25 +4,59 @@ set -euo pipefail
 
 BUILD_DIR="${1}"
 
-BUILDPACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
+BUILDPACK_DIR=$(cd "$(dirname "$(dirname "${BASH_SOURCE[0]}")")" && pwd)
 
-source "${BUILDPACK_DIR}/lib/common.sh"
+source "${BUILDPACK_DIR}/lib/output.sh"
 
-## SBT 0.10 allows either *.sbt in the root dir, or project/*.scala or .sbt/*.scala
-if detect_sbt "${BUILD_DIR}"; then
-	if is_play "${BUILD_DIR}"; then
-		PLAY_2_X="Play 2.x"
-		DETECTED_PLAY_LANG="$(detect_play_lang "${BUILD_DIR}")"
-		if [[ "${DETECTED_PLAY_LANG}" ]]; then
-			echo "${PLAY_2_X} - ${DETECTED_PLAY_LANG}"
-		else
-			echo "${PLAY_2_X}"
-		fi
-	else
+# Patterns that if found in a project mean it should be treated as an sbt project,
+# and so pass this buildpack's detection phase.
+#
+# This list is deliberately larger than just the list of essential sbt files,
+# so that sbt projects that are missing some of the required files still pass detection,
+# allowing us to show a helpful error message during the build phase.
+sbt_detection_patterns=(
+	"*.sbt"
+	".sbtrc"
+	"project/build.properties"
+	"project/*.scala"
+	".sbt/*.scala"
+)
+
+for sbt_detection_pattern in "${sbt_detection_patterns[@]}"; do
+	if compgen -G "${BUILD_DIR}/${sbt_detection_pattern}" >/dev/null 2>&1; then
 		echo "Scala"
+		exit 0
 	fi
-	exit 0
-else
-	(>&2 echo "Could not find a 'build.sbt' file! Please ensure it exists and is checked into Git.")
-	exit 1
-fi
+done
+
+# Note: This error message intentionally doesn't list all of the patterns above,
+# since during compile the build will still require essential sbt files, so it
+# makes sense to describe the stricter requirements upfront.
+output::error <<-EOF
+	Error: Your app is configured to use the Scala buildpack,
+	but we couldn't find any supported sbt project files.
+
+	The Scala buildpack requires a 'build.sbt' or other .sbt file
+	in the root directory of your source code.
+
+	IMPORTANT: If your project uses a different build tool:
+	- For Maven projects, use the heroku/java buildpack instead
+	- For Gradle projects, use the heroku/gradle buildpack instead
+
+	Currently the root directory of your app contains:
+
+	$(ls -1A --indicator-style=slash "${BUILD_DIR}" 2>/dev/null || echo "Unable to list directory contents")
+
+	If your app already has sbt files, check that they:
+
+	1. Are in the correct directory (see requirements above).
+	2. Have the correct spelling (the filenames are case-sensitive).
+	3. Aren't listed in '.gitignore' or '.slugignore'.
+	4. Have been added to the Git repository using 'git add --all'
+	   and then committed using 'git commit'.
+
+	For help with using sbt on Heroku, see:
+	https://devcenter.heroku.com/articles/scala-support
+EOF
+
+exit 1
