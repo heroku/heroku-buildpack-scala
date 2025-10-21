@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+
+## [v102] - 2025-10-21
+
 * Fix buildpack not failing when sbt compilation fails. ([#272](https://github.com/heroku/heroku-buildpack-scala/pull/272))
 * Fix PATH and GEM_PATH rewriting logic when build directory is moved. ([#269](https://github.com/heroku/heroku-buildpack-scala/pull/269))
 
@@ -156,7 +159,8 @@
 *  Upgrade to sbt 0.13.7 launcher
 *  Allow for customized jvm-common package
 
-[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v100...main
+[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v102...main
+[v102]: https://github.com/heroku/heroku-buildpack-scala/compare/v101...v102
 [v100]: https://github.com/heroku/heroku-buildpack-scala/compare/v99...v100
 [v99]: https://github.com/heroku/heroku-buildpack-scala/compare/v98...v99
 [v98]: https://github.com/heroku/heroku-buildpack-scala/compare/v97...v98
