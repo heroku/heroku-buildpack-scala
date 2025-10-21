@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Remove Ivy cache priming feature. ([#275](https://github.com/heroku/heroku-buildpack-scala/pull/275))
 * Improve `bin/detect` error messages when sbt project files are missing. ([#274](https://github.com/heroku/heroku-buildpack-scala/pull/274))
 
 
