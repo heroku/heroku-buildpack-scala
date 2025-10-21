@@ -32,15 +32,10 @@ is_sbt_native_packager() {
 	fi
 }
 
-_has_build_properties_file() {
-	local ctx_dir="${1}"
-	test -e "${ctx_dir}/project/build.properties"
-}
-
 get_supported_sbt_version() {
 	local ctx_dir="${1}"
 	local sbt_version_pattern="${2:-${SBT_0_VERSION_PATTERN}}"
-	if _has_build_properties_file "${ctx_dir}"; then
+	if test -e "${ctx_dir}/project/build.properties"; then
 		sbt_version_line="$(grep -P '[ \t]*sbt\.version[ \t]*=' "${ctx_dir}"/project/build.properties | sed -E -e 's/[ \t\r\n]//g' || true)"
 		sbt_version="$(expr "${sbt_version_line}" : "${sbt_version_pattern}")"
 		if [[ "${sbt_version}" != 0 ]]; then
@@ -85,31 +80,6 @@ has_old_preset_sbt_opts() {
 
 is_app_dir() {
 	test "${1}" != "/app"
-}
-
-uses_universal_packaging() {
-	local ctx_dir="${1}"
-	test -d "${ctx_dir}/target/universal/stage/bin"
-}
-
-_universal_packaging_procs() {
-	local ctx_dir="${1}"
-	(
-		cd "${ctx_dir}" || exit
-		find target/universal/stage/bin -type f -executable
-	)
-}
-
-_universal_packaging_proc_count() {
-	local ctx_dir="${1}"
-	_universal_packaging_procs "${ctx_dir}" | wc -l
-}
-
-universal_packaging_default_web_proc() {
-	local ctx_dir="${1}"
-	if [[ "$(_universal_packaging_proc_count "${ctx_dir}")" -eq 1 ]]; then
-		echo "web: $(_universal_packaging_procs "${ctx_dir}") -Dhttp.port=\$PORT"
-	fi
 }
 
 # sed -l basically makes sed replace and buffer through stdin to stdout
