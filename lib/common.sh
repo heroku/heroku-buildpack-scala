@@ -37,58 +37,6 @@ _has_build_properties_file() {
 	test -e "${ctx_dir}/project/build.properties"
 }
 
-_has_play_plugins_file() {
-	local ctx_dir="${1}"
-	test -e "${ctx_dir}/project/plugins.sbt"
-}
-
-get_scala_version() {
-	local ctx_dir="${1}"
-	local sbt_user_home="${2}"
-	local launcher="${3}"
-	local play_version="${4}"
-
-	if [[ -n "${play_version}" ]]; then
-		if [[ "${play_version}" = "2.3" ]] || [[ "${play_version}" = "2.4" ]]; then
-			# if we don't grep for the version, and instead use `sbt scala-version`,
-			# then sbt will try to download the internet
-			scala_version_line="$(grep "scalaVersion" "${ctx_dir}"/build.sbt | sed -E -e 's/[ \t\r\n]//g' || true)"
-			scala_version="$(expr "${scala_version_line}" : ".\+\(2\.1[0-1]\)\.[0-9]")"
-
-			if [[ -n "${scala_version}" ]]; then
-				echo "${scala_version}"
-			else
-				echo "2.10"
-			fi
-		elif [[ "${play_version}" = "2.2" ]]; then
-			echo '2.10'
-		elif [[ "${play_version}" = "2.1" ]]; then
-			echo '2.10'
-		elif [[ "${play_version}" = "2.0" ]]; then
-			echo '2.9'
-		else
-			echo ''
-		fi
-	else
-		echo ''
-	fi
-}
-
-get_supported_play_version() {
-	local ctx_dir="${1}"
-	local sbt_user_home="${2}"
-	local launcher="${3}"
-
-	if _has_play_plugins_file "${ctx_dir}"; then
-		plugin_version_line="$(grep "addSbtPlugin(.\+play.\+sbt-plugin" "${ctx_dir}"/project/plugins.sbt | sed -E -e 's/[ \t\r\n]//g' || true)"
-		plugin_version="$(expr "${plugin_version_line}" : ".\+\(2\.[0-4]\)\.[0-9]")"
-		if [[ "${plugin_version}" != 0 ]]; then
-			echo -n "${plugin_version}"
-		fi
-	fi
-	echo ""
-}
-
 get_supported_sbt_version() {
 	local ctx_dir="${1}"
 	local sbt_version_pattern="${2:-${SBT_0_VERSION_PATTERN}}"
@@ -102,54 +50,6 @@ get_supported_sbt_version() {
 		fi
 	else
 		echo ""
-	fi
-}
-
-prime_ivy_cache() {
-	local ctx_dir="${1}"
-	local sbt_user_home="${2}"
-	local launcher="${3}"
-	local play_version=""
-	local cache_pkg=""
-
-	if is_play "${ctx_dir}"; then
-		play_version="$(get_supported_play_version "${BUILD_DIR}" "${sbt_user_home}" "${launcher}")"
-	fi
-	scala_version="$(get_scala_version "${ctx_dir}" "${sbt_user_home}" "${launcher}" "${play_version}")"
-
-	if [[ -n "${scala_version}" ]]; then
-		cache_pkg=" (Scala-${scala_version}"
-		if [[ -n "${play_version}" ]]; then
-			cache_pkg="${cache_pkg}, Play-${play_version}"
-		fi
-		cache_pkg="${cache_pkg})"
-	fi
-	output::step "Priming Ivy cache${cache_pkg}"
-	if ! _download_and_unpack_ivy_cache "${sbt_user_home}" "${scala_version}" "${play_version}"; then
-		output::step "No Ivy cache found, skipping priming"
-	fi
-}
-
-_download_and_unpack_ivy_cache() {
-	local sbt_user_home="${1}"
-	local scala_version="${2}"
-	local play_version="${3}"
-
-	base_url="https://lang-jvm.s3.us-east-1.amazonaws.com/sbt/v8/sbt-cache"
-	if [[ -n "${play_version}" ]]; then
-		ivy_cache_url="${base_url}-play-${play_version}_${scala_version}.tar.gz"
-	else
-		ivy_cache_url="${base_url}-base.tar.gz"
-	fi
-
-	if curl --fail --retry 3 --retry-connrefused --connect-timeout 5 --silent --max-time 60 --location "${ivy_cache_url}" | tar xzm -C "${sbt_user_home}"; then
-		shopt -s nullglob
-		mv "${sbt_user_home}"/.sbt/* "${sbt_user_home}" 2>/dev/null || true
-		shopt -u nullglob
-		rm -rf "${sbt_user_home}"/.sbt
-		return 0
-	else
-		return 1
 	fi
 }
 
@@ -241,11 +141,8 @@ install_sbt_extras() {
 }
 
 run_sbt() {
-	# shellcheck disable=SC2034  # Used in future versions
-	local java_version="${1}"
-	local home="${2}"
-	local launcher="${3}"
-	local tasks="${4}"
+	local home="${1}"
+	local tasks="${2}"
 	local build_log_file=".heroku/sbt-build.log"
 
 	echo "" >"${build_log_file}"
@@ -262,7 +159,6 @@ run_sbt() {
 
 write_sbt_dependency_classpath_log() {
 	local home="${1}"
-	local launcher="${2}"
 
 	export SBT_EXTRAS_OPTS="${SBT_EXTRAS_OPTS:-}"
 
