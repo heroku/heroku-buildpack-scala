@@ -2,7 +2,7 @@
 
 BUILDPACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
 
-set -e
+set -euo pipefail
 
 BUILD_DIR="${1}"
 CACHE_DIR="${2}"
@@ -45,8 +45,10 @@ if [[ -z "${CNB_STACK_ID:-}" ]]; then
 	# with the new BUILD_DIR so that executables added by earlier buildpacks remain accessible.
 	PATH=${PATH//"${APP_BUILD_DIR}"/"${BUILD_DIR}"}
 	export PATH
-	GEM_PATH=${GEM_PATH//"${APP_BUILD_DIR}"/"${BUILD_DIR}"}
-	export GEM_PATH
+	if [[ -n "${GEM_PATH:-}" ]]; then
+		GEM_PATH=${GEM_PATH//"${APP_BUILD_DIR}"/"${BUILD_DIR}"}
+		export GEM_PATH
+	fi
 else
 	BUILD_DIR="${APP_BUILD_DIR}"
 fi
@@ -60,15 +62,15 @@ JVM_COMMON_BUILDPACK="${JVM_COMMON_BUILDPACK:-https://buildpack-registry.s3.us-e
 JVM_COMMON_BUILDPACK="$(get_property "${SYSPROPFILE}" "heroku.jvm.buildpack" "${JVM_COMMON_BUILDPACK}")"
 KEEP_PLAY_FORK_RUN="$(get_property "${SYSPROPFILE}" "sbt.keep-play-fork-run" "${KEEP_PLAY_FORK_RUN:-false}")"
 SBT_PROJECT="$(get_property "${SYSPROPFILE}" "sbt.project")"
-SBT_PRE_TASKS="$(get_property "${SYSPROPFILE}" "sbt.pre-tasks" "${SBT_PRE_TASKS}")"
+SBT_PRE_TASKS="$(get_property "${SYSPROPFILE}" "sbt.pre-tasks" "${SBT_PRE_TASKS:-}")"
 SBT_CLEAN="$(get_property "${SYSPROPFILE}" "sbt.clean" "${SBT_CLEAN:-false}")"
 
 [[ -n "${SBT_PRE_TASKS}" ]] && metrics::set_string "sbt_pre_tasks" "${SBT_PRE_TASKS}"
 [[ -n "${SBT_PROJECT}" ]] && metrics::set_string "sbt_project" "${SBT_PROJECT}"
 [[ -n "${SBT_TASKS:-}" ]] && metrics::set_string "sbt_tasks" "${SBT_TASKS}"
 [[ -n "${KEEP_PLAY_FORK_RUN}" ]] && metrics::set_string "keep_play_fork_run" "${KEEP_PLAY_FORK_RUN}"
-[[ -n "${KEEP_SBT_CACHE}" ]] && metrics::set_string "keep_sbt_cache" "${KEEP_SBT_CACHE}"
-[[ -n "${KEEP_COURSIER_CACHE}" ]] && metrics::set_string "keep_coursier_cache" "${KEEP_COURSIER_CACHE}"
+[[ -n "${KEEP_SBT_CACHE:-}" ]] && metrics::set_string "keep_sbt_cache" "${KEEP_SBT_CACHE}"
+[[ -n "${KEEP_COURSIER_CACHE:-}" ]] && metrics::set_string "keep_coursier_cache" "${KEEP_COURSIER_CACHE}"
 [[ -n "${SBT_CLEAN}" ]] && metrics::set_string "sbt_clean" "${SBT_CLEAN}"
 [[ -n "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]] && metrics::set_string "disable_dependency_classpath_log" "${DISABLE_DEPENDENCY_CLASSPATH_LOG}"
 
@@ -163,6 +165,9 @@ fi
 
 # Install the custom sbt script
 install_sbt_extras "${BUILDPACK_DIR}/opt" "${SBT_BINDIR}"
+# SBT_JAR was removed in 2014 when switching to sbt-extras, but is still passed as a parameter to some functions
+# Set to empty string to satisfy set -u (nounset) requirement
+SBT_JAR=""
 
 # copy in heroku sbt plugin
 if has_supported_sbt_1_version "${BUILD_DIR}"; then
@@ -217,12 +222,12 @@ done
 
 # drop useless directories from slug for play and sbt-native-launcher only
 if is_sbt_native_packager "${BUILD_DIR}" || is_play "${BUILD_DIR}"; then
-	if [[ "${KEEP_SBT_CACHE}" != "true" ]]; then
-		if [[ "${KEEP_IVY_CACHE}" != "true" ]] && [[ -d "${SBT_USER_HOME}/.ivy2" ]]; then
+	if [[ "${KEEP_SBT_CACHE:-}" != "true" ]]; then
+		if [[ "${KEEP_IVY_CACHE:-}" != "true" ]] && [[ -d "${SBT_USER_HOME}/.ivy2" ]]; then
 			output::step "Dropping ivy cache from the slug"
 			rm -rf "${SBT_USER_HOME:?}/.ivy2"
 		fi
-		if [[ "${KEEP_COURSIER_CACHE}" != "true" ]] && [[ -d "${SBT_USER_HOME}/.coursier" ]]; then
+		if [[ "${KEEP_COURSIER_CACHE:-}" != "true" ]] && [[ -d "${SBT_USER_HOME}/.coursier" ]]; then
 			output::step "Dropping coursier cache from the slug"
 			rm -rf "${SBT_USER_HOME:?}/.coursier"
 		fi

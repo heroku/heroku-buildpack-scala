@@ -2,9 +2,7 @@
 
 # This is technically redundant, since all consumers of this lib will have enabled these,
 # however, it helps Shellcheck realise the options under which these functions will run.
-#
-# Temporarily disabled until the buildpack works with these settings
-# set -euo pipefail
+set -euo pipefail
 
 # Exports configuration variables of a buildpacks ENV_DIR to environment variables.
 #
