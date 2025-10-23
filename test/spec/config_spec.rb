@@ -27,15 +27,15 @@ describe 'Scala buildpack configuration' do
       app.deploy do
         expect(clean_output(app.output)).to include('Running: sbt clean compile stage')
         expect(clean_output(app.output)).to include(<<~WARNING)
-          Warning: Configuring the Scala buildpack via system.properties is deprecated.
-
-          You are using the sbt.clean property in system.properties, which is
-          deprecated and will be removed in a future buildpack release.
-
-          Please migrate to using the SBT_CLEAN environment variable instead.
-
-          For more information on setting environment variables, see:
-          https://devcenter.heroku.com/articles/config-vars
+          remote:  !     Warning: Configuring the Scala buildpack via system.properties is deprecated.
+          remote:  !     
+          remote:  !     You are using the sbt.clean property in system.properties, which is
+          remote:  !     deprecated and will be removed in a future buildpack release.
+          remote:  !     
+          remote:  !     Please migrate to using the SBT_CLEAN environment variable instead.
+          remote:  !     
+          remote:  !     For more information on setting environment variables, see:
+          remote:  !     https://devcenter.heroku.com/articles/config-vars
         WARNING
       end
     end
