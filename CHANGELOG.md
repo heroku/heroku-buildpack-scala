@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Remove automatic deletion of `project/play-fork-run.sbt` files. Maintainers of legacy apps can consult the PR description for background and how to fix their project in the unlikely case it's necessary. ([#280](https://github.com/heroku/heroku-buildpack-scala/pull/280))
 * Deprecate Scala buildpack configuration via system.properties. A warning is now shown when Scala buildpack configuration properties (like `sbt.clean`, `sbt.project`, etc.) are detected in system.properties. Use environment variables instead. This does not affect `java.runtime.version` which remains supported. ([#279](https://github.com/heroku/heroku-buildpack-scala/pull/279))
 * Remove partial CNB functionality. ([#276](https://github.com/heroku/heroku-buildpack-scala/pull/276))
 * Remove Ivy cache priming feature. ([#275](https://github.com/heroku/heroku-buildpack-scala/pull/275))
