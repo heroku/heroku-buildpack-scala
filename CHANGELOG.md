@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Deprecate Scala buildpack configuration via system.properties. A warning is now shown when Scala buildpack configuration properties (like `sbt.clean`, `sbt.project`, etc.) are detected in system.properties. Use environment variables instead. This does not affect `java.runtime.version` which remains supported. ([#000](https://github.com/heroku/heroku-buildpack-scala/pull/000))
 * Remove partial CNB functionality. ([#276](https://github.com/heroku/heroku-buildpack-scala/pull/276))
 * Remove Ivy cache priming feature. ([#275](https://github.com/heroku/heroku-buildpack-scala/pull/275))
 * Improve `bin/detect` error messages when sbt project files are missing. ([#274](https://github.com/heroku/heroku-buildpack-scala/pull/274))
