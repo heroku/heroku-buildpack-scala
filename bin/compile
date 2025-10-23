@@ -14,8 +14,10 @@ BASE_DIR="$(pwd)"
 source "${BUILDPACK_DIR}/lib/output.sh"
 # shellcheck source=lib/common.sh
 source "${BUILDPACK_DIR}/lib/common.sh"
-# shellcheck source=lib/properties.sh
-source "${BUILDPACK_DIR}/lib/properties.sh"
+# shellcheck source=lib/java_properties.sh
+source "${BUILDPACK_DIR}/lib/java_properties.sh"
+# shellcheck source=lib/config.sh
+source "${BUILDPACK_DIR}/lib/config.sh"
 # shellcheck source=lib/failures.sh
 source "${BUILDPACK_DIR}/lib/failures.sh"
 # shellcheck source=lib/metrics.sh
@@ -48,24 +50,22 @@ fi
 
 util::export_env_dir "${ENV_DIR}" "." "JAVA_OPTS"
 
-# Set system properties as env vars
-SYSPROPFILE="${BUILD_DIR}/system.properties"
+# Used by install_jdk to determine which JVM common buildpack to use
+# Configuring this via system.properties is deprecated and will be removed soon
+# shellcheck disable=SC2034
+JVM_COMMON_BUILDPACK="$(config::get "${BUILD_DIR}" "heroku.jvm.buildpack" "JVM_COMMON_BUILDPACK" "https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz")"
 
-JVM_COMMON_BUILDPACK="${JVM_COMMON_BUILDPACK:-https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz}"
-JVM_COMMON_BUILDPACK="$(get_property "${SYSPROPFILE}" "heroku.jvm.buildpack" "${JVM_COMMON_BUILDPACK}")"
-KEEP_PLAY_FORK_RUN="$(get_property "${SYSPROPFILE}" "sbt.keep-play-fork-run" "${KEEP_PLAY_FORK_RUN:-false}")"
-SBT_PROJECT="$(get_property "${SYSPROPFILE}" "sbt.project")"
-SBT_PRE_TASKS="$(get_property "${SYSPROPFILE}" "sbt.pre-tasks" "${SBT_PRE_TASKS:-}")"
-SBT_CLEAN="$(get_property "${SYSPROPFILE}" "sbt.clean" "${SBT_CLEAN:-false}")"
+KEEP_PLAY_FORK_RUN="$(config::get "${BUILD_DIR}" "sbt.keep-play-fork-run" "KEEP_PLAY_FORK_RUN" "false")"
+SBT_PROJECT="$(config::get "${BUILD_DIR}" "sbt.project" "SBT_PROJECT")"
+SBT_PRE_TASKS="$(config::get "${BUILD_DIR}" "sbt.pre-tasks" "SBT_PRE_TASKS")"
+SBT_CLEAN="$(config::get "${BUILD_DIR}" "sbt.clean" "SBT_CLEAN" "false")"
 
-[[ -n "${SBT_PRE_TASKS}" ]] && metrics::set_string "sbt_pre_tasks" "${SBT_PRE_TASKS}"
-[[ -n "${SBT_PROJECT}" ]] && metrics::set_string "sbt_project" "${SBT_PROJECT}"
-[[ -n "${SBT_TASKS:-}" ]] && metrics::set_string "sbt_tasks" "${SBT_TASKS}"
-[[ -n "${KEEP_PLAY_FORK_RUN}" ]] && metrics::set_string "keep_play_fork_run" "${KEEP_PLAY_FORK_RUN}"
-[[ -n "${KEEP_SBT_CACHE:-}" ]] && metrics::set_string "keep_sbt_cache" "${KEEP_SBT_CACHE}"
-[[ -n "${KEEP_COURSIER_CACHE:-}" ]] && metrics::set_string "keep_coursier_cache" "${KEEP_COURSIER_CACHE}"
-[[ -n "${SBT_CLEAN}" ]] && metrics::set_string "sbt_clean" "${SBT_CLEAN}"
-[[ -n "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]] && metrics::set_string "disable_dependency_classpath_log" "${DISABLE_DEPENDENCY_CLASSPATH_LOG}"
+# Track usage of configuration options
+for env_var in SBT_PRE_TASKS SBT_PROJECT SBT_TASKS KEEP_PLAY_FORK_RUN KEEP_SBT_CACHE KEEP_COURSIER_CACHE SBT_CLEAN DISABLE_DEPENDENCY_CLASSPATH_LOG; do
+	if [[ -n "${!env_var:-}" ]]; then
+		metrics::set_string "${env_var,,}" "${!env_var}"
+	fi
+done
 
 # Install the JDK
 install_jdk "${BUILD_DIR}" "${CACHE_DIR}"
