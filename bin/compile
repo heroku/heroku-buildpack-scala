@@ -55,13 +55,12 @@ util::export_env_dir "${ENV_DIR}" "." "JAVA_OPTS"
 # shellcheck disable=SC2034
 JVM_COMMON_BUILDPACK="$(config::get "${BUILD_DIR}" "heroku.jvm.buildpack" "JVM_COMMON_BUILDPACK" "https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz")"
 
-KEEP_PLAY_FORK_RUN="$(config::get "${BUILD_DIR}" "sbt.keep-play-fork-run" "KEEP_PLAY_FORK_RUN" "false")"
 SBT_PROJECT="$(config::get "${BUILD_DIR}" "sbt.project" "SBT_PROJECT")"
 SBT_PRE_TASKS="$(config::get "${BUILD_DIR}" "sbt.pre-tasks" "SBT_PRE_TASKS")"
 SBT_CLEAN="$(config::get "${BUILD_DIR}" "sbt.clean" "SBT_CLEAN" "false")"
 
 # Track usage of configuration options
-for env_var in SBT_PRE_TASKS SBT_PROJECT SBT_TASKS KEEP_PLAY_FORK_RUN KEEP_SBT_CACHE KEEP_COURSIER_CACHE SBT_CLEAN DISABLE_DEPENDENCY_CLASSPATH_LOG; do
+for env_var in SBT_PRE_TASKS SBT_PROJECT SBT_TASKS KEEP_SBT_CACHE KEEP_COURSIER_CACHE SBT_CLEAN DISABLE_DEPENDENCY_CLASSPATH_LOG; do
 	if [[ -n "${!env_var:-}" ]]; then
 		metrics::set_string "${env_var,,}" "${!env_var}"
 	fi
@@ -122,20 +121,6 @@ if has_old_preset_sbt_opts; then
 		sbt's execution as described in this article:
 		https://github.com/paulp/sbt-extras#sample-usage
 	EOF
-fi
-
-if [[ "${KEEP_PLAY_FORK_RUN}" != "true" ]] && [[ -f project/play-fork-run.sbt ]]; then
-	output::warning <<-EOF
-		Removing project/play-fork-run.sbt. This file was probably added
-		by Activator, and it breaks sbt. For more information see:
-		https://github.com/typesafehub/activator/issues/979
-
-		If you need to keep this file you can either rename it or set the following
-		configuration variable:
-		$ heroku config:set KEEP_PLAY_FORK_RUN=true
-	EOF
-
-	rm project/play-fork-run.sbt
 fi
 
 SBT_VERSION="$(get_supported_sbt_version "${BUILD_DIR}")"
