@@ -163,20 +163,6 @@ if has_old_preset_sbt_opts; then
 	EOF
 fi
 
-if [[ "${KEEP_PLAY_FORK_RUN}" != "true" ]] && [[ -f project/play-fork-run.sbt ]]; then
-	output::warning <<-EOF
-		Removing project/play-fork-run.sbt. This file was probably added
-		by Activator, and it breaks sbt. For more information see:
-		https://github.com/typesafehub/activator/issues/979
-
-		If you need to keep this file you can either rename it or set the following
-		configuration variable:
-		$ heroku config:set KEEP_PLAY_FORK_RUN=true
-	EOF
-
-	rm project/play-fork-run.sbt
-fi
-
 if [[ -n "${SBT_PROJECT}" ]]; then
 	SBT_TASKS="${SBT_PROJECT}/compile ${SBT_PROJECT}/stage"
 else
