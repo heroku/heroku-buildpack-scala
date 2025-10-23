@@ -11,7 +11,9 @@ describe 'Scala buildpack configuration' do
 
       app.deploy do
         expect(clean_output(app.output)).to include('Running: sbt clean compile stage')
-        expect(clean_output(app.output)).not_to include('Warning: Configuring the Scala buildpack via system.properties is deprecated')
+        expect(clean_output(app.output)).not_to include(
+          'Warning: Configuring the Scala buildpack via system.properties is deprecated'
+        )
       end
     end
   end
