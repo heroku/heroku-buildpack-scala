@@ -28,7 +28,7 @@ function config::get() {
 	property_value="$(java_properties::get "${build_dir}/system.properties" "${java_property_key}")"
 
 	if [[ -n "${property_value}" ]]; then
-		metrics::set_string "uses_system_property_configuration" "true"
+		metrics::set_raw "uses_system_property_configuration" "true"
 
 		output::warning <<-EOF
 			Warning: Configuring the Scala buildpack via system.properties is deprecated.
