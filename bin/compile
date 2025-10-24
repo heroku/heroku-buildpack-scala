@@ -134,17 +134,22 @@ case "${sbt_version}" in
 	EOF
 	;;
 2.*)
-	output::warning <<-EOF
-		Warning: Unsupported sbt version detected.
+	output::error <<-EOF
+		Error: Unsupported sbt version detected.
 
-		This buildpack does not support sbt 2.x yet. You are using sbt ${sbt_version}.
-		Note that sbt 2.x is still in development.
+		This buildpack does not currently support sbt 2.x. You are using sbt ${sbt_version}.
 
-		Please use sbt 1.x for stable, production deployments.
+		Support for sbt 2.x will be added in a future buildpack release. In the
+		meantime, please use the latest stable sbt 1.x version for your deployments.
 
-		The buildpack will attempt to build your application, but compatibility
-		is not guaranteed and may break at any time.
+		To continue, update project/build.properties to use sbt 1.x.
+
+		For more information:
+		- Latest sbt 1.x releases: https://github.com/sbt/sbt/releases
+		- sbt 2.x changes: https://www.scala-sbt.org/2.x/docs/en/changes/sbt-2.0-change-summary.html
 	EOF
+
+	exit 1
 	;;
 esac
 
