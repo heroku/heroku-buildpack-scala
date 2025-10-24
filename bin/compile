@@ -103,7 +103,7 @@ if [[ -z "${sbt_version}" ]]; then
 		To fix this issue, create a file named project/build.properties that specifies
 		the sbt version as follows:
 
-			sbt.version=1.11.7
+		    sbt.version=1.11.7
 
 		For more information, see:
 		https://www.scala-sbt.org/1.x/docs/Basic-Def.html#Specifying+the+sbt+version

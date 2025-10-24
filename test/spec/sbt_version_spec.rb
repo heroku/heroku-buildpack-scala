@@ -80,7 +80,7 @@ describe 'Sbt version warnings' do
           remote:  !     To fix this issue, create a file named project/build.properties that specifies
           remote:  !     the sbt version as follows:
           remote:  !     
-          remote:  !     	sbt.version=1.11.7
+          remote:  !         sbt.version=1.11.7
           remote:  !     
           remote:  !     For more information, see:
           remote:  !     https://www.scala-sbt.org/1.x/docs/Basic-Def.html#Specifying+the+sbt+version
