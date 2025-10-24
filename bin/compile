@@ -90,23 +90,68 @@ for DIR in ${CACHED_DIRS}; do
 	cache_copy "${DIR}" "${CACHE_DIR}" "${BUILD_DIR}"
 done
 
-# these are preliminary checks. actual version check happens below when attempting to download sbt boot.properties
-if ! test -e project/build.properties; then
+sbt_version="$(java_properties::get "${BUILD_DIR}/project/build.properties" "sbt.version")"
+metrics::set_string "sbt_version" "${sbt_version:-"unknown"}"
+
+if [[ -z "${sbt_version}" ]]; then
 	output::error <<-EOF
-		Your scala project must include project/build.properties and define sbt.version
+		Error: sbt version cannot be determined.
+
+		As part of your build definition you must specify the version of sbt that
+		your build uses. This ensures consistent results across different environments.
+
+		To fix this issue, create a file named project/build.properties that specifies
+		the sbt version as follows:
+
+		    sbt.version=1.11.7
+
+		For more information, see:
+		https://www.scala-sbt.org/1.x/docs/Basic-Def.html#Specifying+the+sbt+version
 	EOF
 
 	exit 1
 fi
 
-if ! (has_supported_sbt_version "${BUILD_DIR}" || has_supported_sbt_1_version "${BUILD_DIR}"); then
+case "${sbt_version}" in
+0.*)
+	output::warning <<-EOF
+		Warning: Unsupported sbt version detected.
+
+		This buildpack does not officially support sbt ${sbt_version}. You are using
+		an end-of-life version that no longer receives security updates or bug fixes.
+		Support for sbt 0.x was ended by the upstream sbt project on November 30, 2018.
+
+		Please upgrade to sbt 1.x for active support.
+
+		The buildpack will attempt to build your application, but compatibility
+		is not guaranteed and may break at any time.
+
+		For more information:
+		- https://web.archive.org/web/20210918065807/https://www.lightbend.com/blog/scala-sbt-127-patchnotes
+
+		Upgrade guide:
+		- https://www.scala-sbt.org/1.x/docs/Migrating-from-sbt-013x.html
+	EOF
+	;;
+2.*)
 	output::error <<-EOF
-		You have defined an unsupported sbt.version in project/build.properties
-		For sbt 0.x you must use a version >= 0.11, for sbt 1.x you must use a version >= 1.1
+		Error: Unsupported sbt version detected.
+
+		This buildpack does not currently support sbt 2.x. You are using sbt ${sbt_version}.
+
+		Support for sbt 2.x will be added in a future buildpack release. In the
+		meantime, please use the latest stable sbt 1.x version for your deployments.
+
+		To continue, update project/build.properties to use sbt 1.x.
+
+		For more information:
+		- Latest sbt 1.x releases: https://github.com/sbt/sbt/releases
+		- sbt 2.x changes: https://www.scala-sbt.org/2.x/docs/en/changes/sbt-2.0-change-summary.html
 	EOF
 
 	exit 1
-fi
+	;;
+esac
 
 if has_old_preset_sbt_opts; then
 	output::warning <<-EOF
@@ -122,8 +167,6 @@ if has_old_preset_sbt_opts; then
 		https://github.com/paulp/sbt-extras#sample-usage
 	EOF
 fi
-
-SBT_VERSION="$(get_supported_sbt_version "${BUILD_DIR}")"
 
 if [[ -n "${SBT_PROJECT}" ]]; then
 	SBT_TASKS="${SBT_PROJECT}/compile ${SBT_PROJECT}/stage"
@@ -145,11 +188,15 @@ fi
 install_sbt_extras "${BUILDPACK_DIR}/opt" "${SBT_BINDIR}"
 
 # copy in heroku sbt plugin
-if has_supported_sbt_1_version "${BUILD_DIR}"; then
+case "${sbt_version}" in
+1.*)
 	HEROKU_PLUGIN="HerokuBuildpackPlugin_sbt1.scala"
-else
+	;;
+*)
 	HEROKU_PLUGIN="HerokuBuildpackPlugin.scala"
-fi
+	;;
+esac
+
 mkdir -p "${SBT_USER_HOME}/plugins"
 rm -f "${SBT_USER_HOME}/plugins/HerokuPlugin.scala"               # remove the old ambiguously named plugin
 rm -f "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin_sbt1.scala" # remove the old poorly named plugin
@@ -157,7 +204,6 @@ rm -f "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"      # remove the o
 cp -p "${BUILDPACK_DIR}/opt/${HEROKU_PLUGIN}" "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"
 
 # Collect metrics
-metrics::set_string "sbt_version" "${SBT_VERSION:-unknown}"
 
 if is_sbt_native_packager "${BUILD_DIR}"; then
 	metrics::set_raw "uses_sbt_native_packager" "true"

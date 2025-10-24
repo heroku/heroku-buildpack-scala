@@ -2,9 +2,6 @@
 
 set -euo pipefail
 
-SBT_0_VERSION_PATTERN='sbt\.version=\(0\.1[1-3]\.[0-9]\+\(-[a-zA-Z0-9_]\+\)*\)$'
-SBT_1_VERSION_PATTERN='sbt\.version=\(1\.[1-9][0-9]*\.[0-9]\+\(-[a-zA-Z0-9_]\+\)*\)$'
-
 is_play() {
 	local app_dir="${1}"
 
@@ -27,44 +24,6 @@ is_sbt_native_packager() {
 	if [[ -e "${ctx_dir}"/project/plugins.sbt ]]; then
 		plugin_version_line="$(grep "addSbtPlugin(.\+sbt-native-packager" "${ctx_dir}"/project/plugins.sbt || true)"
 		test -n "${plugin_version_line}"
-	else
-		return 1
-	fi
-}
-
-get_supported_sbt_version() {
-	local ctx_dir="${1}"
-	local sbt_version_pattern="${2:-${SBT_0_VERSION_PATTERN}}"
-	if test -e "${ctx_dir}/project/build.properties"; then
-		sbt_version_line="$(grep -P '[ \t]*sbt\.version[ \t]*=' "${ctx_dir}"/project/build.properties | sed -E -e 's/[ \t\r\n]//g' || true)"
-		sbt_version="$(expr "${sbt_version_line}" : "${sbt_version_pattern}")"
-		if [[ "${sbt_version}" != 0 ]]; then
-			echo "${sbt_version}"
-		else
-			echo ""
-		fi
-	else
-		echo ""
-	fi
-}
-
-has_supported_sbt_version() {
-	local ctx_dir="${1}"
-	local supported_version
-	supported_version="$(get_supported_sbt_version "${ctx_dir}" "${SBT_0_VERSION_PATTERN}")"
-	if [[ -n "${supported_version}" ]]; then
-		return 0
-	else
-		return 1
-	fi
-}
-
-has_supported_sbt_1_version() {
-	local ctx_dir="${1}"
-	local supported_version
-	supported_version="$(get_supported_sbt_version "${ctx_dir}" "${SBT_1_VERSION_PATTERN}")"
-	if [[ -n "${supported_version}" ]]; then
-		return 0
 	else
 		return 1
 	fi
