@@ -8,16 +8,25 @@ echo "---"
 
 dependencies_file_path="${BUILD_DIR}/.heroku/sbt-dependency-classpath.log"
 
-if [[ -f "${dependencies_file_path}" ]] && (
-	grep -q "com/impossibl/pgjdbc-ng" "${dependencies_file_path}" ||
-		grep -q "org/postgresql" "${dependencies_file_path}" ||
-		grep -q "skunk-core" "${dependencies_file_path}" ||
-		grep -q "postgresql-async" "${dependencies_file_path}" ||
-		grep -q "quill-ndbc-postgres" "${dependencies_file_path}"
-); then
+# Auto-provision Heroku Postgres if PostgreSQL dependencies are detected.
+# Only applicable to accounts created before May 15, 2023 or accounts with auto-provisioning enabled.
+# See: https://devcenter.heroku.com/articles/scala-support#postgres-auto-provisioning
+if [[ -f "${dependencies_file_path}" ]]; then
+	postgresql_dependencies=(
+		"com/impossibl/pgjdbc-ng" # https://impossibl.github.io/pgjdbc-ng/
+		"org/postgresql"          # https://jdbc.postgresql.org/
+		"skunk-core"              # https://typelevel.org/skunk/
+		"postgresql-async"        # https://github.com/postgresql-async/postgresql-async
+		"quill-ndbc-postgres"     # https://github.com/zio/zio-quill
+	)
 
-	echo "addons:"
-	echo "  - heroku-postgresql"
+	for dependency in "${postgresql_dependencies[@]}"; do
+		if grep -q "${dependency}" "${dependencies_file_path}"; then
+			echo "addons:"
+			echo "  - heroku-postgresql"
+			break
+		fi
+	done
 fi
 
 if [[ ! -f "${BUILD_DIR}/Procfile" ]]; then
