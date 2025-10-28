@@ -35,12 +35,12 @@ describe 'Scala buildpack' do
           remote:        \\[info\\]    / /  / /_/ // // /_/ // /_/ /
           remote:        \\[info\\]   /_/  / .___//_/ \\\\__,_/ \\\\__, /
           remote:        \\[info\\]       /_/               /____/
-          remote:        \\[info\\] 
+          remote:        \\[info\\]
           remote:        \\[info\\] Version 3.0.9 running Java 21.0.[0-9]+
-          remote:        \\[info\\] 
+          remote:        \\[info\\]
           remote:        \\[info\\] Play is run entirely by the community. Please consider contributing and/or donating:
           remote:        \\[info\\] https://www.playframework.com/sponsors
-          remote:        \\[info\\] 
+          remote:        \\[info\\]
           remote:        \\[info\\] Executing in batch mode. For better performance use sbt's shell
           remote:        \\[info\\] compiling 7 Scala sources and 1 Java source to /tmp/scala_buildpack_build_dir/target/scala-2.13/classes ...
           remote:        \\[info\\] done compiling
@@ -55,7 +55,7 @@ describe 'Scala buildpack' do
           remote: -----> Discovering process types
           remote:        Procfile declares types     -> \\(none\\)
           remote:        Default types for buildpack -> web
-          remote: 
+          remote:
           remote: -----> Compressing...
         REGEX
 
@@ -78,12 +78,12 @@ describe 'Scala buildpack' do
           remote:        \\[info\\]    / /  / /_/ // // /_/ // /_/ /
           remote:        \\[info\\]   /_/  / .___//_/ \\\\__,_/ \\\\__, /
           remote:        \\[info\\]       /_/               /____/
-          remote:        \\[info\\] 
+          remote:        \\[info\\]
           remote:        \\[info\\] Version 3.0.9 running Java 21.0.[0-9]+
-          remote:        \\[info\\] 
+          remote:        \\[info\\]
           remote:        \\[info\\] Play is run entirely by the community. Please consider contributing and/or donating:
           remote:        \\[info\\] https://www.playframework.com/sponsors
-          remote:        \\[info\\] 
+          remote:        \\[info\\]
           remote:        \\[info\\] Executing in batch mode. For better performance use sbt's shell
           remote:        \\[success\\] Total time: .* s, completed .*
           remote:        \\[info\\] Wrote /tmp/scala_buildpack_build_dir/target/scala-2.13/sbt-0-11-7-play-3-x-scala-2-13-x_2.13-1.0-SNAPSHOT.pom
@@ -96,7 +96,7 @@ describe 'Scala buildpack' do
           remote: -----> Discovering process types
           remote:        Procfile declares types     -> \\(none\\)
           remote:        Default types for buildpack -> web
-          remote: 
+          remote:
           remote: -----> Compressing...
         REGEX
       end

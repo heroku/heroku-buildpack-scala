@@ -8,6 +8,7 @@ ANSI_BLUE='\033[1;34m'
 ANSI_RED='\033[1;31m'
 ANSI_YELLOW='\033[1;33m'
 ANSI_RESET='\033[0m'
+MESSAGE_INDENTATION='     '
 
 # Output a single line step message to stdout.
 #
@@ -40,10 +41,15 @@ function output::indent() {
 # EOF
 # ```
 function output::notice() {
-	local line
+	local line indentation
 	echo >&2
 	while IFS= read -r line; do
-		echo -e "${ANSI_BLUE} !     ${line}${ANSI_RESET}" >&2
+		indentation=""
+		if [[ -n "${line}" ]]; then
+			indentation="${MESSAGE_INDENTATION}"
+		fi
+
+		echo -e "${ANSI_BLUE} !${indentation}${line}${ANSI_RESET}" >&2
 	done
 	echo >&2
 }
@@ -59,10 +65,15 @@ function output::notice() {
 # EOF
 # ```
 function output::warning() {
-	local line
+	local line indentation
 	echo >&2
 	while IFS= read -r line; do
-		echo -e "${ANSI_YELLOW} !     ${line}${ANSI_RESET}" >&2
+		indentation=""
+		if [[ -n "${line}" ]]; then
+			indentation="${MESSAGE_INDENTATION}"
+		fi
+
+		echo -e "${ANSI_YELLOW} !${indentation}${line}${ANSI_RESET}" >&2
 	done
 	echo >&2
 }
@@ -78,10 +89,15 @@ function output::warning() {
 # EOF
 # ```
 function output::error() {
-	local line
+	local line indentation
 	echo >&2
 	while IFS= read -r line; do
-		echo -e "${ANSI_RED} !     ${line}${ANSI_RESET}" >&2
+		indentation=""
+		if [[ -n "${line}" ]]; then
+			indentation="${MESSAGE_INDENTATION}"
+		fi
+
+		echo -e "${ANSI_RED} !${indentation}${line}${ANSI_RESET}" >&2
 	done
 	echo >&2
 }
