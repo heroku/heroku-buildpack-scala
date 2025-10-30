@@ -8,19 +8,19 @@ describe 'Sbt version warnings' do
       app.deploy do
         expect(clean_output(app.output)).to include(<<~OUTPUT)
           remote:  !     Warning: Unsupported sbt version detected.
-          remote:  !     
+          remote:  !
           remote:  !     This buildpack does not officially support sbt 0.13.18. You are using
           remote:  !     an end-of-life version that no longer receives security updates or bug fixes.
           remote:  !     Support for sbt 0.x was ended by the upstream sbt project on November 30, 2018.
-          remote:  !     
+          remote:  !
           remote:  !     Please upgrade to sbt 1.x for active support.
-          remote:  !     
+          remote:  !
           remote:  !     The buildpack will attempt to build your application, but compatibility
           remote:  !     is not guaranteed and may break at any time.
-          remote:  !     
+          remote:  !
           remote:  !     For more information:
           remote:  !     - https://web.archive.org/web/20210918065807/https://www.lightbend.com/blog/scala-sbt-127-patchnotes
-          remote:  !     
+          remote:  !
           remote:  !     Upgrade guide:
           remote:  !     - https://www.scala-sbt.org/1.x/docs/Migrating-from-sbt-013x.html
         OUTPUT
@@ -46,14 +46,14 @@ describe 'Sbt version warnings' do
         expect(app).not_to be_deployed
         expect(clean_output(app.output)).to include(<<~OUTPUT)
           remote:  !     Error: Unsupported sbt version detected.
-          remote:  !     
+          remote:  !
           remote:  !     This buildpack does not currently support sbt 2.x. You are using sbt 2.0.0-RC6.
-          remote:  !     
+          remote:  !
           remote:  !     Support for sbt 2.x will be added in a future buildpack release. In the
           remote:  !     meantime, please use the latest stable sbt 1.x version for your deployments.
-          remote:  !     
+          remote:  !
           remote:  !     To continue, update project/build.properties to use sbt 1.x.
-          remote:  !     
+          remote:  !
           remote:  !     For more information:
           remote:  !     - Latest sbt 1.x releases: https://github.com/sbt/sbt/releases
           remote:  !     - sbt 2.x changes: https://www.scala-sbt.org/2.x/docs/en/changes/sbt-2.0-change-summary.html
@@ -73,15 +73,15 @@ describe 'Sbt version warnings' do
         expect(app).not_to be_deployed
         expect(clean_output(app.output)).to include(<<~OUTPUT)
           remote:  !     Error: sbt version cannot be determined.
-          remote:  !     
+          remote:  !
           remote:  !     As part of your build definition you must specify the version of sbt that
           remote:  !     your build uses. This ensures consistent results across different environments.
-          remote:  !     
+          remote:  !
           remote:  !     To fix this issue, create a file named project/build.properties that specifies
           remote:  !     the sbt version as follows:
-          remote:  !     
+          remote:  !
           remote:  !         sbt.version=1.11.7
-          remote:  !     
+          remote:  !
           remote:  !     For more information, see:
           remote:  !     https://www.scala-sbt.org/1.x/docs/Basic-Def.html#Specifying+the+sbt+version
         OUTPUT

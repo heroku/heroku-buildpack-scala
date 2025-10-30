@@ -9,26 +9,26 @@ RSpec.describe 'Scala buildpack detection' do
       expect(clean_output(app.output)).to include(<<~OUTPUT)
         remote:  !     Error: Your app is configured to use the Scala buildpack,
         remote:  !     but we couldn't find any supported sbt project files.
-        remote:  !     
+        remote:  !
         remote:  !     The Scala buildpack requires a 'build.sbt' or other .sbt file
         remote:  !     in the root directory of your source code.
-        remote:  !     
+        remote:  !
         remote:  !     IMPORTANT: If your project uses a different build tool:
         remote:  !     - For Maven projects, use the heroku/java buildpack instead
         remote:  !     - For Gradle projects, use the heroku/gradle buildpack instead
-        remote:  !     
+        remote:  !
         remote:  !     Currently the root directory of your app contains:
-        remote:  !     
+        remote:  !
         remote:  !     README.md
-        remote:  !     
+        remote:  !
         remote:  !     If your app already has sbt files, check that they:
-        remote:  !     
+        remote:  !
         remote:  !     1. Are in the correct directory (see requirements above).
         remote:  !     2. Have the correct spelling (the filenames are case-sensitive).
         remote:  !     3. Aren't listed in '.gitignore' or '.slugignore'.
         remote:  !     4. Have been added to the Git repository using 'git add --all'
         remote:  !        and then committed using 'git commit'.
-        remote:  !     
+        remote:  !
         remote:  !     For help with using sbt on Heroku, see:
         remote:  !     https://devcenter.heroku.com/articles/scala-support
       OUTPUT
