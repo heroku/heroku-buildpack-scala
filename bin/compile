@@ -24,6 +24,8 @@ source "${BUILDPACK_DIR}/lib/failures.sh"
 source "${BUILDPACK_DIR}/lib/metrics.sh"
 # shellcheck source=lib/util.sh
 source "${BUILDPACK_DIR}/lib/util.sh"
+# shellcheck source=lib/openjdk.sh
+source "${BUILDPACK_DIR}/lib/openjdk.sh"
 
 APP_BUILD_DIR=$(cd "${BUILD_DIR}" && pwd)
 
@@ -50,7 +52,7 @@ fi
 
 util::export_env_dir "${ENV_DIR}" "." "JAVA_OPTS"
 
-# Used by install_jdk to determine which JVM common buildpack to use
+# Used by openjdk::install_openjdk_via_jvm_common_buildpack to determine which JVM common buildpack to use
 # Configuring this via system.properties is deprecated and will be removed soon
 # shellcheck disable=SC2034
 JVM_COMMON_BUILDPACK="$(config::get "${BUILD_DIR}" "heroku.jvm.buildpack" "JVM_COMMON_BUILDPACK" "https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz")"
@@ -67,7 +69,7 @@ for env_var in SBT_PRE_TASKS SBT_PROJECT SBT_TASKS KEEP_SBT_CACHE KEEP_COURSIER_
 done
 
 # Install the JDK
-install_jdk "${BUILD_DIR}" "${CACHE_DIR}"
+openjdk::install_openjdk_via_jvm_common_buildpack "${BUILD_DIR}" "${BUILDPACK_DIR}"
 
 #create the cache dir if it doesn't exist
 mkdir -p "${CACHE_DIR}"
