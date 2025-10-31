@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Use symlinks instead of moving the build directory. ([#278](https://github.com/heroku/heroku-buildpack-scala/pull/278))
 
 ## [v103] - 2025-10-27
 
