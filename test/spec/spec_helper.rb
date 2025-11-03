@@ -58,5 +58,5 @@ def clean_output(output)
     # Remove trailing space from empty "remote: " lines added by Heroku
     .gsub(/^remote: $/, 'remote:')
     # Remove trailing space from empty sbt log lines (e.g. "remote:        [info] ")
-    .gsub(/^(remote:\s+)\[(info|warn|error|success|debug)\] $/, '\1[\2]')
+    .gsub(/\[(info|warn|error|success|debug)\] $/, '[\1]')
 end
