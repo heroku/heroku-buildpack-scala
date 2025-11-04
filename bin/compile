@@ -266,11 +266,6 @@ cat <<-EOF >"${profile_script}"
 	export PATH="\$SBT_HOME/bin:\$PATH"
 EOF
 
-# Remove symlink if we created one
-if is_app_dir "${APP_BUILD_DIR}"; then
-	rm "${BUILD_DIR}"
-fi
-
 # write export script
 cat <<-EOF >"${BASE_DIR}/export"
 	export SBT_HOME="${APP_BUILD_DIR}/${SBT_USER_HOME}"
