@@ -27,17 +27,8 @@ source "${BUILDPACK_DIR}/lib/util.sh"
 # shellcheck source=lib/openjdk.sh
 source "${BUILDPACK_DIR}/lib/openjdk.sh"
 
-APP_BUILD_DIR=$(cd "${BUILD_DIR}" && pwd)
-
 metrics::init "${CACHE_DIR}" "scala"
 metrics::setup
-
-if is_app_dir "${APP_BUILD_DIR}"; then
-	BUILD_DIR="/tmp/scala_buildpack_build_dir"
-	ln -s "${APP_BUILD_DIR}" "${BUILD_DIR}"
-else
-	BUILD_DIR="${APP_BUILD_DIR}"
-fi
 
 util::export_env_dir "${ENV_DIR}" "." "JAVA_OPTS"
 
@@ -268,6 +259,6 @@ EOF
 
 # write export script
 cat <<-EOF >"${BASE_DIR}/export"
-	export SBT_HOME="${APP_BUILD_DIR}/${SBT_USER_HOME}"
+	export SBT_HOME="${BUILD_DIR}/${SBT_USER_HOME}"
 	export PATH="\$SBT_HOME/bin:\$PATH"
 EOF
