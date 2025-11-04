@@ -37,10 +37,6 @@ has_old_preset_sbt_opts() {
 	fi
 }
 
-is_app_dir() {
-	test "${1}" != "/app"
-}
-
 # sed -l basically makes sed replace and buffer through stdin to stdout
 # so you get updates while the command runs and dont wait for the end
 # e.g. sbt stage | indent
