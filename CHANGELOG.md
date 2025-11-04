@@ -2,7 +2,7 @@
 
 ## [Unreleased]
 
-* Use symlinks instead of moving the build directory. ([#278](https://github.com/heroku/heroku-buildpack-scala/pull/278))
+* Remove build directory symlinking. Modern sbt versions no longer require a stable build path for caching. ([#290](https://github.com/heroku/heroku-buildpack-scala/pull/290))
 
 ## [v103] - 2025-10-27
 
