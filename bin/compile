@@ -26,6 +26,8 @@ source "${BUILDPACK_DIR}/lib/metrics.sh"
 source "${BUILDPACK_DIR}/lib/util.sh"
 # shellcheck source=lib/openjdk.sh
 source "${BUILDPACK_DIR}/lib/openjdk.sh"
+# shellcheck source=lib/sbt.sh
+source "${BUILDPACK_DIR}/lib/sbt.sh"
 
 metrics::init "${CACHE_DIR}" "scala"
 metrics::setup
@@ -50,27 +52,6 @@ done
 
 # Install the JDK
 openjdk::install_openjdk_via_jvm_common_buildpack "${BUILD_DIR}" "${BUILDPACK_DIR}"
-
-#create the cache dir if it doesn't exist
-mkdir -p "${CACHE_DIR}"
-
-# home directory from perspective of SBT; we rename
-# it because otherwise the project root and $HOME
-# are the same, and by default .sbt has a (different)
-# meaning in those two places
-SBT_USER_HOME=".sbt_home"
-SBT_USER_HOME_ABSOLUTE="${BUILD_DIR}/${SBT_USER_HOME}"
-# where we put the SBT binaries
-SBT_BINDIR="${SBT_USER_HOME}/bin"
-
-# chdir as sbt expects
-cd "${BUILD_DIR}"
-
-# unpack cache
-CACHED_DIRS="${SBT_USER_HOME} target project/target project/boot .coursier"
-for DIR in ${CACHED_DIRS}; do
-	cache_copy "${DIR}" "${CACHE_DIR}" "${BUILD_DIR}"
-done
 
 sbt_version="$(java_properties::get "${BUILD_DIR}/project/build.properties" "sbt.version")"
 metrics::set_string "sbt_version" "${sbt_version:-"unknown"}"
@@ -166,27 +147,41 @@ fi
 # See: https://devcenter.heroku.com/articles/scala-support#clean-builds
 [[ "${SBT_CLEAN}" = "true" ]] && SBT_TASKS="clean ${SBT_TASKS}"
 
-# Install the custom sbt script
-install_sbt_extras "${BUILDPACK_DIR}/opt" "${SBT_BINDIR}"
 
-# copy in heroku sbt plugin
+
+ivy_home_dir="${CACHE_DIR}/ivy_home"
+util::prepend_to_env "SBT_OPTS" "-Dsbt.ivy.home=${ivy_home_dir}"
+mkdir -p "${ivy_home_dir}"
+
+coursier_home_dir="${CACHE_DIR}/coursier_home"
+util::prepend_to_env "SBT_OPTS" "-Dsbt.coursier.home=${coursier_home_dir}"
+mkdir -p "${coursier_home_dir}"
+
+sbt_boot_dir="${CACHE_DIR}/sbt_boot"
+util::prepend_to_env "SBT_OPTS" "-Dsbt.boot.directory=${sbt_boot_dir}"
+mkdir -p "${sbt_boot_dir}"
+
+# Recreate the sbt global directory on each build with the current Heroku plugins and settings.
+# See: https://www.scala-sbt.org/1.x/docs/Command-Line-Reference.html
+sbt_global_dir="${CACHE_DIR}/sbt_global"
+util::prepend_to_env "SBT_OPTS" "-Dsbt.global.base=${sbt_global_dir}"
+rm -rf "${sbt_global_dir}"
+mkdir -p "${sbt_global_dir}"
+
+# Install the Heroku sbt plugin
+mkdir -p "${sbt_global_dir}/plugins"
 case "${sbt_version}" in
 1.*)
-	HEROKU_PLUGIN="HerokuBuildpackPlugin_sbt1.scala"
+	cp "${BUILDPACK_DIR}/opt/HerokuBuildpackPlugin_sbt1.scala" "${sbt_global_dir}/plugins/HerokuBuildpackPlugin.scala"
 	;;
 *)
-	HEROKU_PLUGIN="HerokuBuildpackPlugin.scala"
+	cp "${BUILDPACK_DIR}/opt/HerokuBuildpackPlugin.scala" "${sbt_global_dir}/plugins/HerokuBuildpackPlugin.scala"
 	;;
 esac
 
-mkdir -p "${SBT_USER_HOME}/plugins"
-rm -f "${SBT_USER_HOME}/plugins/HerokuPlugin.scala"               # remove the old ambiguously named plugin
-rm -f "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin_sbt1.scala" # remove the old poorly named plugin
-rm -f "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"      # remove the old plugin
-cp -p "${BUILDPACK_DIR}/opt/${HEROKU_PLUGIN}" "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"
+sbt::install_sbt_launcher "${sbt_version}" "${CACHE_DIR}/sbt-launcher"
 
 # Collect metrics
-
 if is_sbt_native_packager "${BUILD_DIR}"; then
 	metrics::set_raw "uses_sbt_native_packager" "true"
 else
@@ -199,45 +194,17 @@ else
 	metrics::set_raw "is_play_app" "false"
 fi
 
-# Manually pre-clean because sbt-native-packager doesn't clobber this dir
-rm -rf "${BUILD_DIR}/target/universal/stage"
-
 # build app
-run_sbt "${SBT_USER_HOME_ABSOLUTE}" "${SBT_TASKS}"
+cd "${BUILD_DIR}"
+run_sbt "${SBT_TASKS}"
 
 if [[ -z "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]]; then
-	write_sbt_dependency_classpath_log "${SBT_USER_HOME_ABSOLUTE}"
+	write_sbt_dependency_classpath_log
 fi
-
-# repack cache
-mkdir -p "${CACHE_DIR}"
-for DIR in ${CACHED_DIRS}; do
-	cache_copy "${DIR}" "${BUILD_DIR}" "${CACHE_DIR}"
-done
 
 # drop useless directories from slug for play and sbt-native-launcher only
 if is_sbt_native_packager "${BUILD_DIR}" || is_play "${BUILD_DIR}"; then
 	if [[ "${KEEP_SBT_CACHE:-}" != "true" ]]; then
-		if [[ "${KEEP_IVY_CACHE:-}" != "true" ]] && [[ -d "${SBT_USER_HOME}/.ivy2" ]]; then
-			output::step "Dropping ivy cache from the slug"
-			rm -rf "${SBT_USER_HOME:?}/.ivy2"
-		fi
-		if [[ "${KEEP_COURSIER_CACHE:-}" != "true" ]] && [[ -d "${SBT_USER_HOME}/.coursier" ]]; then
-			output::step "Dropping coursier cache from the slug"
-			rm -rf "${SBT_USER_HOME:?}/.coursier"
-		fi
-		if [[ -d "${SBT_USER_HOME}/boot" ]]; then
-			output::step "Dropping sbt boot dir from the slug"
-			rm -rf "${SBT_USER_HOME:?}/boot"
-		fi
-		if [[ -d "${SBT_USER_HOME}/.cache" ]]; then
-			output::step "Dropping sbt cache dir from the slug"
-			rm -rf "${SBT_USER_HOME:?}/.cache"
-		fi
-		if [[ -d "${BUILD_DIR}/project/boot" ]]; then
-			output::step "Dropping project boot dir from the slug"
-			rm -rf "${BUILD_DIR}/project/boot"
-		fi
 		if [[ -d "${BUILD_DIR}/target" ]]; then
 			output::step "Dropping compilation artifacts from the slug"
 			rm -rf "${BUILD_DIR}/target/scala-"*

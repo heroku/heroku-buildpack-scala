@@ -61,3 +61,19 @@ function util::cache_copy() {
 function util::nowms() {
 	date +%s%3N
 }
+
+# Prepends a value to an environment variable with an optional delimiter.
+#
+# Usage:
+# ```
+# util::prepend_to_env "PATH" "/usr/local/bin" ":"
+# util::prepend_to_env "OPTS" "-Xmx512m"
+# ```
+function util::prepend_to_env() {
+	local env_var="${1}"
+	local value="${2}"
+	local delimiter="${3:- }"
+
+	local env_var_value="${!env_var:-}"
+	declare -gx "${env_var}=${value}${env_var_value:+${delimiter}${env_var_value}}"
+}
