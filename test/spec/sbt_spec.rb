@@ -27,19 +27,14 @@ describe 'Sbt' do
           remote: -----> Installing Azul Zulu OpenJDK $VERSION
           remote: -----> Scala app detected
           remote: -----> Using provided JDK
+          remote: -----> Downloading sbt launcher 1.11.7...
+          remote: -----> Setting up sbt launcher...
           remote: -----> Running: sbt compile stage
-          remote: Downloading sbt launcher for 1.11.7:
-          remote:   From  https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.11.7/sbt-launch-1.11.7.jar
-          remote:     To  $BUILD_DIR/.sbt_home/launchers/1.11.7/sbt-launch.jar
-          remote: Downloading sbt launcher 1.11.7 md5 hash:
-          remote:   From  https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.11.7/sbt-launch-1.11.7.jar.md5
-          remote:     To  $BUILD_DIR/.sbt_home/launchers/1.11.7/sbt-launch.jar.md5
-          remote:        $BUILD_DIR/.sbt_home/launchers/1.11.7/sbt-launch.jar: OK
           remote: [info] [launcher] getting org.scala-sbt sbt 1.11.7  (this may take some time)...
           remote: [info] [launcher] getting Scala 2.12.20 (for sbt)...
           remote:        [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java $VERSION)
-          remote:        [info] loading global plugins from $BUILD_DIR/.sbt_home/plugins
-          remote:        [info] compiling 1 Scala source to $BUILD_DIR/.sbt_home/plugins/target/scala-2.12/sbt-1.0/classes ...
+          remote:        [info] loading global plugins from /tmp/codon/tmp/cache/sbt_global/plugins
+          remote:        [info] compiling 1 Scala source to /tmp/codon/tmp/cache/sbt_global/plugins/target/scala-2.12/sbt-1.0/classes ...
           remote:        [info] Non-compiled module 'compiler-bridge_2.12' for Scala 2.12.20. Compiling...
           remote:        [info]   Compilation completed in $DURATION.
           remote:        [info] done compiling
@@ -54,14 +49,12 @@ describe 'Sbt' do
           remote:        [info] Wrote $BUILD_DIR/target/scala-2.13/sbt-1-11-7-minimal-with-native-packager_2.13-0.1.0-SNAPSHOT.pom
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote: -----> Collecting dependency information
-          remote: -----> Dropping ivy cache from the slug
-          remote: -----> Dropping sbt boot dir from the slug
-          remote: -----> Dropping sbt cache dir from the slug
+          remote: -----> Copying sbt and dependencies into slug for runtime use
           remote: -----> Dropping compilation artifacts from the slug
           remote: -----> Discovering process types
           remote:        Procfile declares types     -> (none)
           remote:        Default types for buildpack -> web
-          
+
           remote: -----> Compressing...
           remote:        Done: 106.5M
         OUTPUT
@@ -81,19 +74,14 @@ describe 'Sbt' do
         expect(clean_output(app.output)).to eq(<<~OUTPUT)
           remote: -----> Scala app detected
           remote: -----> Installing Azul Zulu OpenJDK $VERSION
+          remote: -----> Downloading sbt launcher 1.11.7...
+          remote: -----> Setting up sbt launcher...
           remote: -----> Running: sbt compile stage
-          remote: Downloading sbt launcher for 1.11.7:
-          remote:   From  https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.11.7/sbt-launch-1.11.7.jar
-          remote:     To  $BUILD_DIR/.sbt_home/launchers/1.11.7/sbt-launch.jar
-          remote: Downloading sbt launcher 1.11.7 md5 hash:
-          remote:   From  https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.11.7/sbt-launch-1.11.7.jar.md5
-          remote:     To  $BUILD_DIR/.sbt_home/launchers/1.11.7/sbt-launch.jar.md5
-          remote:        $BUILD_DIR/.sbt_home/launchers/1.11.7/sbt-launch.jar: OK
           remote: [info] [launcher] getting org.scala-sbt sbt 1.11.7  (this may take some time)...
           remote: [info] [launcher] getting Scala 2.12.20 (for sbt)...
           remote:        [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java $VERSION)
-          remote:        [info] loading global plugins from $BUILD_DIR/.sbt_home/plugins
-          remote:        [info] compiling 1 Scala source to $BUILD_DIR/.sbt_home/plugins/target/scala-2.12/sbt-1.0/classes ...
+          remote:        [info] loading global plugins from /tmp/codon/tmp/cache/sbt_global/plugins
+          remote:        [info] compiling 1 Scala source to /tmp/codon/tmp/cache/sbt_global/plugins/target/scala-2.12/sbt-1.0/classes ...
           remote:        [info] Non-compiled module 'compiler-bridge_2.12' for Scala 2.12.20. Compiling...
           remote:        [info]   Compilation completed in $DURATION.
           remote:        [info] done compiling
@@ -109,7 +97,7 @@ describe 'Sbt' do
           remote:        [error] one error found
           remote:        [error] (Compile / compileIncremental) Compilation failed
           remote:        [error] Total time: $DURATION, completed $DATETIME
-          
+
           remote:  !     Failed to run sbt!
           remote:  !     We're sorry this build is failing. If you can't find the issue in application
           remote:  !     code, please submit a ticket so we can help: https://help.heroku.com
@@ -118,9 +106,9 @@ describe 'Sbt' do
           remote:  !
           remote:  !     Thanks,
           remote:  !     Heroku
-          
+
           remote:  !     Push rejected, failed to compile Scala app.
-          
+
           remote:  !     Push failed
         OUTPUT
       end

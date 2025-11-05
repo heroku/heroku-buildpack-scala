@@ -15,6 +15,8 @@ describe 'Scala buildpack' do
           WARNING: Unable to create a system terminal, creating a dumb terminal (enable debug logging for more information)
           [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java 21.0.9)
           [info] loading global plugins from /app/.sbt_home/plugins
+          [info] compiling 1 Scala source to /app/.sbt_home/plugins/target/scala-2.12/sbt-1.0/classes ...
+          [info] done compiling
           [info] loading settings for project app-build from plugins.sbt...
           [info] loading project definition from /app/project
           [info] loading settings for project app from build.sbt...
@@ -79,6 +81,8 @@ describe 'Scala buildpack' do
           WARNING: Unable to create a system terminal, creating a dumb terminal (enable debug logging for more information)
           [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java 21.0.9)
           [info] loading global plugins from /app/.sbt_home/plugins
+          [info] compiling 1 Scala source to /app/.sbt_home/plugins/target/scala-2.12/sbt-1.0/classes ...
+          [info] done compiling
           [info] loading project definition from /app/project
           [info] loading settings for project app from build.sbt...
           [info] set current project to sbt-1.11.7-minimal-no-native-packager (in build file:/app/)
@@ -124,7 +128,7 @@ describe 'Scala buildpack' do
         expect(sbt_about_output).to eq(<<~OUTPUT)
           Getting org.scala-sbt sbt 0.13.18  (this may take some time)...
           WARNING: An illegal reflective access operation has occurred
-          WARNING: Illegal reflective access by org.apache.ivy.util.url.IvyAuthenticator (file:/app/.sbt_home/launchers/0.13.18/sbt-launch.jar) to field java.net.Authenticator.theAuthenticator
+          WARNING: Illegal reflective access by org.apache.ivy.util.url.IvyAuthenticator (file:/app/.heroku/scala/sbt-launcher/sbt-launch-0.13.18.jar) to field java.net.Authenticator.theAuthenticator
           WARNING: Please consider reporting this to the maintainers of org.apache.ivy.util.url.IvyAuthenticator
           WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
           WARNING: All illegal access operations will be denied in a future release
