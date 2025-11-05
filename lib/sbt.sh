@@ -21,7 +21,7 @@ function sbt::install_sbt_launcher() {
 	cat <<-EOF >"${sbt_launcher_dir}/bin/sbt"
 		#!/usr/bin/env bash
 		script_dir="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
-		java -jar "\${script_dir}/../sbt-launch-${sbt_version}.jar" "\$@"
+		java \${SBT_OPTS:-} -jar "\${script_dir}/../sbt-launch-${sbt_version}.jar" "\$@"
 	EOF
 
 	chmod +x "${sbt_launcher_dir}/bin/sbt"
@@ -99,7 +99,7 @@ function sbt::download_sbt_launcher_jar() {
 	local sha1_path
 	sha1_path=$(mktemp)
 
-	if ! curl --silent --show-error --location "${sbt_launcher_jar_url}.sha1" > "${sha1_path}" 2>/dev/null; then
+	if ! curl --silent --show-error --location "${sbt_launcher_jar_url}.sha1" >"${sha1_path}" 2>/dev/null; then
 		output::error <<-EOF
 			Error: Unable to download SHA-1 checksum for sbt launcher.
 		EOF
