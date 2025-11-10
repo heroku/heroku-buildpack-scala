@@ -1,8 +1,0 @@
-{
-  "name": "play-2.4-heroku-seed",
-  "description": "Seed app for Play 2.4 on Heroku",
-  "repository": "https://github.com/kissaten/play-2.4-scala",
-  "addons": [],
-  "success_url": "/",
-  "keywords": ["play", "scala"]
-}

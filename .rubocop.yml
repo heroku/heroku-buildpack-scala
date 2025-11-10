@@ -13,6 +13,9 @@ Layout/TrailingWhitespace:
 Metrics/BlockLength:
   Enabled: false
 
+Metrics/MethodLength:
+  Enabled: false
+
 RSpec/DescribeClass:
   Enabled: false
 

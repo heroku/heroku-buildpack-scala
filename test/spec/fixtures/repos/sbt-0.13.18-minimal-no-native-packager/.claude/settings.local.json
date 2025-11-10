@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/manuel.fuchs/projects/heroku-buildpack-scala/test/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

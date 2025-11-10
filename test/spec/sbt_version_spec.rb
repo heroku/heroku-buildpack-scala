@@ -24,6 +24,7 @@ describe 'Sbt version warnings' do
           remote:  !     Upgrade guide:
           remote:  !     - https://www.scala-sbt.org/1.x/docs/Migrating-from-sbt-013x.html
         OUTPUT
+
         expect(app.output).to include('Running: sbt compile stage')
         expect(app.output).to include('[info] Done packaging.')
         expect(app.output).to include('[success]')

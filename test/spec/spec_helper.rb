@@ -48,15 +48,68 @@ def http_get(app, options = {})
                                                                               retry_limit: retry_limit).body
 end
 
+def find_output_start_index(lines)
+  # Find the first "app detected" line. This skips the buildpack list at the beginning which will contain a GitHub URL
+  # for the buildpack under test that will be different for each PR/branch under test.
+  lines.index { |line| line.match?(/-----> .* app detected/) }
+end
+
+def find_output_end_index(lines)
+  # Find the end of relevant build output. For successful builds, this is the "Done: 12.3M" line after compression.
+  # For failed builds, this is the "Push failed" line. This skips build-system output after these lines that is
+  # irrelevant for our tests and changes for each deploy.
+  success_end_index = lines.index { |line| line.match?(/Done: \d+(\.\d+)?[MG]/) }
+  failure_end_index = lines.index { |line| line.match?(/!\s+Push failed/) }
+  [success_end_index, failure_end_index].compact.first
+end
+
 def clean_output(output)
-  output
-    # Remove trailing whitespace characters added by Git:
+  # Remove output from the build system before and after the actual build
+  lines = output.lines
+  output = lines[find_output_start_index(lines)..find_output_end_index(lines)].join
+
+  generic = {
+    ##################################################
+    # Generic
+    ##################################################
+    # Trailing whitespace characters added by Git:
     # https://github.com/heroku/hatchet/issues/162
-    .gsub(/ {8}(?=\R)/, '')
-    # Remove ANSI colour codes used in buildpack output (e.g. error messages).
-    .gsub(/\e\[[0-9;]+m/, '')
-    # Remove trailing space from empty "remote: " lines added by Heroku
-    .gsub(/^remote: $/, 'remote:')
-    # Remove trailing space from empty sbt log lines (e.g. "remote:        [info] ")
-    .gsub(/\[(info|warn|error|success|debug)\] $/, '[\1]')
+    / {8}(?=\R)/ => '',
+    # ANSI colour codes used in buildpack output (e.g. error messages).
+    /\e\[[0-9;]+m/ => '',
+    # Trailing spaces from empty "remote: " lines added by Heroku
+    /^remote: $/ => '',
+    /remote:        Released v\d+/ => 'remote:        Released $VERSION',
+    # Build directory
+    %r{/tmp/build_[0-9a-f]{8}} => '$BUILD_DIR',
+    # Build id
+    /build_[0-9a-f]{8}/ => '$BUILD_ID',
+
+    ##################################################
+    # Java
+    ##################################################
+    /(OpenJDK|Java) \d+\.\d+\.\d+(_\d+)?/ => '\1 $VERSION',
+
+    ##################################################
+    # sbt
+    ##################################################
+    # Trailing space from empty sbt log lines (e.g. "remote:        [info] ")
+    /\[(info|warn|error|success|debug)\] $/ => '[\1]',
+    # Datetime strings from sbt (e.g. May 31, 1985 11:38:00 AM or May 31, 1985, 11:38:00 AM)
+    /([A-Z][a-z]{2}) (\d{1,2}), (\d{4}),? (\d{1,2}):(\d{2}):(\d{2}) ([AP]M)/ => '$DATETIME',
+    # Various timing output from sbt
+    /\d+ms/ => '$DURATION',
+    /Total time: .*?,/ => 'Total time: $DURATION,',
+    /Compilation completed in (.*?)$/ => 'Compilation completed in $DURATION.', # sbt 0.x
+    /Compilation completed in (.*?)\.$/ => 'Compilation completed in $DURATION.', # sbt 1.x
+  }
+
+  output = generic.reduce(output) { |output, (pattern, replacement)| output.gsub(pattern, replacement) }
+
+  # Save the cleaned output to disk so it can be copied byte-for-byte when writing or updating test expectations.
+  # Copying from terminal output can introduce issues (especially with whitespace output). Writing this file every time
+  # is inexpensive and ensures it's always available when needed.
+  File.write('/tmp/scala_buildpack_integration_last_test_output.txt', output)
+
+  output
 end

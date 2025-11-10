@@ -4,7 +4,7 @@ require_relative 'spec_helper'
 
 describe 'Scala buildpack configuration' do
   it 'supports environment variable configuration without warning' do
-    new_default_hatchet_runner('sbt-minimal-scala-sample').tap do |app|
+    new_default_hatchet_runner('sbt-1.11.7-minimal-with-native-packager').tap do |app|
       app.before_deploy do
         app.set_config('SBT_CLEAN' => 'true')
       end
@@ -19,7 +19,7 @@ describe 'Scala buildpack configuration' do
   end
 
   it 'shows deprecation warning when using system.properties' do
-    new_default_hatchet_runner('sbt-minimal-scala-sample').tap do |app|
+    new_default_hatchet_runner('sbt-1.11.7-minimal-with-native-packager').tap do |app|
       app.before_deploy do
         File.write('system.properties', "#{File.read('system.properties')}\nsbt.clean=true\n")
       end
