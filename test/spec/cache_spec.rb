@@ -10,19 +10,14 @@ describe 'Scala buildpack' do
         expect(clean_output(app.output)).to eq(<<~OUTPUT)
           remote: -----> Scala app detected
           remote: -----> Installing Azul Zulu OpenJDK $VERSION
+          remote: -----> Downloading sbt launcher 1.11.7...
+          remote: -----> Setting up sbt launcher...
           remote: -----> Running: sbt compile stage
-          remote: Downloading sbt launcher for 1.11.7:
-          remote:   From  https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.11.7/sbt-launch-1.11.7.jar
-          remote:     To  $BUILD_DIR/.sbt_home/launchers/1.11.7/sbt-launch.jar
-          remote: Downloading sbt launcher 1.11.7 md5 hash:
-          remote:   From  https://repo1.maven.org/maven2/org/scala-sbt/sbt-launch/1.11.7/sbt-launch-1.11.7.jar.md5
-          remote:     To  $BUILD_DIR/.sbt_home/launchers/1.11.7/sbt-launch.jar.md5
-          remote:        $BUILD_DIR/.sbt_home/launchers/1.11.7/sbt-launch.jar: OK
           remote: [info] [launcher] getting org.scala-sbt sbt 1.11.7  (this may take some time)...
           remote: [info] [launcher] getting Scala 2.12.20 (for sbt)...
           remote:        [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java $VERSION)
-          remote:        [info] loading global plugins from $BUILD_DIR/.sbt_home/plugins
-          remote:        [info] compiling 1 Scala source to $BUILD_DIR/.sbt_home/plugins/target/scala-2.12/sbt-1.0/classes ...
+          remote:        [info] loading global plugins from /tmp/codon/tmp/cache/sbt_global/plugins
+          remote:        [info] compiling 1 Scala source to /tmp/codon/tmp/cache/sbt_global/plugins/target/scala-2.12/sbt-1.0/classes ...
           remote:        [info] Non-compiled module 'compiler-bridge_2.12' for Scala 2.12.20. Compiling...
           remote:        [info]   Compilation completed in $DURATION.
           remote:        [info] done compiling
@@ -48,14 +43,11 @@ describe 'Scala buildpack' do
           remote:        [info] Wrote $BUILD_DIR/target/scala-2.13/sbt-1-11-7-play-3-x-scala-2-13-x_2.13-1.0-SNAPSHOT.pom
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote: -----> Collecting dependency information
-          remote: -----> Dropping ivy cache from the slug
-          remote: -----> Dropping sbt boot dir from the slug
-          remote: -----> Dropping sbt cache dir from the slug
           remote: -----> Dropping compilation artifacts from the slug
           remote: -----> Discovering process types
           remote:        Procfile declares types     -> (none)
           remote:        Default types for buildpack -> web
-          
+
           remote: -----> Compressing...
           remote:        Done: 114M
         OUTPUT
@@ -69,7 +61,7 @@ describe 'Scala buildpack' do
           remote: -----> Installing Azul Zulu OpenJDK $VERSION
           remote: -----> Running: sbt compile stage
           remote:        [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java $VERSION)
-          remote:        [info] loading global plugins from $BUILD_DIR/.sbt_home/plugins
+          remote:        [info] loading global plugins from /tmp/codon/tmp/cache/sbt_global/plugins
           remote:        [info] loading settings for project $BUILD_ID-build from plugins.sbt...
           remote:        [info] loading project definition from $BUILD_DIR/project
           remote:        [info] loading settings for project root from build.sbt...
@@ -90,14 +82,11 @@ describe 'Scala buildpack' do
           remote:        [info] Wrote $BUILD_DIR/target/scala-2.13/sbt-1-11-7-play-3-x-scala-2-13-x_2.13-1.0-SNAPSHOT.pom
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote: -----> Collecting dependency information
-          remote: -----> Dropping ivy cache from the slug
-          remote: -----> Dropping sbt boot dir from the slug
-          remote: -----> Dropping sbt cache dir from the slug
           remote: -----> Dropping compilation artifacts from the slug
           remote: -----> Discovering process types
           remote:        Procfile declares types     -> (none)
           remote:        Default types for buildpack -> web
-          
+
           remote: -----> Compressing...
           remote:        Done: 114M
         OUTPUT
@@ -122,7 +111,7 @@ describe 'Scala buildpack' do
         expect(clean_output(app.output)).to eq(<<~OUTPUT)
           remote: -----> Scala app detected
           remote: -----> Installing Azul Zulu OpenJDK $VERSION
-          
+
           remote:  !     Warning: Unsupported sbt version detected.
           remote:  !
           remote:  !     This buildpack does not officially support sbt 0.13.18. You are using
@@ -139,11 +128,10 @@ describe 'Scala buildpack' do
           remote:  !
           remote:  !     Upgrade guide:
           remote:  !     - https://www.scala-sbt.org/1.x/docs/Migrating-from-sbt-013x.html
-          
+
+          remote: -----> Downloading sbt launcher 0.13.18...
+          remote: -----> Setting up sbt launcher...
           remote: -----> Running: sbt compile stage
-          remote: Downloading sbt launcher for 0.13.18:
-          remote:   From  https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/0.13.18/sbt-launch.jar
-          remote:     To  $BUILD_DIR/.sbt_home/launchers/0.13.18/sbt-launch.jar
           remote:        
           remote:        Getting org.scala-sbt sbt 0.13.18  (this may take some time)...
           remote: WARNING: An illegal reflective access operation has occurred
@@ -841,13 +829,11 @@ describe 'Scala buildpack' do
           remote: WARNING: Please consider reporting this to the maintainers of sbt.ivyint.ErrorMessageAuthenticator$
           remote: WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
           remote: WARNING: All illegal access operations will be denied in a future release
-          remote: -----> Dropping ivy cache from the slug
-          remote: -----> Dropping sbt boot dir from the slug
           remote: -----> Dropping compilation artifacts from the slug
           remote: -----> Discovering process types
           remote:        Procfile declares types     -> (none)
           remote:        Default types for buildpack -> web
-          
+
           remote: -----> Compressing...
           remote:        Done: 99.8M
         OUTPUT
@@ -1117,13 +1103,11 @@ describe 'Scala buildpack' do
           remote: WARNING: Please consider reporting this to the maintainers of sbt.ivyint.ErrorMessageAuthenticator$
           remote: WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
           remote: WARNING: All illegal access operations will be denied in a future release
-          remote: -----> Dropping ivy cache from the slug
-          remote: -----> Dropping sbt boot dir from the slug
           remote: -----> Dropping compilation artifacts from the slug
           remote: -----> Discovering process types
           remote:        Procfile declares types     -> (none)
           remote:        Default types for buildpack -> web
-          
+
           remote: -----> Compressing...
           remote:        Done: 99.9M
         OUTPUT
