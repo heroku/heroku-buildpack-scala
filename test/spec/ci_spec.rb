@@ -4,7 +4,7 @@ require_relative 'spec_helper'
 
 RSpec.describe 'Scala buildpack' do
   it 'runs tests on Heroku CI' do
-    new_default_hatchet_runner('sbt-0.11.7-play-3.x-scala-2.13.x') do |test_run|
+    new_default_hatchet_runner('sbt-1.11.7-play-3.x-scala-2.13.x') do |test_run|
       # First CI run should build from scratch
       expect(clean_output(test_run.output)).to match(Regexp.new(<<~REGEX, Regexp::MULTILINE))
         -----> Scala app detected
