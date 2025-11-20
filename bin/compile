@@ -173,11 +173,11 @@ done
 # Install the Heroku sbt plugin if the exising version differs (or is missing). We do this conditionally to
 # ensure we can cache the compiled class files of the plugin between builds, speeding up the build overall.
 case "${sbt_version}" in
-1.*)
-	plugin_source_path="${BUILDPACK_DIR}/opt/HerokuBuildpackPlugin_sbt1.scala"
+0.*)
+	plugin_source_path="${BUILDPACK_DIR}/opt/sbt-plugin/sbt-0.x/HerokuBuildpackPlugin.scala"
 	;;
 *)
-	plugin_source_path="${BUILDPACK_DIR}/opt/HerokuBuildpackPlugin.scala"
+	plugin_source_path="${BUILDPACK_DIR}/opt/sbt-plugin/sbt-1.x/HerokuBuildpackPlugin.scala"
 	;;
 esac
 

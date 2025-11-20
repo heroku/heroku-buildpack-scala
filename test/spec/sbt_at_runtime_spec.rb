@@ -6,7 +6,8 @@ describe 'Scala buildpack' do
   it 'makes sbt 1.x available at runtime' do
     new_default_hatchet_runner('sbt-1.11.7-minimal-with-native-packager').tap do |app|
       app.deploy do
-        sbt_about_output = app.run('sbt about').gsub(/\w+ \d+, \d+ \d+:\d+:\d+ [AP]M/, '$TIMESTAMP')
+        sbt_about_output = app.run('sbt about', heroku: { size: 'standard-2x' })
+                              .gsub(/\w+ \d+, \d+ \d+:\d+:\d+ [AP]M/, '$TIMESTAMP')
 
         expect(sbt_about_output).to eq(<<~OUTPUT)
           [info] [launcher] getting org.scala-sbt sbt 1.11.7  (this may take some time)...
@@ -72,7 +73,7 @@ describe 'Scala buildpack' do
   it 'makes sbt 1.x available at runtime without native packager' do
     new_default_hatchet_runner('sbt-1.11.7-minimal-no-native-packager').tap do |app|
       app.deploy do
-        sbt_about_output = app.run('sbt about')
+        sbt_about_output = app.run('sbt about', heroku: { size: 'standard-2x' })
                               .gsub(/\w+ \d+, \d+ \d+:\d+:\d+ [AP]M/, '$TIMESTAMP')
                               .gsub(/\[warn\] In the last .+ were spent in GC\..+\n/, '')
 
@@ -119,7 +120,7 @@ describe 'Scala buildpack' do
       end
 
       app.deploy do
-        sbt_about_output = app.run('sbt about')
+        sbt_about_output = app.run('sbt about', heroku: { size: 'standard-2x' })
                               .gsub(/\(\d+ms\)/, '($DURATION)')
                               .gsub(%r{\((\d+kB)/\d+ms\)}, '(\1/$DURATION)')
                               .gsub(/\d+\.\d+ s/, '$DURATION s')
@@ -830,7 +831,7 @@ describe 'Scala buildpack' do
       end
 
       app.deploy do
-        sbt_about_output = app.run('sbt about')
+        sbt_about_output = app.run('sbt about', heroku: { size: 'standard-2x' })
                               .gsub(/\(\d+ms\)/, '($DURATION)')
                               .gsub(%r{\((\d+kB)/\d+ms\)}, '(\1/$DURATION)')
                               .gsub(/\d+\.\d+ s/, '$DURATION s')

@@ -36,7 +36,6 @@ describe 'Scala buildpack' do
           remote:        [info] Play is run entirely by the community. Please consider contributing and/or donating:
           remote:        [info] https://www.playframework.com/sponsors
           remote:        [info]
-          remote:        [info] Executing in batch mode. For better performance use sbt's shell
           remote:        [info] compiling 7 Scala sources and 1 Java source to $BUILD_DIR/target/scala-2.13/classes ...
           remote:        [info] done compiling
           remote:        [success] Total time: $DURATION, completed $DATETIME
@@ -79,7 +78,6 @@ describe 'Scala buildpack' do
           remote:        [info] Play is run entirely by the community. Please consider contributing and/or donating:
           remote:        [info] https://www.playframework.com/sponsors
           remote:        [info]
-          remote:        [info] Executing in batch mode. For better performance use sbt's shell
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote:        [info] Wrote $BUILD_DIR/target/scala-2.13/sbt-1-11-7-play-3-x-scala-2-13-x_2.13-1.0-SNAPSHOT.pom
           remote:        [success] Total time: $DURATION, completed $DATETIME
@@ -609,7 +607,6 @@ describe 'Scala buildpack' do
           remote:        [warn]
           remote:        [warn] Run 'evicted' to see detailed eviction warnings
           remote:        [info] Set current project to sbt-0.13.18-minimal-with-native-packager (in build file:$BUILD_DIR/)
-          remote:        [info] Executing in batch mode. For better performance use sbt's shell
           remote:        [info] Updating {file:$BUILD_DIR/}$BUILD_ID...
           remote:        [info] Resolving org.scala-lang#scala-library;2.13.17 ...
           remote:        [info] Resolving org.scala-lang#scala-library;2.13.17 ...
@@ -1042,7 +1039,6 @@ describe 'Scala buildpack' do
           remote:        [warn]
           remote:        [warn] Run 'evicted' to see detailed eviction warnings
           remote:        [info] Set current project to sbt-0.13.18-minimal-with-native-packager (in build file:$BUILD_DIR/)
-          remote:        [info] Executing in batch mode. For better performance use sbt's shell
           remote:        [info] Updating {file:$BUILD_DIR/}$BUILD_ID...
           remote:        [info] Resolving org.scala-lang#scala-library;2.13.17 ...
           remote:        [info] Resolving dev.zio#zio-http_2.13;3.5.1 ...
