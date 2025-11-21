@@ -206,12 +206,12 @@ output::step "Collecting sbt plugin information"
 sbt_about_output="$(sbt about 2>&1)"
 metrics::set_duration "sbt_about_duration" "${sbt_about_start_time}"
 
-if echo "${sbt_about_output}" | grep -q "com\.typesafe\.sbt\.SbtNativePackager"; then
+if echo "${sbt_about_output}" | grep --quiet --fixed-strings "com.typesafe.sbt.SbtNativePackager"; then
 	app_has_native_packager_sbt_plugin="true"
 	metrics::set_raw "uses_sbt_native_packager" "true"
 fi
 
-if echo "${sbt_about_output}" | grep -q "play\.sbt\.Play"; then
+if echo "${sbt_about_output}" | grep --quiet --fixed-strings "play.sbt.Play"; then
 	metrics::set_raw "is_play_app" "true"
 fi
 
