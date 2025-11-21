@@ -2,33 +2,6 @@
 
 set -euo pipefail
 
-is_play() {
-	local app_dir="${1}"
-
-	case "${IS_PLAY_APP:-}" in
-	"true")
-		return 0
-		;;
-	"false")
-		return 1
-		;;
-	*)
-		[[ -f "${app_dir}/${PLAY_CONF_FILE:-conf/application.conf}" ]] ||
-			grep -E --quiet --no-messages '^\s*addSbtPlugin\(\s*("org\.playframework"|"com\.typesafe\.play")\s*%\s*"sbt-plugin"' "${app_dir}/project/plugins.sbt"
-		;;
-	esac
-}
-
-is_sbt_native_packager() {
-	local ctx_dir="${1}"
-	if [[ -e "${ctx_dir}"/project/plugins.sbt ]]; then
-		plugin_version_line="$(grep "addSbtPlugin(.\+sbt-native-packager" "${ctx_dir}"/project/plugins.sbt || true)"
-		test -n "${plugin_version_line}"
-	else
-		return 1
-	fi
-}
-
 # sed -l basically makes sed replace and buffer through stdin to stdout
 # so you get updates while the command runs and dont wait for the end
 # e.g. sbt stage | indent
@@ -54,11 +27,4 @@ run_sbt() {
 		handle_sbt_errors "${build_log_file}"
 		exit 1
 	fi
-}
-
-write_sbt_dependency_classpath_log() {
-	export SBT_EXTRAS_OPTS="${SBT_EXTRAS_OPTS:-}"
-
-	output::step "Collecting dependency information"
-	sbt "show dependencyClasspath" | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log || true
 }

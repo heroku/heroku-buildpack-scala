@@ -197,24 +197,31 @@ fi
 sbt::install_sbt_launcher "${sbt_version}" "${CACHE_DIR}/sbt-launcher"
 export PATH="${CACHE_DIR}/sbt-launcher/bin:${PATH}"
 
-# Collect metrics
-if is_sbt_native_packager "${BUILD_DIR}"; then
-	metrics::set_raw "uses_sbt_native_packager" "true"
-else
-	metrics::set_raw "uses_sbt_native_packager" "false"
-fi
-
-if is_play "${BUILD_DIR}"; then
-	metrics::set_raw "is_play_app" "true"
-else
-	metrics::set_raw "is_play_app" "false"
-fi
-
 cd "${BUILD_DIR}"
 run_sbt "${SBT_TASKS}"
 
+# Gather information about relevant installed sbt plugins
+sbt_about_start_time=$(util::nowms)
+sbt_about_output="$(sbt about 2>&1)"
+metrics::set_duration "sbt_about_duration" "${sbt_about_start_time}"
+
+if echo "${sbt_about_output}" | grep -q "com\.typesafe\.sbt\.SbtNativePackager"; then
+	app_has_native_packager_sbt_plugin="true"
+	metrics::set_raw "uses_sbt_native_packager" "true"
+fi
+
+if echo "${sbt_about_output}" | grep -q "play\.sbt\.Play"; then
+	metrics::set_raw "is_play_app" "true"
+fi
+
+# Collect dependency classpath information for Postgres addon auto-provisioning. This creates a log file containing
+# all dependencies and their paths, which is used by bin/release to detect if the app uses Postgres drivers. This
+# can be disabled by setting DISABLE_DEPENDENCY_CLASSPATH_LOG if issues occur during dependency resolution.
 if [[ -z "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]]; then
-	write_sbt_dependency_classpath_log
+	dependency_classpath_log_start_time=$(util::nowms)
+	output::step "Collecting dependency information"
+	sbt "show dependencyClasspath" | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log || true
+	metrics::set_duration "dependency_classpath_log_duration" "${dependency_classpath_log_start_time}"
 fi
 
 # Copy the target dir back to cache for the next build (see cache restore comment above for context)
@@ -276,13 +283,13 @@ if [[ "${SBT_AT_RUNTIME:-"true"}" == "true" ]]; then
 	metrics::set_duration "sbt_runtime_copy_duration" "${sbt_runtime_copy_start_time}"
 fi
 
-# When sbt-native-packager is used (either directly or implicitly by the Play framework), a standalone JAR file with
-# all code and dependencies is created. This makes the other JAR and class files redundant since they are not used by
-# the running application. We remove these files here to reduce the slug size. However, this is a broad assumption that
-# is often but not always correct. Users might want to use these files to run the application differently or for other
-# purposes. This is legacy behavior that we will not change at this point to avoid users running into slug size limits
-# needlessly. Ideally customers would curate their builds to not include extraneous files.
-if (is_sbt_native_packager "${BUILD_DIR}" || is_play "${BUILD_DIR}") && [[ "${KEEP_SBT_CACHE:-}" != "true" ]]; then
+# When sbt-native-packager is used, a standalone JAR file with all code and dependencies is created. This makes the
+# other JAR and class files redundant since they are not used by the running application. We remove these files here
+# to reduce the slug size. However, this is a broad assumption that is often but not always correct. Users might want
+# to use these files to run the application differently or for other purposes. This is legacy behavior that we will not
+# change at this point to avoid users running into slug size limits needlessly. Ideally customers would curate their
+# builds to not include extraneous files.
+if [[ -n "${app_has_native_packager_sbt_plugin:-}" ]] && [[ "${KEEP_SBT_CACHE:-}" != "true" ]]; then
 	artifact_cleanup_start_time=$(util::nowms)
 	output::step "Dropping compilation artifacts from the slug"
 	rm -rf "${BUILD_DIR}/target/scala-"*
