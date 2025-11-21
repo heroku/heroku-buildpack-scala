@@ -23,7 +23,7 @@ run_sbt() {
 
 	output::step "Running: sbt ${tasks}"
 	# shellcheck disable=SC2086  # We want word splitting for tasks
-	if ! sbt ${tasks} | output "${build_log_file}"; then
+	if ! sbt ${tasks} 2>&1 | output "${build_log_file}"; then
 		handle_sbt_errors "${build_log_file}"
 		exit 1
 	fi
