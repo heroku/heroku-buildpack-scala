@@ -128,3 +128,92 @@ function sbt::download_sbt_launcher_jar() {
 		exit 1
 	fi
 }
+
+function sbt::output_build_error_message() {
+	local sbt_build_log_file="${1}"
+
+	if grep --quiet --ignore-case 'Not a valid key: stage' "${sbt_build_log_file}"; then
+		output::error <<-EOF
+			Error: sbt 'stage' task not found.
+
+			Your build definition does not define a valid 'stage' task, which is required
+			for deployment on Heroku. This task should create a deployment-ready
+			version of your application.
+
+			The recommended way to add the 'stage' task is to use the sbt-native-packager
+			plugin, which provides it automatically. Alternatively, you can define a
+			custom 'stage' task that prepares your application for deployment.
+
+			For more information, see:
+			- https://www.scala-sbt.org/sbt-native-packager/
+			- https://devcenter.heroku.com/articles/scala-support#build-behavior
+		EOF
+
+		metrics::set_string "failure_reason" "sbt_build::stage_task_not_found"
+		return
+	fi
+
+	if grep --quiet --ignore-case 'Compilation failed' "${sbt_build_log_file}"; then
+		output::error <<-EOF
+			Error: sbt build failed.
+
+			Your application failed to compile. Check the build output above
+			for specific compilation errors from the Scala compiler.
+
+			Common causes include:
+			- Syntax errors in your Scala/Java source code
+			- Type mismatches or missing implicit conversions
+			- Unresolved symbols or missing imports
+			- Incompatible API changes in dependencies
+
+			Fix the compilation errors in your code and try deploying again.
+		EOF
+
+		metrics::set_string "failure_reason" "sbt_build::compilation_failed"
+		return
+	fi
+
+	if grep --quiet --ignore-case 'is already defined as object' "${sbt_build_log_file}"; then
+		output::error <<-EOF
+			Error: sbt build failed.
+
+			An error occurred during the sbt build process. This error typically
+			indicates stale compilation artifacts in the cache that are conflicting
+			with your current code.
+
+			To fix this issue, run a clean build by setting:
+
+			    $ heroku config:set SBT_CLEAN=true
+
+			Then deploy again with 'git push'. After a successful build, you can
+			remove the variable:
+
+			    $ heroku config:unset SBT_CLEAN
+		EOF
+
+		metrics::set_string "failure_reason" "sbt_build::stale_cache"
+		return
+	fi
+
+	output::error <<-EOF
+		Error: sbt build failed.
+
+		An error occurred during the sbt build process. This usually
+		indicates an issue with your application's dependencies, configuration,
+		or source code.
+
+		First, check the build output above for specific error messages
+		from sbt that might indicate what went wrong. Common issues include:
+
+		- Missing or incompatible dependencies in your build.sbt
+		- Compilation errors in your Scala/Java source code
+		- Configuration problems in your project settings
+		- Plugin compatibility issues
+
+		If the error message isn't clear, try building locally with the
+		same sbt version specified in project/build.properties to reproduce
+		the issue.
+	EOF
+
+	metrics::set_string "failure_reason" "sbt_build::unknown"
+}
