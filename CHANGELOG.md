@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Fix sbt launcher output indentation. ([#296](https://github.com/heroku/heroku-buildpack-scala/pull/296))
 * Improve plugin detection using `sbt about` instead of parsing `project/plugins.sbt` files. ([#294](https://github.com/heroku/heroku-buildpack-scala/pull/294))
 * Suppress sbt batch mode warning. ([#293](https://github.com/heroku/heroku-buildpack-scala/pull/293))
 * Replace sbt-extras with direct sbt launcher installation. ([#291](https://github.com/heroku/heroku-buildpack-scala/pull/291))
