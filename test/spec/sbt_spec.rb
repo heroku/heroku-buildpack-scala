@@ -42,7 +42,6 @@ describe 'Sbt' do
           remote:        [info] loading project definition from $BUILD_DIR/project
           remote:        [info] loading settings for project $BUILD_ID from build.sbt...
           remote:        [info] set current project to sbt-1.11.7-minimal-with-native-packager (in build file:$BUILD_DIR/)
-          remote:        [info] Executing in batch mode. For better performance use sbt's shell
           remote:        [info] compiling 1 Scala source to $BUILD_DIR/target/scala-2.13/classes ...
           remote:        [info] done compiling
           remote:        [success] Total time: $DURATION, completed $DATETIME
@@ -89,7 +88,6 @@ describe 'Sbt' do
           remote:        [info] loading project definition from $BUILD_DIR/project
           remote:        [info] loading settings for project $BUILD_ID from build.sbt...
           remote:        [info] set current project to sbt-1.11.7-minimal-with-native-packager (in build file:$BUILD_DIR/)
-          remote:        [info] Executing in batch mode. For better performance use sbt's shell
           remote:        [info] compiling 1 Scala source to $BUILD_DIR/target/scala-2.13/classes ...
           remote:        [error] $BUILD_DIR/src/main/scala/com/heroku/App.scala:1:1: expected class or object definition
           remote:        [error] this will not compile
