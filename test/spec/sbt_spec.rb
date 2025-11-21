@@ -47,6 +47,7 @@ describe 'Sbt' do
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote:        [info] Wrote $BUILD_DIR/target/scala-2.13/sbt-1-11-7-minimal-with-native-packager_2.13-0.1.0-SNAPSHOT.pom
           remote:        [success] Total time: $DURATION, completed $DATETIME
+          remote: -----> Collecting sbt plugin information
           remote: -----> Collecting dependency information
           remote: -----> Copying sbt and dependencies into slug for runtime use
           remote: -----> Dropping compilation artifacts from the slug

@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Improve plugin detection using `sbt about` instead of parsing `project/plugins.sbt` files. ([#294](https://github.com/heroku/heroku-buildpack-scala/pull/294))
 * Suppress sbt batch mode warning. ([#293](https://github.com/heroku/heroku-buildpack-scala/pull/293))
 * Replace sbt-extras with direct sbt launcher installation. ([#291](https://github.com/heroku/heroku-buildpack-scala/pull/291))
 * Remove build directory symlinking. Modern sbt versions no longer require a stable build path for caching. ([#290](https://github.com/heroku/heroku-buildpack-scala/pull/290))

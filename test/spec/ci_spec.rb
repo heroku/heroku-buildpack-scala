@@ -42,6 +42,7 @@ RSpec.describe 'Scala buildpack' do
                \\[info\\] https://www.playframework.com/sponsors
                \\[info\\]
                \\[success\\] Total time: .* s, completed .*
+        -----> Collecting sbt plugin information
         -----> Collecting dependency information
         -----> No test-setup command provided. Skipping.
         -----> Running Scala buildpack tests...
@@ -96,6 +97,7 @@ RSpec.describe 'Scala buildpack' do
                \\[info\\] https://www.playframework.com/sponsors
                \\[info\\]
                \\[success\\] Total time: .* s, completed .*
+        -----> Collecting sbt plugin information
         -----> Collecting dependency information
         -----> No test-setup command provided. Skipping.
         -----> Running Scala buildpack tests...

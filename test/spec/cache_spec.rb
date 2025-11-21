@@ -41,6 +41,7 @@ describe 'Scala buildpack' do
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote:        [info] Wrote $BUILD_DIR/target/scala-2.13/sbt-1-11-7-play-3-x-scala-2-13-x_2.13-1.0-SNAPSHOT.pom
           remote:        [success] Total time: $DURATION, completed $DATETIME
+          remote: -----> Collecting sbt plugin information
           remote: -----> Collecting dependency information
           remote: -----> Copying sbt and dependencies into slug for runtime use
           remote: -----> Dropping compilation artifacts from the slug
@@ -81,6 +82,7 @@ describe 'Scala buildpack' do
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote:        [info] Wrote $BUILD_DIR/target/scala-2.13/sbt-1-11-7-play-3-x-scala-2-13-x_2.13-1.0-SNAPSHOT.pom
           remote:        [success] Total time: $DURATION, completed $DATETIME
+          remote: -----> Collecting sbt plugin information
           remote: -----> Collecting dependency information
           remote: -----> Copying sbt and dependencies into slug for runtime use
           remote: -----> Dropping compilation artifacts from the slug
@@ -822,6 +824,7 @@ describe 'Scala buildpack' do
           remote:        [info] Packaging $BUILD_DIR/target/scala-2.13/sbt-0-13-18-minimal-with-native-packager_2.13-0.1-SNAPSHOT.jar ...
           remote:        [info] Done packaging.
           remote:        [success] Total time: $DURATION, completed $DATETIME
+          remote: -----> Collecting sbt plugin information
           remote: -----> Collecting dependency information
           remote: WARNING: An illegal reflective access operation has occurred
           remote: WARNING: Illegal reflective access by sbt.ivyint.ErrorMessageAuthenticator$ (file:/tmp/codon/tmp/cache/sbt_boot/scala-2.10.7/org.scala-sbt/sbt/0.13.18/ivy-0.13.18.jar) to field java.net.Authenticator.theAuthenticator
@@ -1097,6 +1100,7 @@ describe 'Scala buildpack' do
           remote:        [info] Packaging $BUILD_DIR/target/scala-2.13/sbt-0-13-18-minimal-with-native-packager_2.13-0.1-SNAPSHOT.jar ...
           remote:        [info] Done packaging.
           remote:        [success] Total time: $DURATION, completed $DATETIME
+          remote: -----> Collecting sbt plugin information
           remote: -----> Collecting dependency information
           remote: WARNING: An illegal reflective access operation has occurred
           remote: WARNING: Illegal reflective access by sbt.ivyint.ErrorMessageAuthenticator$ (file:/tmp/codon/tmp/cache/sbt_boot/scala-2.10.7/org.scala-sbt/sbt/0.13.18/ivy-0.13.18.jar) to field java.net.Authenticator.theAuthenticator
