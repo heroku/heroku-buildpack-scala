@@ -26,11 +26,31 @@ source "${BUILDPACK_DIR}/lib/metrics.sh"
 source "${BUILDPACK_DIR}/lib/util.sh"
 # shellcheck source=lib/openjdk.sh
 source "${BUILDPACK_DIR}/lib/openjdk.sh"
+# shellcheck source=lib/sbt.sh
+source "${BUILDPACK_DIR}/lib/sbt.sh"
 
 metrics::init "${CACHE_DIR}" "scala"
 metrics::setup
 
 util::export_env_dir "${ENV_DIR}" "." "JAVA_OPTS"
+
+# sbt Java system properties that configure directory locations, applied during both build and runtime
+# Data structure: "sbt_property|cache_relative_path|slug_relative_path"
+# Paths are relative to CACHE_DIR and BUILD_DIR/app root respectively
+readonly sbt_directory_properties=(
+	"sbt.ivy.home|ivy_home|.sbt_home/.ivy2"
+	"sbt.coursier.home|coursier_home|.sbt_home/.coursier"
+	"sbt.boot.directory|sbt_boot|.sbt_home/boot"
+	"sbt.global.base|sbt_global|.sbt_home"
+)
+
+# Default sbt Java system properties set by the buildpack, applied during both build and runtime
+readonly sbt_buildpack_default_properties=(
+	"sbt.log.noformat=true"
+	"sbt.color=false"
+)
+
+readonly sbt_launcher_dir_name="sbt-launcher"
 
 # Used by openjdk::install_openjdk_via_jvm_common_buildpack to determine which JVM common buildpack to use
 # Configuring this via system.properties is deprecated and will be removed soon
@@ -50,27 +70,6 @@ done
 
 # Install the JDK
 openjdk::install_openjdk_via_jvm_common_buildpack "${BUILD_DIR}" "${BUILDPACK_DIR}"
-
-#create the cache dir if it doesn't exist
-mkdir -p "${CACHE_DIR}"
-
-# home directory from perspective of SBT; we rename
-# it because otherwise the project root and $HOME
-# are the same, and by default .sbt has a (different)
-# meaning in those two places
-SBT_USER_HOME=".sbt_home"
-SBT_USER_HOME_ABSOLUTE="${BUILD_DIR}/${SBT_USER_HOME}"
-# where we put the SBT binaries
-SBT_BINDIR="${SBT_USER_HOME}/bin"
-
-# chdir as sbt expects
-cd "${BUILD_DIR}"
-
-# unpack cache
-CACHED_DIRS="${SBT_USER_HOME} target project/target project/boot .coursier"
-for DIR in ${CACHED_DIRS}; do
-	cache_copy "${DIR}" "${CACHE_DIR}" "${BUILD_DIR}"
-done
 
 sbt_version="$(java_properties::get "${BUILD_DIR}/project/build.properties" "sbt.version")"
 metrics::set_string "sbt_version" "${sbt_version:-"unknown"}"
@@ -135,20 +134,14 @@ case "${sbt_version}" in
 	;;
 esac
 
-if has_old_preset_sbt_opts; then
-	output::warning <<-EOF
-		Your SBT_OPTS config var looks like its not in the right form.
-		It was probably set this way in an earlier version of the buildpack. The
-		only ill effect should be a warning like \"The \`-\` command is deprecated\".
-		To avoid any unexpected behavior, please unset it by running this command:
-
-			$ heroku config:unset SBT_OPTS
-
-		The buildpack will pick good defaults for you, but you can still customize
-		sbt's execution as described in this article:
-		https://github.com/paulp/sbt-extras#sample-usage
-	EOF
-fi
+# Copy the target dir from cache to speed up compilation. This is legacy buildpack
+# behavior that other JVM buildpacks don't implement. It can cause cache bloat, stale artifacts,
+# and reduced build reproducibility. We've observed customers using SBT_CLEAN (which will remove these files)
+# much more than expected (~10% of builds), presumably to work around issues.
+# This will be removed in a future version.
+target_dir_cache_restore_start_time=$(util::nowms)
+util::cache_copy "target" "${CACHE_DIR}" "${BUILD_DIR}"
+metrics::set_duration "target_dir_cache_restore_duration" "${target_dir_cache_restore_start_time}"
 
 if [[ -n "${SBT_PROJECT}" ]]; then
 	SBT_TASKS="${SBT_PROJECT}/compile ${SBT_PROJECT}/stage"
@@ -166,27 +159,45 @@ fi
 # See: https://devcenter.heroku.com/articles/scala-support#clean-builds
 [[ "${SBT_CLEAN}" = "true" ]] && SBT_TASKS="clean ${SBT_TASKS}"
 
-# Install the custom sbt script
-install_sbt_extras "${BUILDPACK_DIR}/opt" "${SBT_BINDIR}"
+for default_property in "${sbt_buildpack_default_properties[@]}"; do
+	util::prepend_to_env "SBT_OPTS" "-D${default_property}"
+done
 
-# copy in heroku sbt plugin
+# Create sbt directories and configure SBT_OPTS for build time
+for directory_property in "${sbt_directory_properties[@]}"; do
+	IFS='|' read -r sbt_property cache_path slug_path <<<"${directory_property}"
+	mkdir -p "${CACHE_DIR}/${cache_path}"
+	util::prepend_to_env "SBT_OPTS" "-D${sbt_property}=${CACHE_DIR}/${cache_path}"
+done
+
+# Install the Heroku sbt plugin if the exising version differs (or is missing). We do this conditionally to
+# ensure we can cache the compiled class files of the plugin between builds, speeding up the build overall.
 case "${sbt_version}" in
 1.*)
-	HEROKU_PLUGIN="HerokuBuildpackPlugin_sbt1.scala"
+	plugin_source_path="${BUILDPACK_DIR}/opt/HerokuBuildpackPlugin_sbt1.scala"
 	;;
 *)
-	HEROKU_PLUGIN="HerokuBuildpackPlugin.scala"
+	plugin_source_path="${BUILDPACK_DIR}/opt/HerokuBuildpackPlugin.scala"
 	;;
 esac
 
-mkdir -p "${SBT_USER_HOME}/plugins"
-rm -f "${SBT_USER_HOME}/plugins/HerokuPlugin.scala"               # remove the old ambiguously named plugin
-rm -f "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin_sbt1.scala" # remove the old poorly named plugin
-rm -f "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"      # remove the old plugin
-cp -p "${BUILDPACK_DIR}/opt/${HEROKU_PLUGIN}" "${SBT_USER_HOME}/plugins/HerokuBuildpackPlugin.scala"
+plugins_dir="${CACHE_DIR}/sbt_global/plugins"
+plugin_destination_path="${plugins_dir}/HerokuBuildpackPlugin.scala"
+source_checksum="$(sha256sum "${plugin_source_path}" | awk '{print $1}')"
+
+if [[ ! -f "${plugin_destination_path}" ]] || [[ "${source_checksum}" != "$(sha256sum "${plugin_destination_path}" | awk '{print $1}')" ]]; then
+	# We remove the whole directory since we also want to remove the (cached) compiled files
+	# for the older version of the plugin in the ./target directory.
+	rm -rf "${plugins_dir}"
+
+	mkdir -p "${plugins_dir}"
+	cp "${plugin_source_path}" "${plugin_destination_path}"
+fi
+
+sbt::install_sbt_launcher "${sbt_version}" "${CACHE_DIR}/sbt-launcher"
+export PATH="${CACHE_DIR}/sbt-launcher/bin:${PATH}"
 
 # Collect metrics
-
 if is_sbt_native_packager "${BUILD_DIR}"; then
 	metrics::set_raw "uses_sbt_native_packager" "true"
 else
@@ -199,66 +210,95 @@ else
 	metrics::set_raw "is_play_app" "false"
 fi
 
-# Manually pre-clean because sbt-native-packager doesn't clobber this dir
-rm -rf "${BUILD_DIR}/target/universal/stage"
-
-# build app
-run_sbt "${SBT_USER_HOME_ABSOLUTE}" "${SBT_TASKS}"
+cd "${BUILD_DIR}"
+run_sbt "${SBT_TASKS}"
 
 if [[ -z "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]]; then
-	write_sbt_dependency_classpath_log "${SBT_USER_HOME_ABSOLUTE}"
+	write_sbt_dependency_classpath_log
 fi
 
-# repack cache
-mkdir -p "${CACHE_DIR}"
-for DIR in ${CACHED_DIRS}; do
-	cache_copy "${DIR}" "${BUILD_DIR}" "${CACHE_DIR}"
-done
+# Copy the target dir back to cache for the next build (see cache restore comment above for context)
+target_dir_cache_write_start_time=$(util::nowms)
+util::cache_copy "target" "${BUILD_DIR}" "${CACHE_DIR}"
+metrics::set_duration "target_dir_cache_write_duration" "${target_dir_cache_write_start_time}"
 
-# drop useless directories from slug for play and sbt-native-launcher only
-if is_sbt_native_packager "${BUILD_DIR}" || is_play "${BUILD_DIR}"; then
-	if [[ "${KEEP_SBT_CACHE:-}" != "true" ]]; then
-		if [[ "${KEEP_IVY_CACHE:-}" != "true" ]] && [[ -d "${SBT_USER_HOME}/.ivy2" ]]; then
-			output::step "Dropping ivy cache from the slug"
-			rm -rf "${SBT_USER_HOME:?}/.ivy2"
-		fi
-		if [[ "${KEEP_COURSIER_CACHE:-}" != "true" ]] && [[ -d "${SBT_USER_HOME}/.coursier" ]]; then
-			output::step "Dropping coursier cache from the slug"
-			rm -rf "${SBT_USER_HOME:?}/.coursier"
-		fi
-		if [[ -d "${SBT_USER_HOME}/boot" ]]; then
-			output::step "Dropping sbt boot dir from the slug"
-			rm -rf "${SBT_USER_HOME:?}/boot"
-		fi
-		if [[ -d "${SBT_USER_HOME}/.cache" ]]; then
-			output::step "Dropping sbt cache dir from the slug"
-			rm -rf "${SBT_USER_HOME:?}/.cache"
-		fi
-		if [[ -d "${BUILD_DIR}/project/boot" ]]; then
-			output::step "Dropping project boot dir from the slug"
-			rm -rf "${BUILD_DIR}/project/boot"
-		fi
-		if [[ -d "${BUILD_DIR}/target" ]]; then
-			output::step "Dropping compilation artifacts from the slug"
-			rm -rf "${BUILD_DIR}/target/scala-"*
-			rm -rf "${BUILD_DIR}/target/streams"
-			if [[ -d "${BUILD_DIR}/target/resolution-cache" ]]; then
-				find "${BUILD_DIR}/target/resolution-cache"/* ! -name "reports" ! -name "*-compile.xml" -print0 | xargs -0 rm -rf --
-			fi
-		fi
-	fi
-fi
-
-# write profile.d script
-profile_script="${BUILD_DIR}/.profile.d/scala.sh"
-mkdir -p "$(dirname "${profile_script}")"
-cat <<-EOF >"${profile_script}"
-	export SBT_HOME="\$HOME/${SBT_USER_HOME}"
-	export PATH="\$SBT_HOME/bin:\$PATH"
-EOF
-
-# write export script
+# Write export script for use by subsequent buildpacks. The export script sets up the environment so that other
+# buildpacks in the chain can access sbt and its configuration during their build phase. This script is sourced by
+# the buildpack framework between buildpack executions.
 cat <<-EOF >"${BASE_DIR}/export"
-	export SBT_HOME="${BUILD_DIR}/${SBT_USER_HOME}"
-	export PATH="\$SBT_HOME/bin:\$PATH"
+	export PATH="${CACHE_DIR}/${sbt_launcher_dir_name}/bin:\$PATH"
+
+	$(for default_property in "${sbt_buildpack_default_properties[@]}"; do
+		echo "export SBT_OPTS=\"\${SBT_OPTS:-} -D${default_property}\""
+	done)
+
+	$(for directory_property in "${sbt_directory_properties[@]}"; do
+		IFS='|' read -r sbt_property cache_path slug_path <<<"${directory_property}"
+		echo "export SBT_OPTS=\"\${SBT_OPTS:-} -D${sbt_property}=${CACHE_DIR}/${cache_path}\""
+	done)
 EOF
+
+# Historically, the buildpack made sbt and all cached dependencies available at runtime. While we eventually want to
+# phase out this feature for parity with other JVM buildpacks, we still support it for backwards compatibility. To
+# preserve this feature, we copy all sbt-related directories into the slug and write a profile.d script so that sbt
+# will find those directories at runtime. This approach keeps the buildpack source clean and makes it easy to phase
+# out this feature in the future.
+if [[ "${SBT_AT_RUNTIME:-"true"}" == "true" ]]; then
+	sbt_runtime_copy_start_time=$(util::nowms)
+	output::step "Copying sbt and dependencies into slug for runtime use"
+
+	# Copy sbt launcher from cache into slug
+	if [[ -d "${CACHE_DIR}/${sbt_launcher_dir_name}" ]]; then
+		mkdir -p "${BUILD_DIR}/.heroku/scala"
+		cp -r "${CACHE_DIR}/${sbt_launcher_dir_name}" "${BUILD_DIR}/.heroku/scala/${sbt_launcher_dir_name}"
+	fi
+
+	profile_d_script_path="${BUILD_DIR}/.profile.d/scala.sh"
+	mkdir -p "$(dirname "${profile_d_script_path}")"
+	cat <<-EOF >"${profile_d_script_path}"
+		export PATH="\$HOME/.heroku/scala/${sbt_launcher_dir_name}/bin:\$PATH"
+	EOF
+
+	for directory_property in "${sbt_directory_properties[@]}"; do
+		IFS='|' read -r sbt_property cache_path slug_path <<<"${directory_property}"
+		mkdir -p "${BUILD_DIR}/${slug_path}"
+		# For historic reasons, some sbt runtime directories are configured to be subdirectories of
+		# each other. Using '/.' copies the contents of the source into the destination, preventing
+		# 'cp' from creating an additional layer of directories when the destination already exists.
+		cp -r "${CACHE_DIR}/${cache_path}/." "${BUILD_DIR}/${slug_path}/"
+		echo "export SBT_OPTS=\"\${SBT_OPTS:-} -D${sbt_property}=\$HOME/${slug_path}\"" >>"${profile_d_script_path}"
+	done
+
+	for default_property in "${sbt_buildpack_default_properties[@]}"; do
+		echo "export SBT_OPTS=\"\${SBT_OPTS:-} -D${default_property}\"" >>"${profile_d_script_path}"
+	done
+
+	metrics::set_duration "sbt_runtime_copy_duration" "${sbt_runtime_copy_start_time}"
+fi
+
+# When sbt-native-packager is used (either directly or implicitly by the Play framework), a standalone JAR file with
+# all code and dependencies is created. This makes the other JAR and class files redundant since they are not used by
+# the running application. We remove these files here to reduce the slug size. However, this is a broad assumption that
+# is often but not always correct. Users might want to use these files to run the application differently or for other
+# purposes. This is legacy behavior that we will not change at this point to avoid users running into slug size limits
+# needlessly. Ideally customers would curate their builds to not include extraneous files.
+if (is_sbt_native_packager "${BUILD_DIR}" || is_play "${BUILD_DIR}") && [[ "${KEEP_SBT_CACHE:-}" != "true" ]]; then
+	artifact_cleanup_start_time=$(util::nowms)
+	output::step "Dropping compilation artifacts from the slug"
+	rm -rf "${BUILD_DIR}/target/scala-"*
+	rm -rf "${BUILD_DIR}/target/streams"
+	find "${BUILD_DIR}/target/resolution-cache" -mindepth 1 ! -name "reports" ! -name "*-compile.xml" -exec rm -rf {} + 2>/dev/null || true
+
+	for directory_property in "${sbt_directory_properties[@]}"; do
+		IFS='|' read -r sbt_property cache_path slug_path <<<"${directory_property}"
+		# sbt's global directory must not be deleted. It does not contain compilation artifacts related to
+		# the customers app and is required for sbt operations at runtime.
+		if [[ "${sbt_property}" == "sbt.global.base" ]]; then
+			continue
+		fi
+
+		rm -rf "${BUILD_DIR:?}/${slug_path:?}"/*
+	done
+
+	metrics::set_duration "artifact_cleanup_duration" "${artifact_cleanup_start_time}"
+fi

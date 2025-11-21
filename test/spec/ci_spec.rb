@@ -20,8 +20,8 @@ RSpec.describe 'Scala buildpack' do
         \\[info\\] \\[launcher\\] getting org.scala-sbt sbt 1.11.7  \\(this may take some time\\)...
         \\[info\\] \\[launcher\\] getting Scala 2.12.20 \\(for sbt\\)...
                \\[info\\] welcome to sbt 1.11.7 \\(Azul Systems, Inc. Java 21.0.[0-9]+\\)
-               \\[info\\] loading global plugins from /app/.sbt_home/plugins
-               \\[info\\] compiling 1 Scala source to /app/.sbt_home/plugins/target/scala-2.12/sbt-1.0/classes ...
+               \\[info\\] loading global plugins from .*/plugins
+               \\[info\\] compiling 1 Scala source to .* ...
                \\[info\\] Non-compiled module 'compiler-bridge_2.12' for Scala 2.12.20. Compiling...
                \\[info\\]   Compilation completed in .*s.
                \\[info\\] done compiling
@@ -47,7 +47,7 @@ RSpec.describe 'Scala buildpack' do
         -----> Running Scala buildpack tests...
         Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
         \\[info\\] welcome to sbt 1.11.7 \\(Azul Systems, Inc. Java 21.0.[0-9]+\\)
-        \\[info\\] loading global plugins from /app/.sbt_home/plugins
+        \\[info\\] loading global plugins from .*/plugins
         \\[info\\] loading project definition from /app/project/project
         \\[info\\] loading settings for project app-build from ._plugins.sbt, plugins.sbt...
         \\[info\\] loading project definition from /app/project
@@ -78,7 +78,7 @@ RSpec.describe 'Scala buildpack' do
         -----> Installing Azul Zulu OpenJDK 21.0.[0-9]+
         -----> Running: sbt update
                \\[info\\] welcome to sbt 1.11.7 \\(Azul Systems, Inc. Java 21.0.[0-9]+\\)
-               \\[info\\] loading global plugins from /app/.sbt_home/plugins
+               \\[info\\] loading global plugins from .*/plugins
                \\[info\\] loading project definition from /app/project/project
                \\[info\\] loading settings for project app-build from ._plugins.sbt, plugins.sbt...
                \\[info\\] loading project definition from /app/project
@@ -101,7 +101,7 @@ RSpec.describe 'Scala buildpack' do
         -----> Running Scala buildpack tests...
         Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
         \\[info\\] welcome to sbt 1.11.7 \\(Azul Systems, Inc. Java 21.0.[0-9]+\\)
-        \\[info\\] loading global plugins from /app/.sbt_home/plugins
+        \\[info\\] loading global plugins from .*/plugins
         \\[info\\] loading project definition from /app/project/project
         \\[info\\] loading settings for project app-build from ._plugins.sbt, plugins.sbt...
         \\[info\\] loading project definition from /app/project

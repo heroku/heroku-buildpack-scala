@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Replace sbt-extras with direct sbt launcher installation. ([#291](https://github.com/heroku/heroku-buildpack-scala/pull/291))
 * Remove build directory symlinking. Modern sbt versions no longer require a stable build path for caching. ([#290](https://github.com/heroku/heroku-buildpack-scala/pull/290))
 
 ## [v103] - 2025-10-27
