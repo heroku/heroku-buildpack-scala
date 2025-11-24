@@ -103,4 +103,3 @@ describe 'Sbt multi-project builds' do
     end
   end
 end
-
