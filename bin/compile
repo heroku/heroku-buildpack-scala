@@ -225,7 +225,7 @@ fi
 # Gather information about relevant installed sbt plugins
 sbt_about_start_time=$(util::nowms)
 output::step "Collecting sbt plugin information"
-sbt_about_output="$(sbt about 2>&1)"
+sbt_about_output="$(sbt ${SBT_PROJECT:+$SBT_PROJECT/}about 2>&1)"
 metrics::set_duration "sbt_about_duration" "${sbt_about_start_time}"
 
 if echo "${sbt_about_output}" | grep --quiet --fixed-strings "com.typesafe.sbt.SbtNativePackager"; then
@@ -244,7 +244,7 @@ if [[ -z "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]]; then
 	dependency_classpath_log_start_time=$(util::nowms)
 	output::step "Collecting dependency information"
 	# With some sbt + Java version combinations, Java reflective access warnings are written to stderr. Redirect stderr to avoid spilling these warnings to the build output.
-	sbt "show dependencyClasspath" 2>/dev/null | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log || true
+	sbt "show ${SBT_PROJECT:+$SBT_PROJECT/}dependencyClasspath" 2>/dev/null | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log || true
 	metrics::set_duration "dependency_classpath_log_duration" "${dependency_classpath_log_start_time}"
 fi
 
