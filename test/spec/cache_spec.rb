@@ -826,11 +826,6 @@ describe 'Scala buildpack' do
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote: -----> Collecting sbt plugin information
           remote: -----> Collecting dependency information
-          remote:        WARNING: An illegal reflective access operation has occurred
-          remote:        WARNING: Illegal reflective access by sbt.ivyint.ErrorMessageAuthenticator$ (file:/tmp/codon/tmp/cache/sbt_boot/scala-2.10.7/org.scala-sbt/sbt/0.13.18/ivy-0.13.18.jar) to field java.net.Authenticator.theAuthenticator
-          remote:        WARNING: Please consider reporting this to the maintainers of sbt.ivyint.ErrorMessageAuthenticator$
-          remote:        WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-          remote:        WARNING: All illegal access operations will be denied in a future release
           remote: -----> Copying sbt and dependencies into slug for runtime use
           remote: -----> Dropping compilation artifacts from the slug
           remote: -----> Discovering process types
@@ -1102,11 +1097,6 @@ describe 'Scala buildpack' do
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote: -----> Collecting sbt plugin information
           remote: -----> Collecting dependency information
-          remote:        WARNING: An illegal reflective access operation has occurred
-          remote:        WARNING: Illegal reflective access by sbt.ivyint.ErrorMessageAuthenticator$ (file:/tmp/codon/tmp/cache/sbt_boot/scala-2.10.7/org.scala-sbt/sbt/0.13.18/ivy-0.13.18.jar) to field java.net.Authenticator.theAuthenticator
-          remote:        WARNING: Please consider reporting this to the maintainers of sbt.ivyint.ErrorMessageAuthenticator$
-          remote:        WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-          remote:        WARNING: All illegal access operations will be denied in a future release
           remote: -----> Copying sbt and dependencies into slug for runtime use
           remote: -----> Dropping compilation artifacts from the slug
           remote: -----> Discovering process types
