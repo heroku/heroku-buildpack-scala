@@ -44,6 +44,9 @@ describe 'Sbt multi-project builds' do
           remote: -----> Compressing...
           remote:        Done: 106.5M
         OUTPUT
+
+        response = http_get(app)
+        expect(response).to eq('Hello from Scala multi-project!')
       end
     end
   end
@@ -91,6 +94,9 @@ describe 'Sbt multi-project builds' do
           remote: -----> Compressing...
           remote:        Done: 106.5M
         OUTPUT
+
+        response = http_get(app)
+        expect(response).to eq('Hello from Scala multi-project!')
       end
     end
   end
