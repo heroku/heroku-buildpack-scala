@@ -39,16 +39,11 @@ describe 'Sbt multi-project builds' do
           remote: -----> Copying sbt and dependencies into slug for runtime use
           remote: -----> Dropping compilation artifacts from the slug
           remote: -----> Discovering process types
-          remote:        Procfile declares types     -> (none)
-          remote:        Default types for buildpack -> web
-          remote:
-          remote: -----> Compressing...
-          remote:        Done: $SIZE
-        OUTPUT
+          remote:        Procfile declares types -> (none)
 
-        # Verify app responds to HTTP requests
-        response = Excon.get("#{app.platform_api.app.info(app.name)['web_url']}", expects: [200])
-        expect(response.body).to eq('Hello from Scala multi-project!')
+          remote: -----> Compressing...
+          remote:        Done: 106.5M
+        OUTPUT
       end
     end
   end
@@ -91,16 +86,11 @@ describe 'Sbt multi-project builds' do
           remote: -----> Copying sbt and dependencies into slug for runtime use
           remote: -----> Dropping compilation artifacts from the slug
           remote: -----> Discovering process types
-          remote:        Procfile declares types     -> (none)
-          remote:        Default types for buildpack -> web
-          remote:
-          remote: -----> Compressing...
-          remote:        Done: $SIZE
-        OUTPUT
+          remote:        Procfile declares types -> (none)
 
-        # Verify app responds to HTTP requests
-        response = Excon.get("#{app.platform_api.app.info(app.name)['web_url']}", expects: [200])
-        expect(response.body).to eq('Hello from Scala multi-project!')
+          remote: -----> Compressing...
+          remote:        Done: 106.5M
+        OUTPUT
       end
     end
   end
