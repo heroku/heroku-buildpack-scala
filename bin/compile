@@ -206,7 +206,7 @@ cd "${BUILD_DIR}"
 output::step "Running: sbt ${SBT_TASKS}"
 build_log_file="$(mktemp)"
 # shellcheck disable=SC2086
-if ! sbt ${SBT_TASKS} | tee -a "${build_log_file}" | output::indent; then
+if ! sbt ${SBT_TASKS} 2>&1 | tee -a "${build_log_file}" | output::indent; then
 	sbt::output_build_error_message "${build_log_file}"
 	exit 1
 fi
