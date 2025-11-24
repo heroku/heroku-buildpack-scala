@@ -28,11 +28,11 @@ describe 'Sbt multi-project builds' do
           remote:        [info] loading settings for project $BUILD_ID-build from plugins.sbt...
           remote:        [info] loading project definition from $BUILD_DIR/project
           remote:        [info] loading settings for project root from build.sbt...
-          remote:        [info] set current project to sbt-1.11.7-multi-project-root (in build file:$BUILD_DIR/)
+          remote:        [info] set current project to sbt-1.11.7-minimal-multi-project-with-native-packager-root (in build file:$BUILD_DIR/)
           remote:        [info] compiling 1 Scala source to $BUILD_DIR/subproject/target/scala-2.13/classes ...
           remote:        [info] done compiling
           remote:        [success] Total time: $DURATION, completed $DATETIME
-          remote:        [info] Wrote $BUILD_DIR/subproject/target/scala-2.13/subproject_2.13-0.1.0-SNAPSHOT.pom
+          remote:        [info] Wrote $BUILD_DIR/subproject/target/scala-2.13/sbt-1-11-7-minimal-multi-project-with-native-packager-subproject_2.13-0.1.0-SNAPSHOT.pom
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote: -----> Collecting sbt plugin information
           remote: -----> Collecting dependency information
@@ -77,12 +77,12 @@ describe 'Sbt multi-project builds' do
           remote:        [info] loading settings for project $BUILD_ID-build from plugins.sbt...
           remote:        [info] loading project definition from $BUILD_DIR/project
           remote:        [info] loading settings for project root from build.sbt...
-          remote:        [info] set current project to sbt-1.11.7-multi-project-root (in build file:$BUILD_DIR/)
+          remote:        [info] set current project to sbt-1.11.7-minimal-multi-project-with-native-packager-root (in build file:$BUILD_DIR/)
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote:        [info] compiling 1 Scala source to $BUILD_DIR/subproject/target/scala-2.13/classes ...
           remote:        [info] done compiling
           remote:        [success] Total time: $DURATION, completed $DATETIME
-          remote:        [info] Wrote $BUILD_DIR/subproject/target/scala-2.13/subproject_2.13-0.1.0-SNAPSHOT.pom
+          remote:        [info] Wrote $BUILD_DIR/subproject/target/scala-2.13/sbt-1-11-7-minimal-multi-project-with-native-packager-subproject_2.13-0.1.0-SNAPSHOT.pom
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote: -----> Collecting sbt plugin information
           remote: -----> Collecting dependency information
