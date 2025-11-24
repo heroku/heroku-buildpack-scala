@@ -97,14 +97,18 @@ describe 'Sbt' do
           remote:        [error] (Compile / compileIncremental) Compilation failed
           remote:        [error] Total time: $DURATION, completed $DATETIME
 
-          remote:  !     Failed to run sbt!
-          remote:  !     We're sorry this build is failing. If you can't find the issue in application
-          remote:  !     code, please submit a ticket so we can help: https://help.heroku.com
-          remote:  !     You can also try reverting to the previous version of the buildpack by running:
-          remote:  !     $ heroku buildpacks:set https://github.com/heroku/heroku-buildpack-scala#previous-version
+          remote:  !     Error: sbt build failed.
           remote:  !
-          remote:  !     Thanks,
-          remote:  !     Heroku
+          remote:  !     Your application failed to compile. Check the build output above
+          remote:  !     for specific compilation errors from the Scala compiler.
+          remote:  !
+          remote:  !     Common causes include:
+          remote:  !     - Syntax errors in your Scala/Java source code
+          remote:  !     - Type mismatches or missing implicit conversions
+          remote:  !     - Unresolved symbols or missing imports
+          remote:  !     - Incompatible API changes in dependencies
+          remote:  !
+          remote:  !     Fix the compilation errors in your code and try deploying again.
 
           remote:  !     Push rejected, failed to compile Scala app.
 

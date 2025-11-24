@@ -12,14 +12,10 @@ BASE_DIR="$(pwd)"
 
 # shellcheck source=lib/output.sh
 source "${BUILDPACK_DIR}/lib/output.sh"
-# shellcheck source=lib/common.sh
-source "${BUILDPACK_DIR}/lib/common.sh"
 # shellcheck source=lib/java_properties.sh
 source "${BUILDPACK_DIR}/lib/java_properties.sh"
 # shellcheck source=lib/config.sh
 source "${BUILDPACK_DIR}/lib/config.sh"
-# shellcheck source=lib/failures.sh
-source "${BUILDPACK_DIR}/lib/failures.sh"
 # shellcheck source=lib/metrics.sh
 source "${BUILDPACK_DIR}/lib/metrics.sh"
 # shellcheck source=lib/util.sh
@@ -206,7 +202,14 @@ sbt::install_sbt_launcher "${sbt_version}" "${CACHE_DIR}/sbt-launcher"
 export PATH="${CACHE_DIR}/sbt-launcher/bin:${PATH}"
 
 cd "${BUILD_DIR}"
-run_sbt "${SBT_TASKS}"
+
+output::step "Running: sbt ${SBT_TASKS}"
+build_log_file="$(mktemp)"
+# shellcheck disable=SC2086
+if ! sbt ${SBT_TASKS} 2>&1 | tee -a "${build_log_file}" | output::indent; then
+	sbt::output_build_error_message "${build_log_file}"
+	exit 1
+fi
 
 # Gather information about relevant installed sbt plugins
 sbt_about_start_time=$(util::nowms)
