@@ -32,7 +32,9 @@ fi
 if [[ ! -f "${BUILD_DIR}/Procfile" ]]; then
 	# Use sbt-native-packager executable if exactly one is found.
 	# https://www.scala-sbt.org/sbt-native-packager/archetypes/java_app/index.html
-	mapfile -t -d '' sbt_native_packager_executables < <(find "${BUILD_DIR}/target/universal/stage/bin" -type f -executable -print0 2>/dev/null)
+	# Search for executables in both single-project (target/universal/stage/bin) and
+	# multi-project (*/target/universal/stage/bin) locations.
+	mapfile -t -d '' sbt_native_packager_executables < <(find "${BUILD_DIR}" -path "*/target/universal/stage/bin/*" -type f -executable -print0 2>/dev/null)
 	if [[ "${#sbt_native_packager_executables[@]}" -eq 1 ]]; then
 		# Include -Dhttp.port=$PORT since many sbt-native-packager apps use Play Framework.
 		# Apps that don't use the http.port system property will not be negatively affected by setting it.

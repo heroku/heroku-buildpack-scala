@@ -8,8 +8,6 @@ BUILD_DIR="${1}"
 CACHE_DIR="${2}"
 ENV_DIR="${3}"
 
-BASE_DIR="$(pwd)"
-
 # shellcheck source=lib/output.sh
 source "${BUILDPACK_DIR}/lib/output.sh"
 # shellcheck source=lib/java_properties.sh
@@ -66,7 +64,7 @@ SBT_PRE_TASKS="$(config::get "${BUILD_DIR}" "sbt.pre-tasks" "SBT_PRE_TASKS")"
 SBT_CLEAN="$(config::get "${BUILD_DIR}" "sbt.clean" "SBT_CLEAN" "false")"
 
 # Track usage of configuration options
-for env_var in SBT_PRE_TASKS SBT_PROJECT SBT_TASKS KEEP_SBT_CACHE KEEP_COURSIER_CACHE SBT_CLEAN DISABLE_DEPENDENCY_CLASSPATH_LOG; do
+for env_var in SBT_PRE_TASKS SBT_PROJECT SBT_TASKS KEEP_SBT_CACHE SBT_CLEAN DISABLE_DEPENDENCY_CLASSPATH_LOG SBT_AT_RUNTIME; do
 	if [[ -n "${!env_var:-}" ]]; then
 		metrics::set_string "${env_var,,}" "${!env_var}"
 	fi
@@ -147,21 +145,42 @@ target_dir_cache_restore_start_time=$(util::nowms)
 util::cache_copy "target" "${CACHE_DIR}" "${BUILD_DIR}"
 metrics::set_duration "target_dir_cache_restore_duration" "${target_dir_cache_restore_start_time}"
 
-if [[ -n "${SBT_PROJECT}" ]]; then
-	SBT_TASKS="${SBT_PROJECT}/compile ${SBT_PROJECT}/stage"
-else
-	SBT_TASKS="${SBT_TASKS:-compile stage}"
+SBT_TASKS="${SBT_TASKS:-compile stage}"
+
+if [[ -n "${SBT_PRE_TASKS}" ]]; then
+	output::warning <<-EOF
+		Warning: SBT_PRE_TASKS is deprecated.
+
+		The SBT_PRE_TASKS configuration option is deprecated and will be removed
+		in a future buildpack version.
+
+		Instead of using SBT_PRE_TASKS, add your tasks directly to SBT_TASKS:
+
+		    heroku config:set SBT_TASKS="${SBT_PRE_TASKS} compile stage"
+
+		The buildpack will continue to use your SBT_PRE_TASKS configuration for now.
+	EOF
+
+	SBT_TASKS="${SBT_PRE_TASKS} ${SBT_TASKS}"
 fi
 
-# To run any tasks before the actual build, configure the environment
-# $ heroku config:set SBT_PRE_TASKS=flyway:info
-[[ "${SBT_PRE_TASKS}" ]] && SBT_TASKS="${SBT_PRE_TASKS} ${SBT_TASKS}"
-
-# To enable clean compiles, configure the environment to clean:
-# $ heroku config:set SBT_CLEAN=true
-# $ git push heroku main
+# Prepend 'clean' task when SBT_CLEAN is enabled to remove all generated files before compilation.
 # See: https://devcenter.heroku.com/articles/scala-support#clean-builds
-[[ "${SBT_CLEAN}" = "true" ]] && SBT_TASKS="clean ${SBT_TASKS}"
+if [[ "${SBT_CLEAN}" = "true" ]]; then
+	SBT_TASKS="clean ${SBT_TASKS}"
+fi
+
+# Apply project prefix to all tasks when SBT_PROJECT is set. This ensures the project prefix is
+# applied both to the buildpack's default tasks (compile/stage) and any custom tasks set by users.
+# See: https://www.scala-sbt.org/1.x/docs/Multi-Project.html
+if [[ -n "${SBT_PROJECT}" ]]; then
+	prefixed_sbt_tasks=""
+	for sbt_task in ${SBT_TASKS}; do
+		prefixed_sbt_tasks="${prefixed_sbt_tasks:+$prefixed_sbt_tasks }${SBT_PROJECT}/${sbt_task}"
+	done
+
+	SBT_TASKS="${prefixed_sbt_tasks}"
+fi
 
 for default_property in "${sbt_buildpack_default_properties[@]}"; do
 	util::prepend_to_env "SBT_OPTS" "-D${default_property}"
@@ -214,7 +233,20 @@ fi
 # Gather information about relevant installed sbt plugins
 sbt_about_start_time=$(util::nowms)
 output::step "Collecting sbt plugin information"
-sbt_about_output="$(sbt about 2>&1)"
+if ! sbt_about_output="$(sbt about 2>&1)"; then
+	metrics::set_string "failure_reason" "collect_plugin_info::sbt_command_failed"
+	output::error <<-EOF
+		Error: Failed to collect sbt plugin information.
+
+		The buildpack attempted to run 'sbt about' to detect installed plugins,
+		but the command failed.
+
+		Command output:
+
+		${sbt_about_output}
+	EOF
+	exit 1
+fi
 metrics::set_duration "sbt_about_duration" "${sbt_about_start_time}"
 
 if echo "${sbt_about_output}" | grep --quiet --fixed-strings "com.typesafe.sbt.SbtNativePackager"; then
@@ -233,7 +265,7 @@ if [[ -z "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]]; then
 	dependency_classpath_log_start_time=$(util::nowms)
 	output::step "Collecting dependency information"
 	# With some sbt + Java version combinations, Java reflective access warnings are written to stderr. Redirect stderr to avoid spilling these warnings to the build output.
-	sbt "show dependencyClasspath" 2>/dev/null | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log || true
+	sbt "show ${SBT_PROJECT:+$SBT_PROJECT/}dependencyClasspath" 2>/dev/null | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log || true
 	metrics::set_duration "dependency_classpath_log_duration" "${dependency_classpath_log_start_time}"
 fi
 
@@ -245,7 +277,7 @@ metrics::set_duration "target_dir_cache_write_duration" "${target_dir_cache_writ
 # Write export script for use by subsequent buildpacks. The export script sets up the environment so that other
 # buildpacks in the chain can access sbt and its configuration during their build phase. This script is sourced by
 # the buildpack framework between buildpack executions.
-cat <<-EOF >"${BASE_DIR}/export"
+cat <<-EOF >"${BUILDPACK_DIR}/export"
 	export PATH="${CACHE_DIR}/${sbt_launcher_dir_name}/bin:\$PATH"
 
 	$(for default_property in "${sbt_buildpack_default_properties[@]}"; do
