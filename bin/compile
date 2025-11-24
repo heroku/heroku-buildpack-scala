@@ -64,7 +64,7 @@ SBT_PRE_TASKS="$(config::get "${BUILD_DIR}" "sbt.pre-tasks" "SBT_PRE_TASKS")"
 SBT_CLEAN="$(config::get "${BUILD_DIR}" "sbt.clean" "SBT_CLEAN" "false")"
 
 # Track usage of configuration options
-for env_var in SBT_PRE_TASKS SBT_PROJECT SBT_TASKS KEEP_SBT_CACHE KEEP_COURSIER_CACHE SBT_CLEAN DISABLE_DEPENDENCY_CLASSPATH_LOG; do
+for env_var in SBT_PRE_TASKS SBT_PROJECT SBT_TASKS KEEP_SBT_CACHE SBT_CLEAN DISABLE_DEPENDENCY_CLASSPATH_LOG SBT_AT_RUNTIME; do
 	if [[ -n "${!env_var:-}" ]]; then
 		metrics::set_string "${env_var,,}" "${!env_var}"
 	fi
@@ -151,9 +151,22 @@ else
 	SBT_TASKS="${SBT_TASKS:-compile stage}"
 fi
 
-# To run any tasks before the actual build, configure the environment
-# $ heroku config:set SBT_PRE_TASKS=flyway:info
-[[ "${SBT_PRE_TASKS}" ]] && SBT_TASKS="${SBT_PRE_TASKS} ${SBT_TASKS}"
+if [[ -n "${SBT_PRE_TASKS}" ]]; then
+	output::warning <<-EOF
+		Warning: SBT_PRE_TASKS is deprecated.
+
+		The SBT_PRE_TASKS configuration option is deprecated and will be removed
+		in a future buildpack version.
+
+		Instead of using SBT_PRE_TASKS, add your tasks directly to SBT_TASKS:
+
+		    heroku config:set SBT_TASKS="${SBT_PRE_TASKS} compile stage"
+
+		The buildpack will continue to use your SBT_PRE_TASKS configuration for now.
+	EOF
+
+	SBT_TASKS="${SBT_PRE_TASKS} ${SBT_TASKS}"
+fi
 
 # To enable clean compiles, configure the environment to clean:
 # $ heroku config:set SBT_CLEAN=true

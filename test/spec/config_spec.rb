@@ -40,4 +40,28 @@ describe 'Scala buildpack configuration' do
       end
     end
   end
+
+  it 'shows deprecation warning when using SBT_PRE_TASKS' do
+    new_default_hatchet_runner('sbt-1.11.7-minimal-with-native-packager').tap do |app|
+      app.before_deploy do
+        app.set_config('SBT_PRE_TASKS' => 'clean')
+      end
+
+      app.deploy do
+        expect(clean_output(app.output)).to include('Running: sbt clean compile stage')
+        expect(clean_output(app.output)).to include(<<~WARNING)
+          remote:  !     Warning: SBT_PRE_TASKS is deprecated.
+          remote:  !
+          remote:  !     The SBT_PRE_TASKS configuration option is deprecated and will be removed
+          remote:  !     in a future buildpack version.
+          remote:  !
+          remote:  !     Instead of using SBT_PRE_TASKS, add your tasks directly to SBT_TASKS:
+          remote:  !
+          remote:  !         heroku config:set SBT_TASKS="clean compile stage"
+          remote:  !
+          remote:  !     The buildpack will continue to use your SBT_PRE_TASKS configuration for now.
+        WARNING
+      end
+    end
+  end
 end
