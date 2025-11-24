@@ -2,4 +2,7 @@
 
 set -euo pipefail
 
-SBT_TASKS="update" KEEP_SBT_CACHE="true" "$(dirname "${0:-}")/compile" "${1}" "${2}" "${3}"
+SBT_TASKS="update" \
+	SBT_AT_RUNTIME="true" \
+	KEEP_SBT_CACHE="true" \
+	"$(dirname "${0:-}")/compile" "$@"
