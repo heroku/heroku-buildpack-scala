@@ -8,8 +8,6 @@ BUILD_DIR="${1}"
 CACHE_DIR="${2}"
 ENV_DIR="${3}"
 
-BASE_DIR="$(pwd)"
-
 # shellcheck source=lib/output.sh
 source "${BUILDPACK_DIR}/lib/output.sh"
 # shellcheck source=lib/java_properties.sh
@@ -245,7 +243,7 @@ metrics::set_duration "target_dir_cache_write_duration" "${target_dir_cache_writ
 # Write export script for use by subsequent buildpacks. The export script sets up the environment so that other
 # buildpacks in the chain can access sbt and its configuration during their build phase. This script is sourced by
 # the buildpack framework between buildpack executions.
-cat <<-EOF >"${BASE_DIR}/export"
+cat <<-EOF >"${BUILDPACK_DIR}/export"
 	export PATH="${CACHE_DIR}/${sbt_launcher_dir_name}/bin:\$PATH"
 
 	$(for default_property in "${sbt_buildpack_default_properties[@]}"; do
