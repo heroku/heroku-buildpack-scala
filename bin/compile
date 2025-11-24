@@ -233,7 +233,21 @@ fi
 # Gather information about relevant installed sbt plugins
 sbt_about_start_time=$(util::nowms)
 output::step "Collecting sbt plugin information"
-sbt_about_output="$(sbt ${SBT_PROJECT:+$SBT_PROJECT/}about 2>&1)"
+# shellcheck disable=SC2086
+if ! sbt_about_output="$(sbt ${SBT_PROJECT:+$SBT_PROJECT/}about 2>&1)"; then
+	output::error <<-EOF
+		Error: Failed to collect sbt plugin information.
+
+		The buildpack attempted to run 'sbt ${SBT_PROJECT:+$SBT_PROJECT/}about' to detect installed plugins,
+		but the command failed.${SBT_PROJECT:+ This may indicate that the project '${SBT_PROJECT}' does not exist
+		or is not properly configured in your build.sbt file.}
+
+		Command output:
+
+		${sbt_about_output}
+	EOF
+	exit 1
+fi
 metrics::set_duration "sbt_about_duration" "${sbt_about_start_time}"
 
 if echo "${sbt_about_output}" | grep --quiet --fixed-strings "com.typesafe.sbt.SbtNativePackager"; then
