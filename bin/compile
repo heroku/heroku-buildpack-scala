@@ -229,7 +229,8 @@ fi
 if [[ -z "${DISABLE_DEPENDENCY_CLASSPATH_LOG:-}" ]]; then
 	dependency_classpath_log_start_time=$(util::nowms)
 	output::step "Collecting dependency information"
-	sbt "show dependencyClasspath" | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log || true
+	# With some sbt + Java version combinations, Java reflective access warnings are written to stderr. Redirect stderr to avoid spilling these warnings to the build output.
+	sbt "show dependencyClasspath" 2>/dev/null | grep -o "Attributed\(.*\)" >.heroku/sbt-dependency-classpath.log || true
 	metrics::set_duration "dependency_classpath_log_duration" "${dependency_classpath_log_start_time}"
 fi
 

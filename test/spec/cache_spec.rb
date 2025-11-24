@@ -13,8 +13,8 @@ describe 'Scala buildpack' do
           remote: -----> Downloading sbt launcher 1.11.7...
           remote: -----> Setting up sbt launcher...
           remote: -----> Running: sbt compile stage
-          remote: [info] [launcher] getting org.scala-sbt sbt 1.11.7  (this may take some time)...
-          remote: [info] [launcher] getting Scala 2.12.20 (for sbt)...
+          remote:        [info] [launcher] getting org.scala-sbt sbt 1.11.7  (this may take some time)...
+          remote:        [info] [launcher] getting Scala 2.12.20 (for sbt)...
           remote:        [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java $VERSION)
           remote:        [info] loading global plugins from /tmp/codon/tmp/cache/sbt_global/plugins
           remote:        [info] compiling 1 Scala source to /tmp/codon/tmp/cache/sbt_global/plugins/target/scala-2.12/sbt-1.0/classes ...
@@ -136,11 +136,11 @@ describe 'Scala buildpack' do
           remote: -----> Setting up sbt launcher...
           remote: -----> Running: sbt compile stage
           remote:        Getting org.scala-sbt sbt 0.13.18  (this may take some time)...
-          remote: WARNING: An illegal reflective access operation has occurred
-          remote: WARNING: Illegal reflective access by org.apache.ivy.util.url.IvyAuthenticator (file:/tmp/codon/tmp/cache/sbt-launcher/sbt-launch-0.13.18.jar) to field java.net.Authenticator.theAuthenticator
-          remote: WARNING: Please consider reporting this to the maintainers of org.apache.ivy.util.url.IvyAuthenticator
-          remote: WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-          remote: WARNING: All illegal access operations will be denied in a future release
+          remote:        WARNING: An illegal reflective access operation has occurred
+          remote:        WARNING: Illegal reflective access by org.apache.ivy.util.url.IvyAuthenticator (file:/tmp/codon/tmp/cache/sbt-launcher/sbt-launch-0.13.18.jar) to field java.net.Authenticator.theAuthenticator
+          remote:        WARNING: Please consider reporting this to the maintainers of org.apache.ivy.util.url.IvyAuthenticator
+          remote:        WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+          remote:        WARNING: All illegal access operations will be denied in a future release
           remote:        downloading https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt/0.13.18/jars/sbt.jar ...
           remote:        	[SUCCESSFUL ] org.scala-sbt#sbt;0.13.18!sbt.jar ($DURATION)
           remote:        downloading https://repo1.maven.org/maven2/org/scala-lang/scala-library/2.10.7/scala-library-2.10.7.jar ...
@@ -826,11 +826,6 @@ describe 'Scala buildpack' do
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote: -----> Collecting sbt plugin information
           remote: -----> Collecting dependency information
-          remote: WARNING: An illegal reflective access operation has occurred
-          remote: WARNING: Illegal reflective access by sbt.ivyint.ErrorMessageAuthenticator$ (file:/tmp/codon/tmp/cache/sbt_boot/scala-2.10.7/org.scala-sbt/sbt/0.13.18/ivy-0.13.18.jar) to field java.net.Authenticator.theAuthenticator
-          remote: WARNING: Please consider reporting this to the maintainers of sbt.ivyint.ErrorMessageAuthenticator$
-          remote: WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-          remote: WARNING: All illegal access operations will be denied in a future release
           remote: -----> Copying sbt and dependencies into slug for runtime use
           remote: -----> Dropping compilation artifacts from the slug
           remote: -----> Discovering process types
@@ -870,11 +865,11 @@ describe 'Scala buildpack' do
           remote: -----> Running: sbt compile stage
           remote:        [info] Loading global plugins from /tmp/codon/tmp/cache/sbt_global/plugins
           remote:        [info] Updating {file:/tmp/codon/tmp/cache/sbt_global/plugins/}global-plugins...
-          remote: WARNING: An illegal reflective access operation has occurred
-          remote: WARNING: Illegal reflective access by sbt.ivyint.ErrorMessageAuthenticator$ (file:/tmp/codon/tmp/cache/sbt_boot/scala-2.10.7/org.scala-sbt/sbt/0.13.18/ivy-0.13.18.jar) to field java.net.Authenticator.theAuthenticator
-          remote: WARNING: Please consider reporting this to the maintainers of sbt.ivyint.ErrorMessageAuthenticator$
-          remote: WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-          remote: WARNING: All illegal access operations will be denied in a future release
+          remote:        WARNING: An illegal reflective access operation has occurred
+          remote:        WARNING: Illegal reflective access by sbt.ivyint.ErrorMessageAuthenticator$ (file:/tmp/codon/tmp/cache/sbt_boot/scala-2.10.7/org.scala-sbt/sbt/0.13.18/ivy-0.13.18.jar) to field java.net.Authenticator.theAuthenticator
+          remote:        WARNING: Please consider reporting this to the maintainers of sbt.ivyint.ErrorMessageAuthenticator$
+          remote:        WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+          remote:        WARNING: All illegal access operations will be denied in a future release
           remote:        [info] Resolving org.scala-lang#scala-library;2.10.7 ...
           remote:        [info] Resolving org.scala-sbt#sbt;0.13.18 ...
           remote:        [info] Resolving org.scala-sbt#main;0.13.18 ...
@@ -1102,11 +1097,6 @@ describe 'Scala buildpack' do
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote: -----> Collecting sbt plugin information
           remote: -----> Collecting dependency information
-          remote: WARNING: An illegal reflective access operation has occurred
-          remote: WARNING: Illegal reflective access by sbt.ivyint.ErrorMessageAuthenticator$ (file:/tmp/codon/tmp/cache/sbt_boot/scala-2.10.7/org.scala-sbt/sbt/0.13.18/ivy-0.13.18.jar) to field java.net.Authenticator.theAuthenticator
-          remote: WARNING: Please consider reporting this to the maintainers of sbt.ivyint.ErrorMessageAuthenticator$
-          remote: WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
-          remote: WARNING: All illegal access operations will be denied in a future release
           remote: -----> Copying sbt and dependencies into slug for runtime use
           remote: -----> Dropping compilation artifacts from the slug
           remote: -----> Discovering process types
