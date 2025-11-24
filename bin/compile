@@ -164,11 +164,11 @@ if [[ -n "${SBT_PRE_TASKS}" ]]; then
 	SBT_TASKS="${SBT_PRE_TASKS} ${SBT_TASKS}"
 fi
 
-# To enable clean compiles, configure the environment to clean:
-# $ heroku config:set SBT_CLEAN=true
-# $ git push heroku main
+# Prepend 'clean' task when SBT_CLEAN is enabled to remove all generated files before compilation.
 # See: https://devcenter.heroku.com/articles/scala-support#clean-builds
-[[ "${SBT_CLEAN}" = "true" ]] && SBT_TASKS="clean ${SBT_TASKS}"
+if [[ "${SBT_CLEAN}" = "true" ]]; then
+	SBT_TASKS="clean ${SBT_TASKS}"
+fi
 
 # Apply project prefix to all tasks when SBT_PROJECT is set. This ensures the project prefix is
 # applied both to the buildpack's default tasks (compile/stage) and any custom tasks set by users.
