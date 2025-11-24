@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* Improve `SBT_PROJECT` handling for multi-project builds. ([#299](https://github.com/heroku/heroku-buildpack-scala/pull/299))
+* Deprecate `SBT_PRE_TASKS` configuration option. ([#299](https://github.com/heroku/heroku-buildpack-scala/pull/299))
 * Improve build failure error messages. ([#298](https://github.com/heroku/heroku-buildpack-scala/pull/298))
 * Fix sbt launcher output indentation. ([#296](https://github.com/heroku/heroku-buildpack-scala/pull/296))
 * Improve plugin detection using `sbt about` instead of parsing `project/plugins.sbt` files. ([#294](https://github.com/heroku/heroku-buildpack-scala/pull/294))
