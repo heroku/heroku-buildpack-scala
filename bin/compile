@@ -55,11 +55,10 @@ readonly sbt_launcher_dir_name="sbt-launcher"
 # The buildpack's caching directories changed in November 2025. To ensure the cache created by older
 # Scala buildpack versions doesn't stay around indefinitely, we explicitly delete these old directories.
 # This will speed up subsequent app builds since it will take less time to restore the cache before each build.
-for legacy_cached_dir in .sbt_home project .coursier; do
-	if [[ -d "${CACHE_DIR}/${legacy_cached_dir}" ]]; then
-		rm -rf "${CACHE_DIR:?}/${legacy_cached_dir:?}"
-	fi
-done
+rm -rf \
+	"${CACHE_DIR}/.coursier" \
+	"${CACHE_DIR}/.sbt_home" \
+	"${CACHE_DIR}/project"
 
 # Used by openjdk::install_openjdk_via_jvm_common_buildpack to determine which JVM common buildpack to use
 # Configuring this via system.properties is deprecated and will be removed soon
