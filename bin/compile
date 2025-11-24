@@ -145,11 +145,7 @@ target_dir_cache_restore_start_time=$(util::nowms)
 util::cache_copy "target" "${CACHE_DIR}" "${BUILD_DIR}"
 metrics::set_duration "target_dir_cache_restore_duration" "${target_dir_cache_restore_start_time}"
 
-if [[ -n "${SBT_PROJECT}" ]]; then
-	SBT_TASKS="${SBT_PROJECT}/compile ${SBT_PROJECT}/stage"
-else
-	SBT_TASKS="${SBT_TASKS:-compile stage}"
-fi
+SBT_TASKS="${SBT_TASKS:-compile stage}"
 
 if [[ -n "${SBT_PRE_TASKS}" ]]; then
 	output::warning <<-EOF
@@ -173,6 +169,18 @@ fi
 # $ git push heroku main
 # See: https://devcenter.heroku.com/articles/scala-support#clean-builds
 [[ "${SBT_CLEAN}" = "true" ]] && SBT_TASKS="clean ${SBT_TASKS}"
+
+# Apply project prefix to all tasks when SBT_PROJECT is set. This ensures the project prefix is
+# applied both to the buildpack's default tasks (compile/stage) and any custom tasks set by users.
+# See: https://www.scala-sbt.org/1.x/docs/Multi-Project.html
+if [[ -n "${SBT_PROJECT}" ]]; then
+	prefixed_sbt_tasks=""
+	for sbt_task in ${SBT_TASKS}; do
+		prefixed_sbt_tasks="${prefixed_sbt_tasks:+$prefixed_sbt_tasks }${SBT_PROJECT}/${sbt_task}"
+	done
+
+	SBT_TASKS="${prefixed_sbt_tasks}"
+fi
 
 for default_property in "${sbt_buildpack_default_properties[@]}"; do
 	util::prepend_to_env "SBT_OPTS" "-D${default_property}"
