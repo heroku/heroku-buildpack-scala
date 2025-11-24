@@ -234,6 +234,7 @@ fi
 sbt_about_start_time=$(util::nowms)
 output::step "Collecting sbt plugin information"
 if ! sbt_about_output="$(sbt about 2>&1)"; then
+	metrics::set_string "failure_reason" "collect_plugin_info::sbt_command_failed"
 	output::error <<-EOF
 		Error: Failed to collect sbt plugin information.
 
