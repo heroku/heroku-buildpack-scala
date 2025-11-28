@@ -84,6 +84,8 @@ def clean_output(output)
     %r{/tmp/build_[0-9a-f]{8}} => '$BUILD_DIR',
     # Build id
     /build_[0-9a-f]{8}/ => '$BUILD_ID',
+    # Cache directory (used in CI)
+    %r{/tmp/cache\d+} => '$CACHE_DIR',
 
     ##################################################
     # Java
