@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Install Ruby and dependencies
         uses: ruby/setup-ruby@v1
         with:
@@ -49,7 +49,7 @@ jobs:
       # Default stack for all Heroku apps created by Hatchet
       DEFAULT_APP_STACK: ${{ matrix.stack }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Install Ruby and dependencies
         uses: ruby/setup-ruby@v1
         with:
