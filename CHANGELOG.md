@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+
+## [v104] - 2025-12-02
+
 * Improve `SBT_PROJECT` handling for multi-project builds. ([#299](https://github.com/heroku/heroku-buildpack-scala/pull/299))
 * Deprecate `SBT_PRE_TASKS` configuration option. ([#299](https://github.com/heroku/heroku-buildpack-scala/pull/299))
 * Improve build failure error messages. ([#298](https://github.com/heroku/heroku-buildpack-scala/pull/298))
@@ -177,7 +180,8 @@
 *  Upgrade to sbt 0.13.7 launcher
 *  Allow for customized jvm-common package
 
-[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v103...main
+[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v104...main
+[v104]: https://github.com/heroku/heroku-buildpack-scala/compare/v103...v104
 [v103]: https://github.com/heroku/heroku-buildpack-scala/compare/v102...v103
 [v102]: https://github.com/heroku/heroku-buildpack-scala/compare/v101...v102
 [v100]: https://github.com/heroku/heroku-buildpack-scala/compare/v99...v100
