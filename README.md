@@ -1,4 +1,4 @@
-![](https://cloud.githubusercontent.com/assets/51578/11041625/f2eed216-86e0-11e5-8470-5c01a775fa51.jpg)
+![](https://raw.githubusercontent.com/heroku/buildpacks/refs/heads/main/assets/images/buildpack-banner-scala.jpg)
 
 # Heroku Buildpack: Scala (sbt) [![CI](https://github.com/heroku/heroku-buildpack-scala/actions/workflows/ci.yml/badge.svg)](https://github.com/heroku/heroku-buildpack-scala/actions/workflows/ci.yml)
 
