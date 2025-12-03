@@ -10,8 +10,7 @@ RSpec.describe 'Scala buildpack' do
         expect(clean_output(test_run.output)).to eq(<<~OUTPUT)
           -----> Scala app detected
           -----> Installing Azul Zulu OpenJDK $VERSION
-          -----> Downloading sbt launcher 1.11.7...
-          -----> Setting up sbt launcher...
+          -----> Installing sbt runner 1.11.7...
           -----> Running: sbt update
                  [info] [launcher] getting org.scala-sbt sbt 1.11.7  (this may take some time)...
                  [info] [launcher] getting Scala 2.12.20 (for sbt)...
@@ -42,6 +41,8 @@ RSpec.describe 'Scala buildpack' do
           -----> Copying sbt and dependencies into slug for runtime use
           -----> No test-setup command provided. Skipping.
           -----> Running Scala buildpack tests...
+          Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
+          Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
           Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
           [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java $VERSION)
           [info] loading global plugins from /app/.sbt_home/plugins
@@ -74,7 +75,7 @@ RSpec.describe 'Scala buildpack' do
         expect(clean_output(test_run.output)).to eq(<<~OUTPUT)
           -----> Scala app detected
           -----> Installing Azul Zulu OpenJDK $VERSION
-          -----> Setting up sbt launcher...
+          -----> Using cached sbt runner 1.11.7...
           -----> Running: sbt update
                  [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java $VERSION)
                  [info] loading global plugins from $CACHE_DIR/sbt_global/plugins
@@ -101,6 +102,8 @@ RSpec.describe 'Scala buildpack' do
           -----> Copying sbt and dependencies into slug for runtime use
           -----> No test-setup command provided. Skipping.
           -----> Running Scala buildpack tests...
+          Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
+          Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
           Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
           [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java $VERSION)
           [info] loading global plugins from /app/.sbt_home/plugins

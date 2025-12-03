@@ -4,42 +4,35 @@
 # however, it helps Shellcheck realise the options under which these functions will run.
 set -euo pipefail
 
-function sbt::install_sbt_launcher() {
-	local sbt_version="${1}"
-	local sbt_launcher_dir="${2}"
+function sbt::install_sbt_runner() {
+	local sbt_runner_version="${1}"
+	local sbt_dir="${2}"
 
-	mkdir -p "${sbt_launcher_dir}"
-	local launcher_jar_path="${sbt_launcher_dir}/sbt-launch-${sbt_version}.jar"
+	local sbt_bin_path="${sbt_dir}/bin/sbt"
 
-	if [[ ! -f "${launcher_jar_path}" ]]; then
-		output::step "Downloading sbt launcher ${sbt_version}..."
-		sbt::download_sbt_launcher_jar "${sbt_version}" "${launcher_jar_path}"
+	if [[ -f "${sbt_bin_path}" ]]; then
+		# Using --script-version here to check for the runner version, not the sbt version of the project which
+		# might be completely different.
+		local installed_version
+		installed_version=$("${sbt_bin_path}" --script-version 2>/dev/null || echo "unknown")
+
+		if [[ "${installed_version}" == "${sbt_runner_version}" ]]; then
+			output::step "Using cached sbt runner ${sbt_runner_version}..."
+			return
+		fi
 	fi
 
-	output::step "Setting up sbt launcher..."
-	mkdir -p "${sbt_launcher_dir}/bin"
-	cat <<-EOF >"${sbt_launcher_dir}/bin/sbt"
-		#!/usr/bin/env bash
-
-		# We determine this at runtime since the whole directory might be relocated later to make sbt available
-		# at runtime.
-		script_dir="\$(cd "\$(dirname "\${BASH_SOURCE[0]}")" && pwd)"
-		java \${SBT_OPTS:-} -jar "\${script_dir}/../sbt-launch-${sbt_version}.jar" "\$@"
-	EOF
-
-	chmod +x "${sbt_launcher_dir}/bin/sbt"
+	output::step "Installing sbt runner ${sbt_runner_version}..."
+	sbt::install_sbt_runner_distribution "${sbt_runner_version}" "${sbt_dir}"
 }
 
-function sbt::download_sbt_launcher_jar() {
-	local sbt_version="${1}"
-	local destination_path="${2}"
+function sbt::install_sbt_runner_distribution() {
+	local sbt_runner_version="${1}"
+	local destination_dir="${2}"
 
-	local sbt_launcher_jar_url
-	if [[ "${sbt_version}" == 0.* ]]; then
-		sbt_launcher_jar_url="https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/${sbt_version}/sbt-launch.jar"
-	else
-		sbt_launcher_jar_url="https://repo.maven.apache.org/maven2/org/scala-sbt/sbt-launch/${sbt_version}/sbt-launch-${sbt_version}.jar"
-	fi
+	local sbt_runner_url="https://github.com/sbt/sbt/releases/download/v${sbt_runner_version}/sbt-${sbt_runner_version}.tgz"
+	local download_path
+	download_path=$(mktemp)
 
 	local http_status_code
 	http_status_code=$(curl \
@@ -51,19 +44,19 @@ function sbt::download_sbt_launcher_jar() {
 		--max-time 60 \
 		--location \
 		--write-out "%{http_code}" \
-		--output "${destination_path}" \
-		"${sbt_launcher_jar_url}")
+		--output "${download_path}" \
+		"${sbt_runner_url}")
 
 	local curl_exit_code=$?
 
 	if [[ "${http_status_code}" == "404" ]]; then
 		output::error <<-EOF
-			Error: The requested sbt launcher version isn't available.
+			Error: The requested sbt runner version isn't available.
 
-			We couldn't find sbt launcher version ${sbt_version} in the
-			Maven repository.
+			We couldn't find sbt runner version ${sbt_runner_version} in the
+			GitHub releases.
 
-			Check that this sbt version has been released upstream:
+			Check that this sbt runner version has been released upstream:
 			https://github.com/sbt/sbt/releases
 
 			If it has, make sure that you are using the latest version
@@ -72,14 +65,14 @@ function sbt::download_sbt_launcher_jar() {
 			https://devcenter.heroku.com/articles/managing-buildpacks#classic-buildpacks-references
 		EOF
 
-		metrics::set_string "failure_reason" "install_sbt::version_unavailable"
+		metrics::set_string "failure_reason" "install_sbt_runner::version_unavailable"
 		exit 1
 	elif [[ "${curl_exit_code}" -ne 0 || "${http_status_code}" != "200" ]]; then
 		output::error <<-EOF
-			Error: Unable to download sbt launcher.
+			Error: Unable to download sbt runner.
 
-			An error occurred while downloading the sbt launcher from:
-			${sbt_launcher_jar_url}
+			An error occurred while downloading sbt runner from:
+			${sbt_runner_url}
 
 			In some cases, this happens due to a temporary issue with
 			the network connection or server.
@@ -94,39 +87,50 @@ function sbt::download_sbt_launcher_jar() {
 			HTTP status code: ${http_status_code}, curl exit code: ${curl_exit_code}
 		EOF
 
-		metrics::set_string "failure_reason" "install_sbt::download_error"
+		metrics::set_string "failure_reason" "install_sbt_runner::download_error"
 		exit 1
 	fi
 
-	local sha1_path
-	sha1_path=$(mktemp)
+	local sha256_path
+	sha256_path=$(mktemp)
 
-	if ! curl --silent --show-error --location "${sbt_launcher_jar_url}.sha1" >"${sha1_path}" 2>/dev/null; then
+	if ! curl --silent --show-error --location "${sbt_runner_url}.sha256" >"${sha256_path}" 2>/dev/null; then
 		output::error <<-EOF
-			Error: Unable to download SHA-1 checksum for sbt launcher.
+			Error: Unable to download SHA-256 checksum for sbt runner.
 		EOF
 
-		metrics::set_string "failure_reason" "install_sbt::checksum_unavailable"
+		metrics::set_string "failure_reason" "install_sbt_runner::checksum_unavailable"
 		exit 1
 	fi
 
-	local expected_sha1
-	expected_sha1=$(cat "${sha1_path}")
+	local expected_sha256
+	expected_sha256=$(cut -d' ' -f1 "${sha256_path}")
 
-	local actual_sha1
-	actual_sha1=$(sha1sum "${destination_path}" | cut -d' ' -f1)
+	local actual_sha256
+	actual_sha256=$(sha256sum "${download_path}" | cut -d' ' -f1)
 
-	if [[ "${actual_sha1}" != "${expected_sha1}" ]]; then
+	if [[ "${actual_sha256}" != "${expected_sha256}" ]]; then
 		output::error <<-EOF
-			Error: Checksum verification failed for sbt launcher.
+			Error: Checksum verification failed for sbt runner.
 
-			Expected: ${expected_sha1}
-			Actual:   ${actual_sha1}
+			Expected: ${expected_sha256}
+			Actual:   ${actual_sha256}
 		EOF
 
-		metrics::set_string "failure_reason" "install_sbt::checksum_mismatch"
+		metrics::set_string "failure_reason" "install_sbt_runner::checksum_mismatch"
 		exit 1
 	fi
+
+	rm -rf "${destination_dir}"
+	mkdir -p "${destination_dir}"
+
+	tar -xzf "${download_path}" -C "${destination_dir}" --strip-components=1
+
+	# Remove large native sbt binaries that are not used by the buildpack. If a user requests to use sbtn at runtime,
+	# the sbt runner will gracefully download them again.
+	rm -f "${destination_dir}/bin/sbtn-"*
+	# Remove Windows specific files
+	rm -f "${destination_dir}/bin/sbt.bat"
 }
 
 function sbt::output_build_error_message() {
