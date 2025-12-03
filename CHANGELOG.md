@@ -2,12 +2,12 @@
 
 ## [Unreleased]
 
+* Use official `sbt` runner distribution instead of custom runner for better dev/prod parity. ([#308](https://github.com/heroku/heroku-buildpack-scala/pull/308))
 
 ## [v105] - 2025-12-03
 
 * Sanitize `SBT_OPTS` by removing `-J` prefix from arguments. ([#309](https://github.com/heroku/heroku-buildpack-scala/pull/309))
 * Fail builds early for `sbt` versions older than `0.13.18`. These versions have shown very frequent and hard to debug issues with user builds. Builds now fail immediately with a clear error message and instructions. ([#307](https://github.com/heroku/heroku-buildpack-scala/pull/307))
-
 
 ## [v104] - 2025-12-02
 
@@ -186,8 +186,7 @@
 * Upgrade to `sbt` `0.13.7` launcher.
 * Allow for customized jvm-common package.
 
-[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v105...main
-[v105]: https://github.com/heroku/heroku-buildpack-scala/compare/v104...v105
+[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v104...main
 [v104]: https://github.com/heroku/heroku-buildpack-scala/compare/v103...v104
 [v103]: https://github.com/heroku/heroku-buildpack-scala/compare/v102...v103
 [v102]: https://github.com/heroku/heroku-buildpack-scala/compare/v101...v102
