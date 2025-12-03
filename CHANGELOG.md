@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Sanitize `SBT_OPTS` by removing `-J` prefix from arguments. ([#309](https://github.com/heroku/heroku-buildpack-scala/pull/309))
 * Fail builds early for `sbt` versions older than `0.13.18`. These versions have shown very frequent and hard to debug issues with user builds. Builds now fail immediately with a clear error message and instructions. ([#307](https://github.com/heroku/heroku-buildpack-scala/pull/307))
 
 
