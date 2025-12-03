@@ -77,3 +77,27 @@ function util::prepend_to_env() {
 	local env_var_value="${!env_var:-}"
 	declare -gx "${env_var}=${value}${env_var_value:+${delimiter}${env_var_value}}"
 }
+
+# Sanitizes SBT_OPTS by removing -J prefix from arguments.
+#
+# sbt uses -J prefix to pass JVM options, but since we invoke java directly,
+# we need to remove the prefix.
+#
+# Usage:
+# ```
+# util::sanitize_sbt_opts
+# ```
+function util::sanitize_sbt_opts() {
+	if [[ -n "${SBT_OPTS:-}" ]]; then
+		local sanitized_opts=""
+		for opt in ${SBT_OPTS}; do
+			if [[ "${opt}" =~ ^-J(.+)$ ]]; then
+				local sanitized_opt="${BASH_REMATCH[1]}"
+				sanitized_opts="${sanitized_opts:+$sanitized_opts }${sanitized_opt}"
+			else
+				sanitized_opts="${sanitized_opts:+$sanitized_opts }${opt}"
+			fi
+		done
+		export SBT_OPTS="${sanitized_opts}"
+	fi
+}

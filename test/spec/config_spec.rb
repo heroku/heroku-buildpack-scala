@@ -64,4 +64,17 @@ describe 'Scala buildpack configuration' do
       end
     end
   end
+
+  it 'sanitizes SBT_OPTS by removing -J prefix from arguments' do
+    new_default_hatchet_runner('sbt-1.11.7-minimal-with-native-packager').tap do |app|
+      app.before_deploy do
+        app.set_config('SBT_OPTS' => '-J-Xmx1G -J-Xms512m -Dfoo=bar')
+      end
+
+      app.deploy do
+        expect(app).to be_deployed
+        expect(clean_output(app.output)).to include('Running: sbt compile stage')
+      end
+    end
+  end
 end

@@ -27,6 +27,7 @@ metrics::init "${CACHE_DIR}" "scala"
 metrics::setup
 
 util::export_env_dir "${ENV_DIR}" "." "JAVA_OPTS"
+util::sanitize_sbt_opts
 
 # sbt Java system properties that configure directory locations, applied during both build and runtime
 # Data structure: "sbt_property|cache_relative_path|slug_relative_path"
