@@ -3,7 +3,7 @@
 require_relative 'spec_helper'
 
 describe 'Sbt version warnings' do
-  it 'shows warning for sbt 0.x versions' do
+  it 'shows warning for sbt 0.13.18' do
     new_default_hatchet_runner('sbt-0.13.18-minimal-with-native-packager').tap do |app|
       app.deploy do
         expect(clean_output(app.output)).to include(<<~OUTPUT)
@@ -28,6 +28,33 @@ describe 'Sbt version warnings' do
         expect(app.output).to include('Running: sbt compile stage')
         expect(app.output).to include('[info] Done packaging.')
         expect(app.output).to include('[success]')
+      end
+    end
+  end
+
+  it 'shows error for sbt versions older than 0.13.18' do
+    new_default_hatchet_runner('sbt-0.13.17-minimal-with-native-packager', allow_failure: true).tap do |app|
+      app.deploy do
+        expect(app).not_to be_deployed
+        expect(clean_output(app.output)).to include(<<~OUTPUT)
+          remote:  !     Error: Unsupported sbt version detected.
+          remote:  !
+          remote:  !     This buildpack does not support sbt 0.13.17. You are using an end-of-life
+          remote:  !     version that no longer receives security updates or bug fixes. Support for
+          remote:  !     sbt 0.x was ended by the upstream sbt project on November 30, 2018.
+          remote:  !
+          remote:  !     Additionally, this buildpack version is not compatible with sbt versions
+          remote:  !     older than 0.13.18 and cannot build your application.
+          remote:  !
+          remote:  !     To continue, update project/build.properties to use at least sbt 0.13.18,
+          remote:  !     or preferably upgrade to sbt 1.x for active support.
+          remote:  !
+          remote:  !     For more information:
+          remote:  !     - https://web.archive.org/web/20210918065807/https://www.lightbend.com/blog/scala-sbt-127-patchnotes
+          remote:  !
+          remote:  !     Upgrade guide:
+          remote:  !     - https://www.scala-sbt.org/1.x/docs/Migrating-from-sbt-013x.html
+        OUTPUT
       end
     end
   end

@@ -96,7 +96,7 @@ if [[ -z "${sbt_version}" ]]; then
 fi
 
 case "${sbt_version}" in
-0.*)
+0.13.18)
 	output::warning <<-EOF
 		Warning: Unsupported sbt version detected.
 
@@ -116,6 +116,30 @@ case "${sbt_version}" in
 		- https://www.scala-sbt.org/1.x/docs/Migrating-from-sbt-013x.html
 	EOF
 	;;
+0.*)
+	output::error <<-EOF
+		Error: Unsupported sbt version detected.
+
+		This buildpack does not support sbt ${sbt_version}. You are using an end-of-life
+		version that no longer receives security updates or bug fixes. Support for
+		sbt 0.x was ended by the upstream sbt project on November 30, 2018.
+
+		Additionally, this buildpack version is not compatible with sbt versions
+		older than 0.13.18 and cannot build your application.
+
+		To continue, update project/build.properties to use at least sbt 0.13.18,
+		or preferably upgrade to sbt 1.x for active support.
+
+		For more information:
+		- https://web.archive.org/web/20210918065807/https://www.lightbend.com/blog/scala-sbt-127-patchnotes
+
+		Upgrade guide:
+		- https://www.scala-sbt.org/1.x/docs/Migrating-from-sbt-013x.html
+	EOF
+
+	metrics::set_string "failure_reason" "unsupported_sbt_0x_version"
+	exit 1
+	;;
 2.*)
 	output::error <<-EOF
 		Error: Unsupported sbt version detected.
@@ -132,6 +156,7 @@ case "${sbt_version}" in
 		- sbt 2.x changes: https://www.scala-sbt.org/2.x/docs/en/changes/sbt-2.0-change-summary.html
 	EOF
 
+	metrics::set_string "failure_reason" "unsupported_sbt_2x_version"
 	exit 1
 	;;
 esac
