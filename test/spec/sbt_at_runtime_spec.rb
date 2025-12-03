@@ -128,6 +128,7 @@ describe 'Scala buildpack' do
 
         expect(sbt_about_output).to eq(<<~OUTPUT)
           [info] [launcher] getting org.scala-sbt sbt 0.13.18  (this may take some time)...
+          [info] [launcher] getting Scala 2.10.7 (for sbt)...
           WARNING: An illegal reflective access operation has occurred
           WARNING: Illegal reflective access by org.apache.ivy.util.url.IvyAuthenticator (file:/app/.heroku/scala/sbt-runner/bin/sbt-launch.jar) to field java.net.Authenticator.theAuthenticator
           WARNING: Please consider reporting this to the maintainers of org.apache.ivy.util.url.IvyAuthenticator
@@ -841,7 +842,7 @@ describe 'Scala buildpack' do
           [info] Loading global plugins from /app/.sbt_home/plugins
           [info] Updating {file:/app/.sbt_home/plugins/}global-plugins...
           WARNING: An illegal reflective access operation has occurred
-          WARNING: Illegal reflective access by sbt.ivyint.ErrorMessageAuthenticator$ (file:/app/.sbt_home/boot/scala-2.10.7/org.scala-sbt/sbt/0.13.18/ivy-0.13.18.jar) to field java.net.Authenticator.theAuthenticator
+          WARNING: Illegal reflective access by sbt.ivyint.ErrorMessageAuthenticator$ (file:/app/.sbt_home/boot/scala-2.10.7/org.scala-sbt/sbt/0.13.18/ivy.jar) to field java.net.Authenticator.theAuthenticator
           WARNING: Please consider reporting this to the maintainers of sbt.ivyint.ErrorMessageAuthenticator$
           WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
           WARNING: All illegal access operations will be denied in a future release
