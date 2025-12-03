@@ -131,11 +131,11 @@ describe 'Scala buildpack' do
           remote:  !     Upgrade guide:
           remote:  !     - https://www.scala-sbt.org/1.x/docs/Migrating-from-sbt-013x.html
 
-          remote: -----> Installing sbt runner 0.13.18...
+          remote: -----> Installing sbt runner 1.11.7...
           remote: -----> Running: sbt compile stage
-          remote:        Getting org.scala-sbt sbt 0.13.18  (this may take some time)...
+          remote:        [info] [launcher] getting org.scala-sbt sbt 0.13.18  (this may take some time)...
           remote:        WARNING: An illegal reflective access operation has occurred
-          remote:        WARNING: Illegal reflective access by org.apache.ivy.util.url.IvyAuthenticator (file:/tmp/codon/tmp/cache/sbt-launcher/sbt/bin/sbt-launch.jar) to field java.net.Authenticator.theAuthenticator
+          remote:        WARNING: Illegal reflective access by org.apache.ivy.util.url.IvyAuthenticator (file:/tmp/codon/tmp/cache/sbt-runner/bin/sbt-launch.jar) to field java.net.Authenticator.theAuthenticator
           remote:        WARNING: Please consider reporting this to the maintainers of org.apache.ivy.util.url.IvyAuthenticator
           remote:        WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
           remote:        WARNING: All illegal access operations will be denied in a future release
@@ -831,7 +831,7 @@ describe 'Scala buildpack' do
           remote:        Default types for buildpack -> web
 
           remote: -----> Compressing...
-          remote:        Done: 99.8M
+          remote:        Done: 102.1M
         OUTPUT
 
         app.commit!
@@ -1102,7 +1102,7 @@ describe 'Scala buildpack' do
           remote:        Default types for buildpack -> web
 
           remote: -----> Compressing...
-          remote:        Done: 99.8M
+          remote:        Done: 102.1M
         OUTPUT
       end
     end

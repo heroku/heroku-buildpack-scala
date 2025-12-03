@@ -127,9 +127,9 @@ describe 'Scala buildpack' do
                               .gsub(/\[(info|warn|error|success|debug)\] $/, '[\1]')
 
         expect(sbt_about_output).to eq(<<~OUTPUT)
-          Getting org.scala-sbt sbt 0.13.18  (this may take some time)...
+          [info] [launcher] getting org.scala-sbt sbt 0.13.18  (this may take some time)...
           WARNING: An illegal reflective access operation has occurred
-          WARNING: Illegal reflective access by org.apache.ivy.util.url.IvyAuthenticator (file:/app/.heroku/scala/sbt-launcher/sbt/bin/sbt-launch.jar) to field java.net.Authenticator.theAuthenticator
+          WARNING: Illegal reflective access by org.apache.ivy.util.url.IvyAuthenticator (file:/app/.heroku/scala/sbt-runner/bin/sbt-launch.jar) to field java.net.Authenticator.theAuthenticator
           WARNING: Please consider reporting this to the maintainers of org.apache.ivy.util.url.IvyAuthenticator
           WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
           WARNING: All illegal access operations will be denied in a future release

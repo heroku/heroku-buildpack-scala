@@ -42,6 +42,8 @@ RSpec.describe 'Scala buildpack' do
           -----> No test-setup command provided. Skipping.
           -----> Running Scala buildpack tests...
           Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
+          Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
+          Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
           [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java $VERSION)
           [info] loading global plugins from /app/.sbt_home/plugins
           [info] compiling 1 Scala source to /app/.sbt_home/plugins/target/scala-2.12/sbt-1.0/classes ...
@@ -100,6 +102,8 @@ RSpec.describe 'Scala buildpack' do
           -----> Copying sbt and dependencies into slug for runtime use
           -----> No test-setup command provided. Skipping.
           -----> Running Scala buildpack tests...
+          Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
+          Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
           Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8 -XX:MaxRAM=2684354560 -XX:MaxRAMPercentage=80.0
           [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java $VERSION)
           [info] loading global plugins from /app/.sbt_home/plugins
