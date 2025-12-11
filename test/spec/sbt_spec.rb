@@ -100,10 +100,10 @@ describe 'Sbt' do
           remote:  !     Error: sbt build failed.
           remote:  !
           remote:  !     Your application failed to compile. Check the build output above
-          remote:  !     for specific compilation errors from the Scala compiler.
+          remote:  !     for specific compilation errors from the compiler.
           remote:  !
           remote:  !     Common causes include:
-          remote:  !     - Syntax errors in your Scala/Java source code
+          remote:  !     - Syntax errors in your source code
           remote:  !     - Type mismatches or missing implicit conversions
           remote:  !     - Unresolved symbols or missing imports
           remote:  !     - Incompatible API changes in dependencies

@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+* Recognize `javac` compilation errors as compilation errors. ([#311](https://github.com/heroku/heroku-buildpack-scala/pull/311))
+
 
 ## [v105] - 2025-12-03
 
