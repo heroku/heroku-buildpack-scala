@@ -153,15 +153,15 @@ function sbt::output_build_error_message() {
 		return
 	fi
 
-	if grep --quiet --ignore-case 'Compilation failed' "${sbt_build_log_file}"; then
+	if grep --quiet --ignore-case -E '(Compilation failed|javac returned non-zero exit code)' "${sbt_build_log_file}"; then
 		output::error <<-EOF
 			Error: sbt build failed.
 
 			Your application failed to compile. Check the build output above
-			for specific compilation errors from the Scala compiler.
+			for specific compilation errors from the compiler.
 
 			Common causes include:
-			- Syntax errors in your Scala/Java source code
+			- Syntax errors in your source code
 			- Type mismatches or missing implicit conversions
 			- Unresolved symbols or missing imports
 			- Incompatible API changes in dependencies
