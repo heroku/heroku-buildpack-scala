@@ -833,7 +833,7 @@ describe 'Scala buildpack' do
           remote:        Default types for buildpack -> web
 
           remote: -----> Compressing...
-          remote:        Done: 99.8M
+          remote:        Done: 99.9M
         OUTPUT
 
         app.commit!

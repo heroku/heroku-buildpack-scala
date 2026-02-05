@@ -8,13 +8,14 @@ describe 'Scala buildpack' do
       app.deploy do
         sbt_about_output = app.run('sbt about', heroku: { size: 'standard-2x' })
                               .gsub(/\w+ \d+, \d+ \d+:\d+:\d+ [AP]M/, '$TIMESTAMP')
+                              .gsub(/Java \d+\.\d+\.\d+(_\d+)?/, 'Java $VERSION')
 
         expect(sbt_about_output).to eq(<<~OUTPUT)
           [info] [launcher] getting org.scala-sbt sbt 1.11.7  (this may take some time)...
           [info] [launcher] getting Scala 2.12.20 (for sbt)...
           $TIMESTAMP org.jline.utils.Log logr
           WARNING: Unable to create a system terminal, creating a dumb terminal (enable debug logging for more information)
-          [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java 21.0.9)
+          [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java $VERSION)
           [info] loading global plugins from /app/.sbt_home/plugins
           [info] compiling 1 Scala source to /app/.sbt_home/plugins/target/scala-2.12/sbt-1.0/classes ...
           [info] done compiling
@@ -76,11 +77,12 @@ describe 'Scala buildpack' do
         sbt_about_output = app.run('sbt about', heroku: { size: 'standard-2x' })
                               .gsub(/\w+ \d+, \d+ \d+:\d+:\d+ [AP]M/, '$TIMESTAMP')
                               .gsub(/\[warn\] In the last .+ were spent in GC\..+\n/, '')
+                              .gsub(/Java \d+\.\d+\.\d+(_\d+)?/, 'Java $VERSION')
 
         expect(sbt_about_output).to eq(<<~OUTPUT)
           $TIMESTAMP org.jline.utils.Log logr
           WARNING: Unable to create a system terminal, creating a dumb terminal (enable debug logging for more information)
-          [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java 21.0.9)
+          [info] welcome to sbt 1.11.7 (Azul Systems, Inc. Java $VERSION)
           [info] loading global plugins from /app/.sbt_home/plugins
           [info] compiling 1 Scala source to /app/.sbt_home/plugins/target/scala-2.12/sbt-1.0/classes ...
           [info] done compiling

@@ -43,7 +43,7 @@ describe 'Sbt multi-project builds' do
           remote:        Default types for buildpack -> web
 
           remote: -----> Compressing...
-          remote:        Done: 106.5M
+          remote:        Done: 106.6M
         OUTPUT
 
         response = http_get(app)
@@ -94,7 +94,7 @@ describe 'Sbt multi-project builds' do
           remote:        Default types for buildpack -> web
 
           remote: -----> Compressing...
-          remote:        Done: 106.5M
+          remote:        Done: 106.6M
         OUTPUT
 
         response = http_get(app)
