@@ -58,7 +58,7 @@ rm -rf \
 # Used by openjdk::install_openjdk_via_jvm_common_buildpack to determine which JVM common buildpack to use
 # Configuring this via system.properties is deprecated and will be removed soon
 # shellcheck disable=SC2034
-JVM_COMMON_BUILDPACK="$(config::get "${BUILD_DIR}" "heroku.jvm.buildpack" "JVM_COMMON_BUILDPACK" "https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz")"
+JVM_COMMON_BUILDPACK="$(config::get "${BUILD_DIR}" "heroku.jvm.buildpack" "JVM_COMMON_BUILDPACK" "https://buildpack-registry.s3.dualstack.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz")"
 
 SBT_PROJECT="$(config::get "${BUILD_DIR}" "sbt.project" "SBT_PROJECT")"
 SBT_PRE_TASKS="$(config::get "${BUILD_DIR}" "sbt.pre-tasks" "SBT_PRE_TASKS")"
