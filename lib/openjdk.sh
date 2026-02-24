@@ -12,7 +12,7 @@ function openjdk::install_openjdk_via_jvm_common_buildpack() {
 
 	# Legacy behaviour for customers and testing code can override the download location of the heroku/jvm buildpack
 	# with JVM_COMMON_BUILDPACK for testing and debugging purposes.
-	local jvm_common_buildpack_tarball_url="${JVM_COMMON_BUILDPACK:-https://buildpack-registry.s3.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz}"
+	local jvm_common_buildpack_tarball_url="${JVM_COMMON_BUILDPACK:-https://buildpack-registry.s3.dualstack.us-east-1.amazonaws.com/buildpacks/heroku/jvm.tgz}"
 
 	local jvm_common_buildpack_tarball_path
 	jvm_common_buildpack_tarball_path=$(mktemp)

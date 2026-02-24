@@ -3,7 +3,7 @@
 ## [Unreleased]
 
 * Recognize `javac` compilation errors as compilation errors. ([#311](https://github.com/heroku/heroku-buildpack-scala/pull/311))
-
+* Changed the S3 URLs used for downloads to use AWS' dual-stack (IPv6 compatible) endpoint. ([#315](https://github.com/heroku/heroku-buildpack-scala/pull/315))
 
 ## [v105] - 2025-12-03
 
