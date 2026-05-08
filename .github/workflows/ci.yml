@@ -33,7 +33,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        stack: ["heroku-22", "heroku-24"]
+        stack: ["heroku-22", "heroku-24", "heroku-26"]
     env:
       HATCHET_APP_LIMIT: 100
       HATCHET_RUN_MULTI: 1
