@@ -800,8 +800,8 @@ describe 'Scala buildpack' do
           remote:        [info] 	[SUCCESSFUL ] org.bouncycastle#bcpkix-jdk18on;1.80!bcpkix-jdk18on.jar ($DURATION)
           remote:        [info] downloading https://repo1.maven.org/maven2/org/bouncycastle/bcprov-jdk18on/1.80/bcprov-jdk18on-1.80.jar ...
           remote:        [info] 	[SUCCESSFUL ] org.bouncycastle#bcprov-jdk18on;1.80!bcprov-jdk18on.jar ($DURATION)
-          remote:        [info] downloading https://repo1.maven.org/maven2/org/bouncycastle/bcutil-jdk18on/1.80/bcutil-jdk18on-1.80.jar ...
-          remote:        [info] 	[SUCCESSFUL ] org.bouncycastle#bcutil-jdk18on;1.80!bcutil-jdk18on.jar ($DURATION)
+          remote:        [info] downloading https://repo1.maven.org/maven2/org/bouncycastle/bcutil-jdk18on/1.80.2/bcutil-jdk18on-1.80.2.jar ...
+          remote:        [info] 	[SUCCESSFUL ] org.bouncycastle#bcutil-jdk18on;1.80.2!bcutil-jdk18on.jar ($DURATION)
           remote:        [info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar ...
           remote:        [info] 	[SUCCESSFUL ] org.scala-lang#scala-compiler;2.13.17!scala-compiler.jar ($DURATION)
           remote:        [info] downloading https://repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar ...
@@ -809,13 +809,6 @@ describe 'Scala buildpack' do
           remote:        [info] downloading https://repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar ...
           remote:        [info] 	[SUCCESSFUL ] org.jline#jline;3.29.0!jline.jar ($DURATION)
           remote:        [info] Done updating.
-          remote:        [warn] Found version conflict(s) in library dependencies; some are suspected to be binary incompatible:
-          remote:        [warn]
-          remote:        [warn] 	* org.bouncycastle:bcprov-jdk18on:1.80 is selected over [1.80,1.81)
-          remote:        [warn] 	    +- org.bouncycastle:bcutil-jdk18on:1.80               (depends on [1.80,1.81))
-          remote:        [warn] 	    +- io.netty:netty-pkitesting:4.2.6.Final              (depends on [1.80,1.81))
-          remote:        [warn]
-          remote:        [warn] Run 'evicted' to see detailed eviction warnings
           remote:        [info] Compiling 1 Scala source to $BUILD_DIR/target/scala-2.13/classes...
           remote:        [info] 'compiler-interface' not yet compiled for Scala 2.13.17. Compiling...
           remote:        [info]   Compilation completed in $DURATION.
@@ -1082,13 +1075,6 @@ describe 'Scala buildpack' do
           remote:        [info] Resolving io.github.java-diff-utils#java-diff-utils;4.16 ...
           remote:        [info] Resolving org.jline#jline;3.29.0 ...
           remote:        [info] Done updating.
-          remote:        [warn] Found version conflict(s) in library dependencies; some are suspected to be binary incompatible:
-          remote:        [warn]
-          remote:        [warn] 	* org.bouncycastle:bcprov-jdk18on:1.80 is selected over [1.80,1.81)
-          remote:        [warn] 	    +- org.bouncycastle:bcutil-jdk18on:1.80               (depends on [1.80,1.81))
-          remote:        [warn] 	    +- io.netty:netty-pkitesting:4.2.6.Final              (depends on [1.80,1.81))
-          remote:        [warn]
-          remote:        [warn] Run 'evicted' to see detailed eviction warnings
           remote:        [info] Compiling 1 Scala source to $BUILD_DIR/target/scala-2.13/classes...
           remote:        [success] Total time: $DURATION, completed $DATETIME
           remote:        [info] Wrote $BUILD_DIR/target/scala-2.13/sbt-0-13-18-minimal-with-native-packager_2.13-0.1-SNAPSHOT.pom

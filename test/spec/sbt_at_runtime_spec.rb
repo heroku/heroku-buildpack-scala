@@ -794,8 +794,8 @@ describe 'Scala buildpack' do
           [info] 	[SUCCESSFUL ] org.bouncycastle#bcpkix-jdk18on;1.80!bcpkix-jdk18on.jar ($DURATION)
           [info] downloading https://repo1.maven.org/maven2/org/bouncycastle/bcprov-jdk18on/1.80/bcprov-jdk18on-1.80.jar ...
           [info] 	[SUCCESSFUL ] org.bouncycastle#bcprov-jdk18on;1.80!bcprov-jdk18on.jar ($DURATION)
-          [info] downloading https://repo1.maven.org/maven2/org/bouncycastle/bcutil-jdk18on/1.80/bcutil-jdk18on-1.80.jar ...
-          [info] 	[SUCCESSFUL ] org.bouncycastle#bcutil-jdk18on;1.80!bcutil-jdk18on.jar ($DURATION)
+          [info] downloading https://repo1.maven.org/maven2/org/bouncycastle/bcutil-jdk18on/1.80.2/bcutil-jdk18on-1.80.2.jar ...
+          [info] 	[SUCCESSFUL ] org.bouncycastle#bcutil-jdk18on;1.80.2!bcutil-jdk18on.jar ($DURATION)
           [info] downloading https://repo1.maven.org/maven2/org/scala-lang/scala-compiler/2.13.17/scala-compiler-2.13.17.jar ...
           [info] 	[SUCCESSFUL ] org.scala-lang#scala-compiler;2.13.17!scala-compiler.jar ($DURATION)
           [info] downloading https://repo1.maven.org/maven2/io/github/java-diff-utils/java-diff-utils/4.16/java-diff-utils-4.16.jar ...
@@ -803,13 +803,6 @@ describe 'Scala buildpack' do
           [info] downloading https://repo1.maven.org/maven2/org/jline/jline/3.29.0/jline-3.29.0-jdk8.jar ...
           [info] 	[SUCCESSFUL ] org.jline#jline;3.29.0!jline.jar ($DURATION)
           [info] Done updating.
-          [warn] Found version conflict(s) in library dependencies; some are suspected to be binary incompatible:
-          [warn]
-          [warn] 	* org.bouncycastle:bcprov-jdk18on:1.80 is selected over [1.80,1.81)
-          [warn] 	    +- org.bouncycastle:bcutil-jdk18on:1.80               (depends on [1.80,1.81))
-          [warn] 	    +- io.netty:netty-pkitesting:4.2.6.Final              (depends on [1.80,1.81))
-          [warn]
-          [warn] Run 'evicted' to see detailed eviction warnings
           [info] This is sbt 0.13.18
           [info] The current project is {file:/app/}app 0.1-SNAPSHOT
           [info] The current project is built against Scala 2.13.17
@@ -1005,13 +998,6 @@ describe 'Scala buildpack' do
           [info] Resolving io.github.java-diff-utils#java-diff-utils;4.16 ...
           [info] Resolving org.jline#jline;3.29.0 ...
           [info] Done updating.
-          [warn] Found version conflict(s) in library dependencies; some are suspected to be binary incompatible:
-          [warn]
-          [warn] 	* org.bouncycastle:bcprov-jdk18on:1.80 is selected over [1.80,1.81)
-          [warn] 	    +- org.bouncycastle:bcutil-jdk18on:1.80               (depends on [1.80,1.81))
-          [warn] 	    +- io.netty:netty-pkitesting:4.2.6.Final              (depends on [1.80,1.81))
-          [warn]
-          [warn] Run 'evicted' to see detailed eviction warnings
           [info] This is sbt 0.13.18
           [info] The current project is {file:/app/}app 0.1-SNAPSHOT
           [info] The current project is built against Scala 2.13.17
