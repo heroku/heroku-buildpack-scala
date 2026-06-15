@@ -141,25 +141,6 @@ case "${sbt_version}" in
 	metrics::set_string "failure_reason" "unsupported_sbt_0x_version"
 	exit 1
 	;;
-2.*)
-	output::error <<-EOF
-		Error: Unsupported sbt version detected.
-
-		This buildpack does not currently support sbt 2.x. You are using sbt ${sbt_version}.
-
-		Support for sbt 2.x will be added in a future buildpack release. In the
-		meantime, please use the latest stable sbt 1.x version for your deployments.
-
-		To continue, update project/build.properties to use sbt 1.x.
-
-		For more information:
-		- Latest sbt 1.x releases: https://github.com/sbt/sbt/releases
-		- sbt 2.x changes: https://www.scala-sbt.org/2.x/docs/en/changes/sbt-2.0-change-summary.html
-	EOF
-
-	metrics::set_string "failure_reason" "unsupported_sbt_2x_version"
-	exit 1
-	;;
 esac
 
 # Copy the target dir from cache to speed up compilation. This is legacy buildpack
@@ -225,8 +206,11 @@ case "${sbt_version}" in
 0.*)
 	plugin_source_path="${BUILDPACK_DIR}/opt/sbt-plugin/sbt-0.x/HerokuBuildpackPlugin.scala"
 	;;
-*)
+1.*)
 	plugin_source_path="${BUILDPACK_DIR}/opt/sbt-plugin/sbt-1.x/HerokuBuildpackPlugin.scala"
+	;;
+2.*)
+	plugin_source_path="${BUILDPACK_DIR}/opt/sbt-plugin/sbt-2.x/HerokuBuildpackPlugin.scala"
 	;;
 esac
 

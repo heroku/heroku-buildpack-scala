@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Add `sbt` `2.x` support. ([#331](https://github.com/heroku/heroku-buildpack-scala/pull/331))
 
 ## [v106] - 2026-02-24
 

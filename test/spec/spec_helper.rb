@@ -102,6 +102,8 @@ def clean_output(output)
     # Various timing output from sbt
     /\d+ms/ => '$DURATION',
     /Total time: .*?,/ => 'Total time: $DURATION,',
+    # sbt 2.x success line timing (e.g. "[success] elapsed time: 4 s, ...")
+    /elapsed time: \d+ s/ => 'elapsed time: $DURATION',
     /Compilation completed in (.*?)$/ => 'Compilation completed in $DURATION.', # sbt 0.x
     /Compilation completed in (.*?)\.$/ => 'Compilation completed in $DURATION.', # sbt 1.x
   }

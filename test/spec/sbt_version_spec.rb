@@ -68,28 +68,6 @@ describe 'Sbt version warnings' do
     end
   end
 
-  it 'shows error for sbt 2.x versions' do
-    new_default_hatchet_runner('sbt-2.0.0-RC6-minimal-with-native-packager', allow_failure: true).tap do |app|
-      app.deploy do
-        expect(app).not_to be_deployed
-        expect(clean_output(app.output)).to include(<<~OUTPUT)
-          remote:  !     Error: Unsupported sbt version detected.
-          remote:  !
-          remote:  !     This buildpack does not currently support sbt 2.x. You are using sbt 2.0.0-RC6.
-          remote:  !
-          remote:  !     Support for sbt 2.x will be added in a future buildpack release. In the
-          remote:  !     meantime, please use the latest stable sbt 1.x version for your deployments.
-          remote:  !
-          remote:  !     To continue, update project/build.properties to use sbt 1.x.
-          remote:  !
-          remote:  !     For more information:
-          remote:  !     - Latest sbt 1.x releases: https://github.com/sbt/sbt/releases
-          remote:  !     - sbt 2.x changes: https://www.scala-sbt.org/2.x/docs/en/changes/sbt-2.0-change-summary.html
-        OUTPUT
-      end
-    end
-  end
-
   it 'shows error when sbt version cannot be determined' do
     new_default_hatchet_runner('sbt-1.11.7-minimal-with-native-packager', allow_failure: true).tap do |app|
       app.before_deploy do
@@ -112,6 +90,68 @@ describe 'Sbt version warnings' do
           remote:  !
           remote:  !     For more information, see:
           remote:  !     https://www.scala-sbt.org/1.x/docs/Basic-Def.html#Specifying+the+sbt+version
+        OUTPUT
+      end
+    end
+  end
+
+  it 'successfully builds an sbt 2.x app' do
+    new_default_hatchet_runner('sbt-2.0.0-minimal-with-native-packager').tap do |app|
+      app.deploy do
+        expect(clean_output(app.output)).to eq(<<~OUTPUT)
+          remote: -----> Scala app detected
+          remote: -----> Installing Azul Zulu OpenJDK $VERSION
+          remote: -----> Downloading sbt launcher 2.0.0...
+          remote: -----> Setting up sbt launcher...
+          remote: -----> Running: sbt compile stage
+          remote:        [info] [launcher] getting org.scala-sbt sbt 2.0.0  (this may take some time)...
+          remote:        [info] [launcher] getting Scala 3.8.4 (for sbt)...
+          remote:        [info] welcome to sbt 2.0.0 (Azul Systems, Inc. Java $VERSION)
+          remote:        [info] loading global plugins from /tmp/codon/tmp/cache/sbt_global/plugins
+          remote:        [info] compiling 1 Scala source to $BUILD_DIR/target/out/jvm/scala-3.8.4/global-plugins/classes ...
+          remote:        [info] done compiling
+          remote:        [info] loading project definition from $BUILD_DIR/project
+          remote:        [info] set current project to sbt-2.0.0-minimal-with-native-packager (in build file:$BUILD_DIR/)
+          remote:        [warn] there are 10 keys that are not used by any other settings/tasks:
+          remote:        [warn]#{'  '}
+          remote:        [warn] * $BUILD_ID / Debian / executableScriptName
+          remote:        [warn]   +- Debian / executableScriptName := (Linux / executableScriptName).value:89
+          remote:        [warn] * $BUILD_ID / Debian / sourceDirectory
+          remote:        [warn]   +- Debian / sourceDirectory := sourceDirectory.value:101
+          remote:        [warn] * $BUILD_ID / Rpm / daemonStdoutLogFile
+          remote:        [warn]   +- Rpm / daemonStdoutLogFile := Some(rpmDaemonLogFile.value):107
+          remote:        [warn] * $BUILD_ID / Rpm / executableScriptName
+          remote:        [warn]   +- Rpm / executableScriptName := (Linux / executableScriptName).value:105
+          remote:        [warn] * $BUILD_ID / Rpm / name
+          remote:        [warn]   +- Rpm / name := (Linux / name).value:103
+          remote:        [warn] * $BUILD_ID / Rpm / sourceDirectory
+          remote:        [warn]   +- Rpm / sourceDirectory := sourceDirectory.value:119
+          remote:        [warn] * $BUILD_ID / Universal / executableScriptName
+          remote:        [warn]   +- Universal / executableScriptName := executableScriptName.value:73
+          remote:        [warn] * $BUILD_ID / Universal-docs / name
+          remote:        [warn]   +- UniversalDocs / name := (Universal / name).value:69
+          remote:        [warn] * $BUILD_ID / Universal-src / name
+          remote:        [warn]   +- UniversalSrc / name := (Universal / name).value:70
+          remote:        [warn] * $BUILD_ID / rpmScriptletsDirectory
+          remote:        [warn]   +- rpmScriptsDirectory := sourceDirectory.value / "rpm" / Names.Scriptlets:97
+          remote:        [warn]#{'  '}
+          remote:        [warn] note: a setting might still be used by a command; to exclude a key from this `lintUnused` check
+          remote:        [warn] either append it to `Global / excludeLintKeys` or call .withRank(KeyRanks.Invisible) on the key
+          remote:        [info] Executing in batch mode. For better performance use sbt's shell
+          remote:        [info] compiling 1 Scala source to $BUILD_DIR/target/out/jvm/scala-2.13.17/sbt-2-0-0-minimal-with-native-packager/classes ...
+          remote:        [info] done compiling
+          remote:        [success] elapsed time: $DURATION, cache 25%, 3 disk cache hits, 9 onsite tasks
+          remote:        [info] Wrote $BUILD_DIR/target/out/jvm/scala-2.13.17/sbt-2-0-0-minimal-with-native-packager/sbt-2-0-0-minimal-with-native-packager_2.13-0.1.0-SNAPSHOT.pom
+          remote:        [success] elapsed time: $DURATION, cache 42%, 12 disk cache hits, 16 onsite tasks
+          remote: -----> Collecting sbt plugin information
+          remote: -----> Collecting dependency information
+          remote: -----> Copying sbt and dependencies into slug for runtime use
+          remote: -----> Dropping compilation artifacts from the slug
+          remote: -----> Discovering process types
+          remote:        Procfile declares types -> (none)
+
+          remote: -----> Compressing...
+          remote:        Done: 108.8M
         OUTPUT
       end
     end
