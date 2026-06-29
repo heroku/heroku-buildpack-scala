@@ -96,22 +96,22 @@ describe 'Sbt version warnings' do
   end
 
   it 'successfully builds an sbt 2.x app' do
-    new_default_hatchet_runner('sbt-2.0.0-minimal-with-native-packager').tap do |app|
+    new_default_hatchet_runner('sbt-2.0.1-minimal-with-native-packager').tap do |app|
       app.deploy do
         expect(clean_output(app.output)).to eq(<<~OUTPUT)
           remote: -----> Scala app detected
           remote: -----> Installing Azul Zulu OpenJDK $VERSION
-          remote: -----> Downloading sbt launcher 2.0.0...
+          remote: -----> Downloading sbt launcher 2.0.1...
           remote: -----> Setting up sbt launcher...
           remote: -----> Running: sbt compile stage
-          remote:        [info] [launcher] getting org.scala-sbt sbt 2.0.0  (this may take some time)...
+          remote:        [info] [launcher] getting org.scala-sbt sbt 2.0.1  (this may take some time)...
           remote:        [info] [launcher] getting Scala 3.8.4 (for sbt)...
-          remote:        [info] welcome to sbt 2.0.0 (Azul Systems, Inc. Java $VERSION)
+          remote:        [info] welcome to sbt 2.0.1 (Azul Systems, Inc. Java $VERSION)
           remote:        [info] loading global plugins from /tmp/codon/tmp/cache/sbt_global/plugins
           remote:        [info] compiling 1 Scala source to $BUILD_DIR/target/out/jvm/scala-3.8.4/global-plugins/classes ...
           remote:        [info] done compiling
           remote:        [info] loading project definition from $BUILD_DIR/project
-          remote:        [info] set current project to sbt-2.0.0-minimal-with-native-packager (in build file:$BUILD_DIR/)
+          remote:        [info] set current project to sbt-2.0.1-minimal-with-native-packager (in build file:$BUILD_DIR/)
           remote:        [warn] there are 10 keys that are not used by any other settings/tasks:
           remote:        [warn]#{'  '}
           remote:        [warn] * $BUILD_ID / Debian / executableScriptName
@@ -137,12 +137,11 @@ describe 'Sbt version warnings' do
           remote:        [warn]#{'  '}
           remote:        [warn] note: a setting might still be used by a command; to exclude a key from this `lintUnused` check
           remote:        [warn] either append it to `Global / excludeLintKeys` or call .withRank(KeyRanks.Invisible) on the key
-          remote:        [info] Executing in batch mode. For better performance use sbt's shell
-          remote:        [info] compiling 1 Scala source to $BUILD_DIR/target/out/jvm/scala-2.13.17/sbt-2-0-0-minimal-with-native-packager/classes ...
+          remote:        [info] compiling 1 Scala source to $BUILD_DIR/target/out/jvm/scala-2.13.17/sbt-2-0-1-minimal-with-native-packager/classes ...
           remote:        [info] done compiling
           remote:        [success] elapsed time: $DURATION, cache 25%, 3 disk cache hits, 9 onsite tasks
-          remote:        [info] Wrote $BUILD_DIR/target/out/jvm/scala-2.13.17/sbt-2-0-0-minimal-with-native-packager/sbt-2-0-0-minimal-with-native-packager_2.13-0.1.0-SNAPSHOT.pom
-          remote:        [success] elapsed time: $DURATION, cache 42%, 12 disk cache hits, 16 onsite tasks
+          remote:        [info] Wrote $BUILD_DIR/target/out/jvm/scala-2.13.17/sbt-2-0-1-minimal-with-native-packager/sbt-2-0-1-minimal-with-native-packager_2.13-0.1.0-SNAPSHOT.pom
+          remote:        [success] elapsed time: $DURATION, cache 66%, 12 disk cache hits, 6 onsite tasks
           remote: -----> Collecting sbt plugin information
           remote: -----> Collecting dependency information
           remote: -----> Copying sbt and dependencies into slug for runtime use
@@ -151,7 +150,7 @@ describe 'Sbt version warnings' do
           remote:        Procfile declares types -> (none)
 
           remote: -----> Compressing...
-          remote:        Done: 108.8M
+          remote:        Done: 106.8M
         OUTPUT
       end
     end

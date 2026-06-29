@@ -1,4 +1,4 @@
-name := "sbt-2.0.0-minimal-with-native-packager"
+name := "sbt-2.0.1-minimal-with-native-packager"
 
 scalaVersion := "2.13.17"
 
