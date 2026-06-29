@@ -141,7 +141,7 @@ case "${sbt_version}" in
 	metrics::set_string "failure_reason" "unsupported_sbt_0x_version"
 	exit 1
 	;;
-2.0.0)
+2.0.0 | 2.0.0-*)
 	output::error <<-EOF
 		Error: Unsupported sbt version detected.
 
