@@ -141,6 +141,22 @@ case "${sbt_version}" in
 	metrics::set_string "failure_reason" "unsupported_sbt_0x_version"
 	exit 1
 	;;
+2.0.0)
+	output::error <<-EOF
+		Error: Unsupported sbt version detected.
+
+		This buildpack does not support sbt 2.0.0. Due to a bug in this version,
+		global plugins are not executed, which are required by this buildpack.
+		The bug was fixed in sbt 2.0.1.
+
+		To continue, update project/build.properties to use at least sbt 2.0.1:
+
+		    sbt.version=2.0.1
+	EOF
+
+	metrics::set_string "failure_reason" "unsupported_sbt_2x_version"
+	exit 1
+	;;
 esac
 
 # Copy the target dir from cache to speed up compilation. This is legacy buildpack
