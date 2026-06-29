@@ -114,6 +114,19 @@ describe 'Sbt version warnings' do
     end
   end
 
+  it 'shows error for unsupported sbt versions' do
+    new_default_hatchet_runner('sbt-unsupported-version', allow_failure: true).tap do |app|
+      app.deploy do
+        expect(app).not_to be_deployed
+        expect(clean_output(app.output)).to include(<<~OUTPUT)
+          remote:  !     Error: Unsupported sbt version detected.
+          remote:  !
+          remote:  !     This buildpack does not support sbt 99.99.99.
+        OUTPUT
+      end
+    end
+  end
+
   it 'successfully builds an sbt 2.x app' do
     new_default_hatchet_runner('sbt-2.0.1-minimal-with-native-packager').tap do |app|
       app.deploy do

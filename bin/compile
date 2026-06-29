@@ -157,6 +157,18 @@ case "${sbt_version}" in
 	metrics::set_string "failure_reason" "unsupported_sbt_2x_version"
 	exit 1
 	;;
+# Supported sbt versions, no action needed.
+1.* | 2.*) ;;
+*)
+	output::error <<-EOF
+		Error: Unsupported sbt version detected.
+
+		This buildpack does not support sbt ${sbt_version}.
+	EOF
+
+	metrics::set_string "failure_reason" "unsupported_sbt_version"
+	exit 1
+	;;
 esac
 
 # Copy the target dir from cache to speed up compilation. This is legacy buildpack
