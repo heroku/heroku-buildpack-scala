@@ -4,7 +4,6 @@
 
 * Add `sbt` `2.x` support. ([#331](https://github.com/heroku/heroku-buildpack-scala/pull/331))
 * Fix the `sbt` launcher download error reporting to actually trigger on download failures. ([#332](https://github.com/heroku/heroku-buildpack-scala/pull/332))
-* Improve reliability of the sbt launcher SHA-1 checksum download. ([#329](https://github.com/heroku/heroku-buildpack-scala/pull/329))
 
 ## [v106] - 2026-02-24
 
