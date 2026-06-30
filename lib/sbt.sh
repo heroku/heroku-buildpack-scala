@@ -41,7 +41,7 @@ function sbt::download_sbt_launcher_jar() {
 		sbt_launcher_jar_url="https://repo.maven.apache.org/maven2/org/scala-sbt/sbt-launch/${sbt_version}/sbt-launch-${sbt_version}.jar"
 	fi
 
-	local http_status_code
+	local http_status_code curl_exit_code=0
 	http_status_code=$(curl \
 		--retry 3 \
 		--retry-connrefused \
@@ -52,9 +52,7 @@ function sbt::download_sbt_launcher_jar() {
 		--location \
 		--write-out "%{http_code}" \
 		--output "${destination_path}" \
-		"${sbt_launcher_jar_url}")
-
-	local curl_exit_code=$?
+		"${sbt_launcher_jar_url}") || curl_exit_code=$?
 
 	if [[ "${http_status_code}" == "404" ]]; then
 		output::error <<-EOF
@@ -101,9 +99,32 @@ function sbt::download_sbt_launcher_jar() {
 	local sha1_path
 	sha1_path=$(mktemp)
 
-	if ! curl --silent --show-error --location "${sbt_launcher_jar_url}.sha1" >"${sha1_path}" 2>/dev/null; then
+	local sha1_http_status_code sha1_curl_exit_code=0
+	sha1_http_status_code=$(curl \
+		--retry 3 \
+		--retry-connrefused \
+		--connect-timeout 5 \
+		--silent \
+		--show-error \
+		--max-time 60 \
+		--location \
+		--write-out "%{http_code}" \
+		--output "${sha1_path}" \
+		"${sbt_launcher_jar_url}.sha1") || sha1_curl_exit_code=$?
+
+	if [[ "${sha1_curl_exit_code}" -ne 0 || "${sha1_http_status_code}" != "200" ]]; then
 		output::error <<-EOF
 			Error: Unable to download SHA-1 checksum for sbt launcher.
+
+			An error occurred while downloading the SHA-1 checksum from:
+			${sbt_launcher_jar_url}.sha1
+
+			In some cases, this happens due to a temporary issue with
+			the network connection or server.
+
+			Try building again to see if the error resolves itself.
+
+			HTTP status code: ${sha1_http_status_code}, curl exit code: ${sha1_curl_exit_code}
 		EOF
 
 		metrics::set_string "failure_reason" "install_sbt::checksum_unavailable"
