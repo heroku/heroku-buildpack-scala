@@ -185,6 +185,9 @@ describe 'Sbt version warnings' do
           remote: -----> Compressing...
           remote:        Done: 106.8M
         OUTPUT
+
+        response = http_get(app)
+        expect(response).to eq('Hello from Scala!')
       end
     end
   end
