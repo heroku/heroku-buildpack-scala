@@ -41,7 +41,7 @@ function sbt::download_sbt_launcher_jar() {
 		sbt_launcher_jar_url="https://repo.maven.apache.org/maven2/org/scala-sbt/sbt-launch/${sbt_version}/sbt-launch-${sbt_version}.jar"
 	fi
 
-	local http_status_code
+	local http_status_code curl_exit_code=0
 	http_status_code=$(curl \
 		--retry 3 \
 		--retry-connrefused \
@@ -52,9 +52,7 @@ function sbt::download_sbt_launcher_jar() {
 		--location \
 		--write-out "%{http_code}" \
 		--output "${destination_path}" \
-		"${sbt_launcher_jar_url}")
-
-	local curl_exit_code=$?
+		"${sbt_launcher_jar_url}") || curl_exit_code=$?
 
 	if [[ "${http_status_code}" == "404" ]]; then
 		output::error <<-EOF
