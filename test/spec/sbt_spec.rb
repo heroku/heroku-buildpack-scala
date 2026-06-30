@@ -3,6 +3,15 @@
 require_relative 'spec_helper'
 
 describe 'Sbt' do
+  it 'serves traffic via the auto-detected web process' do
+    new_default_hatchet_runner('sbt-1.11.7-minimal-with-native-packager').tap do |app|
+      app.deploy do
+        response = http_get(app)
+        expect(response).to eq('Hello from Scala!')
+      end
+    end
+  end
+
   it 'runs sbt-clean' do
     new_default_hatchet_runner('sbt-1.11.7-minimal-with-native-packager').tap do |app|
       app.before_deploy do

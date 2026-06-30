@@ -52,6 +52,19 @@ describe 'Sbt multi-project builds' do
     end
   end
 
+  it 'builds an sbt 2.x multi-project app and serves traffic via the auto-detected web process' do
+    new_default_hatchet_runner('sbt-2.0.1-minimal-multi-project-with-native-packager').tap do |app|
+      app.before_deploy do
+        app.set_config('SBT_PROJECT' => 'subproject')
+      end
+
+      app.deploy do
+        response = http_get(app)
+        expect(response).to eq('Hello from Scala multi-project!')
+      end
+    end
+  end
+
   it 'applies project prefix to custom tasks when SBT_PROJECT and SBT_TASKS are both set' do
     new_default_hatchet_runner('sbt-1.11.7-minimal-multi-project-with-native-packager').tap do |app|
       app.before_deploy do
