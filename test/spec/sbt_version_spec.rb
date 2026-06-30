@@ -179,7 +179,8 @@ describe 'Sbt version warnings' do
           remote: -----> Copying sbt and dependencies into slug for runtime use
           remote: -----> Dropping compilation artifacts from the slug
           remote: -----> Discovering process types
-          remote:        Procfile declares types -> (none)
+          remote:        Procfile declares types     -> (none)
+          remote:        Default types for buildpack -> web
 
           remote: -----> Compressing...
           remote:        Done: 106.8M
