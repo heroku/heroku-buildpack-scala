@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+
+## [v107] - 2026-07-14
+
 * Add `sbt` `2.x` support. ([#331](https://github.com/heroku/heroku-buildpack-scala/pull/331))
 * Fix the `sbt` launcher download error reporting to actually trigger on download failures. ([#332](https://github.com/heroku/heroku-buildpack-scala/pull/332))
 * Improve reliability of the sbt launcher SHA-1 checksum download. ([#329](https://github.com/heroku/heroku-buildpack-scala/pull/329))
@@ -194,7 +197,8 @@
 * Upgrade to `sbt` `0.13.7` launcher.
 * Allow for customized jvm-common package.
 
-[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v106...main
+[unreleased]: https://github.com/heroku/heroku-buildpack-scala/compare/v107...main
+[v107]: https://github.com/heroku/heroku-buildpack-scala/compare/v106...v107
 [v106]: https://github.com/heroku/heroku-buildpack-scala/compare/v105...v106
 [v105]: https://github.com/heroku/heroku-buildpack-scala/compare/v104...v105
 [v104]: https://github.com/heroku/heroku-buildpack-scala/compare/v103...v104
