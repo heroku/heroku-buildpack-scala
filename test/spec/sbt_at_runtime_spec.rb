@@ -8,7 +8,7 @@ describe 'Scala buildpack' do
       app.deploy do
         sbt_about_output = app.run('sbt about', heroku: { size: 'standard-2x' })
                               .gsub(/\w+ \d+, \d+ \d+:\d+:\d+ [AP]M/, '$TIMESTAMP')
-                              .gsub(/Java \d+\.\d+\.\d+(_\d+)?/, 'Java $VERSION')
+                              .gsub(/Java \d+\.\d+\.\d+(?:[._]\d+)?/, 'Java $VERSION')
 
         expect(sbt_about_output).to eq(<<~OUTPUT)
           [info] [launcher] getting org.scala-sbt sbt 1.11.7  (this may take some time)...
@@ -77,7 +77,7 @@ describe 'Scala buildpack' do
         sbt_about_output = app.run('sbt about', heroku: { size: 'standard-2x' })
                               .gsub(/\w+ \d+, \d+ \d+:\d+:\d+ [AP]M/, '$TIMESTAMP')
                               .gsub(/\[warn\] In the last .+ were spent in GC\..+\n/, '')
-                              .gsub(/Java \d+\.\d+\.\d+(_\d+)?/, 'Java $VERSION')
+                              .gsub(/Java \d+\.\d+\.\d+(?:[._]\d+)?/, 'Java $VERSION')
 
         expect(sbt_about_output).to eq(<<~OUTPUT)
           $TIMESTAMP org.jline.utils.Log logr
