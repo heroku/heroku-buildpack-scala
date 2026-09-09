@@ -16,7 +16,7 @@ RSpec.configure do |config|
   config.default_retry_count = 2 if ENV['CI']
 end
 
-def new_default_hatchet_runner(*args, **kwargs)
+def new_default_hatchet_runner(*, **kwargs)
   kwargs[:stack] ||= ENV.fetch('DEFAULT_APP_STACK', nil)
   kwargs[:config] ||= {}
 
@@ -27,7 +27,7 @@ def new_default_hatchet_runner(*args, **kwargs)
     end
   end
 
-  Hatchet::Runner.new(*args, **kwargs)
+  Hatchet::Runner.new(*, **kwargs)
 end
 
 def write_to_procfile(content)
