@@ -65,7 +65,7 @@ describe 'Sbt' do
           remote:        Default types for buildpack -> web
 
           remote: -----> Compressing...
-          remote:        Done: 106.2M
+          remote:        Done: 106.3M
         OUTPUT
       end
     end

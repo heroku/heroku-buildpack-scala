@@ -50,7 +50,7 @@ describe 'Scala buildpack' do
           remote:        Default types for buildpack -> web
 
           remote: -----> Compressing...
-          remote:        Done: 113.7M
+          remote:        Done: 113.9M
         OUTPUT
 
         app.commit!
@@ -91,7 +91,7 @@ describe 'Scala buildpack' do
           remote:        Default types for buildpack -> web
 
           remote: -----> Compressing...
-          remote:        Done: 113.7M
+          remote:        Done: 113.8M
         OUTPUT
       end
     end

@@ -183,7 +183,7 @@ describe 'Sbt version warnings' do
           remote:        Default types for buildpack -> web
 
           remote: -----> Compressing...
-          remote:        Done: 106.3M
+          remote:        Done: 106.5M
         OUTPUT
 
         response = http_get(app)
