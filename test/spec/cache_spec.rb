@@ -91,7 +91,7 @@ describe 'Scala buildpack' do
           remote:        Default types for buildpack -> web
 
           remote: -----> Compressing...
-          remote:        Done: 113.9M
+          remote:        Done: 113.8M
         OUTPUT
       end
     end
