@@ -38,7 +38,7 @@ function sbt::download_sbt_launcher_jar() {
 	if [[ "${sbt_version}" == 0.* ]]; then
 		sbt_launcher_jar_url="https://repo.typesafe.com/typesafe/ivy-releases/org.scala-sbt/sbt-launch/${sbt_version}/sbt-launch.jar"
 	else
-		sbt_launcher_jar_url="https://repo.maven.apache.org/maven2/org/scala-sbt/sbt-launch/${sbt_version}/sbt-launch-${sbt_version}.jar"
+		sbt_launcher_jar_url="https://heroku-buildpacks-jvm.s3.dualstack.us-east-1.amazonaws.com/maven-central/org/scala-sbt/sbt-launch/${sbt_version}/sbt-launch-${sbt_version}.jar"
 	fi
 
 	local http_status_code curl_exit_code=0
@@ -54,7 +54,8 @@ function sbt::download_sbt_launcher_jar() {
 		--output "${destination_path}" \
 		"${sbt_launcher_jar_url}") || curl_exit_code=$?
 
-	if [[ "${http_status_code}" == "404" ]]; then
+	# S3 responds with 403 instead of 404 for missing objects since the bucket doesn't allow public listing.
+	if [[ "${http_status_code}" == "404" || "${http_status_code}" == "403" ]]; then
 		output::error <<-EOF
 			Error: The requested sbt launcher version isn't available.
 

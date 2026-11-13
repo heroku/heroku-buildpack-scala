@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Download the `sbt` launcher from a Heroku-hosted mirror of Maven Central. ([#352](https://github.com/heroku/heroku-buildpack-scala/pull/352))
 
 ## [v107] - 2026-07-14
 
