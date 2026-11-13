@@ -16,7 +16,8 @@ RSpec.describe 'Scala buildpack' do
     end
   end
 
-  it 'resolves Maven Central artifacts from Maven Central when MAVEN_CENTRAL_MIRROR is false' do
+  it 'resolves Maven Central artifacts from Maven Central when MAVEN_CENTRAL_MIRROR is false',
+     skip: 'Maven Central rate limits CI' do
     new_default_hatchet_runner('sbt-1.11.7-minimal-no-native-packager',
                                config: { MAVEN_CENTRAL_MIRROR: 'false' }).tap do |app|
       app.deploy do
