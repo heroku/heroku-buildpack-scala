@@ -2,6 +2,7 @@
 
 ## [Unreleased]
 
+* Resolve Maven Central artifacts from the Google Maven Central mirror to avoid Maven Central rate limiting. Set `MAVEN_CENTRAL_MIRROR` to `false` to opt out. ([#354](https://github.com/heroku/heroku-buildpack-scala/pull/354))
 
 ## [v108] - 2026-11-13
 

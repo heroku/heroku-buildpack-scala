@@ -258,6 +258,14 @@ fi
 sbt::install_sbt_launcher "${sbt_version}" "${CACHE_DIR}/sbt-launcher"
 export PATH="${CACHE_DIR}/sbt-launcher/bin:${PATH}"
 
+central_mirror_properties_path=$(mktemp)
+if sbt::write_central_mirror_properties "${central_mirror_properties_path}"; then
+	metrics::set_raw "maven_central_mirror" "true"
+	export COURSIER_MIRRORS="${central_mirror_properties_path}"
+else
+	metrics::set_raw "maven_central_mirror" "false"
+fi
+
 cd "${BUILD_DIR}"
 
 output::step "Running: sbt ${SBT_TASKS}"
