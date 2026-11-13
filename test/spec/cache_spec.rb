@@ -97,7 +97,8 @@ describe 'Scala buildpack' do
     end
   end
 
-  it 'caches compiled artifacts between builds with sbt 0.13.x' do
+  it 'caches compiled artifacts between builds with sbt 0.13.x',
+     skip: 'sbt 0.13 resolves dependencies from Maven Central, which rate limits CI' do
     new_default_hatchet_runner('sbt-0.13.18-minimal-with-native-packager').tap do |app|
       app.before_deploy do
         # Override sbt-extra's default for OpenJDK >9 and <17 to use JVMCI. Enabling JVMCI causes non-fatal
