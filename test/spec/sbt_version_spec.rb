@@ -3,7 +3,8 @@
 require_relative 'spec_helper'
 
 describe 'Sbt version warnings' do
-  it 'shows warning for sbt 0.13.18' do
+  it 'shows warning for sbt 0.13.18',
+     skip: 'sbt 0.13 resolves dependencies from Maven Central, which rate limits CI' do
     new_default_hatchet_runner('sbt-0.13.18-minimal-with-native-packager').tap do |app|
       app.deploy do
         expect(clean_output(app.output)).to include(<<~OUTPUT)

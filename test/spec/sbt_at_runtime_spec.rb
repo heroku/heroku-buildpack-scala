@@ -109,7 +109,8 @@ describe 'Scala buildpack' do
     end
   end
 
-  it 'makes sbt 0.x available at runtime' do
+  it 'makes sbt 0.x available at runtime',
+     skip: 'sbt 0.13 resolves dependencies from Maven Central, which rate limits CI' do
     new_default_hatchet_runner('sbt-0.13.18-minimal-with-native-packager').tap do |app|
       app.before_deploy do
         # Override sbt-extra's default for OpenJDK >9 and <17 to use JVMCI. Enabling JVMCI causes non-fatal
@@ -813,7 +814,8 @@ describe 'Scala buildpack' do
     end
   end
 
-  it 'makes sbt 0.x available at runtime without native packager' do
+  it 'makes sbt 0.x available at runtime without native packager',
+     skip: 'sbt 0.13 resolves dependencies from Maven Central, which rate limits CI' do
     new_default_hatchet_runner('sbt-0.13.18-minimal-no-native-packager').tap do |app|
       app.before_deploy do
         # Override sbt-extra's default for OpenJDK >9 and <17 to use JVMCI. Enabling JVMCI causes non-fatal

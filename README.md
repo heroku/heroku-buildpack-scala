@@ -56,6 +56,7 @@ Configure the buildpack by setting environment variables:
 | `SBT_PROJECT` | For multi-project builds, specifies which project to build | (none) |
 | `SBT_AT_RUNTIME` | Make sbt available at runtime | `true` |
 | `KEEP_SBT_CACHE` | Prevent removal of compilation artifacts from slug | `false` |
+| `MAVEN_CENTRAL_MIRROR` | Set to `false` to resolve Maven Central artifacts from Maven Central instead of the Google Maven Central mirror. The buildpack doesn't configure the Google mirror if you set `COURSIER_MIRRORS`. | `true` |
 
 ## Documentation
 

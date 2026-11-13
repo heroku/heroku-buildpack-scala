@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+BUILDPACK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
+
 set -euo pipefail
+
+# shellcheck source=lib/sbt.sh
+source "${BUILDPACK_DIR}/lib/sbt.sh"
+
+central_mirror_properties_path=$(mktemp)
+if sbt::write_central_mirror_properties "${central_mirror_properties_path}"; then
+	export COURSIER_MIRRORS="${central_mirror_properties_path}"
+fi
 
 cd "${1}" && sbt test

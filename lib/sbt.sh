@@ -239,3 +239,31 @@ function sbt::output_build_error_message() {
 
 	metrics::set_string "failure_reason" "sbt_build::unknown"
 }
+
+# Writes a coursier mirror configuration file that points Maven Central at the Google Maven Central mirror.
+# Returns 1 without writing anything if MAVEN_CENTRAL_MIRROR is `false` or the user configured their own
+# coursier mirrors via COURSIER_MIRRORS.
+#
+# This is a temporary workaround for rate limiting by Maven Central.
+#
+# Usage:
+# ```
+# if sbt::write_central_mirror_properties "/tmp/mirror.properties"; then
+#     export COURSIER_MIRRORS="/tmp/mirror.properties"
+# fi
+# ```
+function sbt::write_central_mirror_properties() {
+	local properties_path="${1}"
+
+	if [[ "${MAVEN_CENTRAL_MIRROR:-}" == "false" || -n "${COURSIER_MIRRORS:-}" ]]; then
+		return 1
+	fi
+
+	# sbt uses coursier for both the launcher and dependency resolution, which applies these mirrors to all
+	# matching repositories, including the ones in the project's meta-build. sbt's default Maven Central
+	# repository uses `repo1.maven.org`, but builds can declare `repo.maven.apache.org` explicitly.
+	cat >"${properties_path}" <<-EOF
+		central.from=https://repo1.maven.org/maven2;https://repo.maven.apache.org/maven2
+		central.to=https://maven-central.storage-download.googleapis.com/maven2
+	EOF
+}
