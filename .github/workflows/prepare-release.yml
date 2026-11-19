@@ -8,7 +8,7 @@ permissions: {}
 
 jobs:
   prepare-release:
-    uses: heroku/languages-github-actions/.github/workflows/_classic-buildpack-prepare-release.yml@923af913b844b3f24ec5bda007a701f6ec38a2a3 # v2.0.0
+    uses: heroku/languages-github-actions/.github/workflows/_classic-buildpack-prepare-release.yml@latest
     with:
       app_id: ${{ vars.LINGUIST_GH_APP_ID }}
     secrets:
